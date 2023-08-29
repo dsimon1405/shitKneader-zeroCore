@@ -1,0 +1,3 @@
+#pragma once
+
+#define ZC_ERROR_LOGGER_TYPE "${ZC_ERROR_LOGGER_TYPE}"

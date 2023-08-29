@@ -1,0 +1,3 @@
+[submodule "zeroCore/external/sdl3"]
+	path = zeroCore/external/sdl3
+	url = https://github.com/libsdl-org/SDL.git
