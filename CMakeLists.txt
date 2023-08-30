@@ -13,21 +13,21 @@ endif()
 
 #               DOWANLOAD ALL THE SUBMODULES
 find_package(Git QUIET)
-if(GIT_GOUND AND EXISTS ".git")
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 #               UPDATE SUBMODULES AS NEDDED
-    option(GIT_SUBMODULE "Check submodules duting build" ON)
+    option(GIT_SUBMODULE "Check submodules during build" ON)
     if(GIT_SUBMODULE)
         message(STATUS "Submodule update")
-        execute_process(COMMAND ${GIT_ECECUTABLE} submodule update --init --recurcive
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        RESULT_VARIABLE GIT_SUBMODULE_RESULT)
-        if(NOT GIT_SUBMODULE_RESULT EQUAL "0")
-            message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMODULE_RESULT}")
+                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
+        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}")
         endif()
     endif()
 endif()
 #               CHECK ALL THE SUBMODULES
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zeroCore/external/sdl3/CMakeLists.txt")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/zeroCore/external/sdl3/CMakeLists.txt")
     message(FATAL_ERROR "The sdl submodule was not downloaded!")
 endif()
 

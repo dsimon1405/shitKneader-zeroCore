@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ZC/ZC_Window.h>
+#include <memory>
 
 class ZC_APIFactory
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ZC/ErrorLogger/ZC_ErroLogger.h>
+#include <ZC_string.h>
 
 class ZC_EL_None : public ZC_ErrorLogger
 {

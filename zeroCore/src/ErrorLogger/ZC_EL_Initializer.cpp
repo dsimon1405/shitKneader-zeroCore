@@ -4,7 +4,6 @@
 
 bool EL_Initializer()
 {
-    int a = 3;
     if (ZC_ERROR_LOGGER_TYPE == "console")
     {
         ZC_ErrorLogger::SetLogger(std::dynamic_pointer_cast<ZC_ErrorLogger>(std::make_shared<ZC_EL_Console>()));

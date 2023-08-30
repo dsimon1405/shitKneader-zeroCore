@@ -2,7 +2,6 @@
 
 #include <ZC/ZC_Noncopyable.h>
 #include <memory>
-#include <iostream>
 
 class ZC_Window : public ZC_Noncopyable
 {
