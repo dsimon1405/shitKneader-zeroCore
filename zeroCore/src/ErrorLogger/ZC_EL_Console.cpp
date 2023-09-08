@@ -1,5 +1,7 @@
 #include <ZC/ErrorLogger/ZC_EL_Console.h>
 
+#include <iostream>
+
 void ZC_EL_Console::LogError(const std::string& msg)
 {
     std::cout << "=> ERROR: " << msg << std::endl;

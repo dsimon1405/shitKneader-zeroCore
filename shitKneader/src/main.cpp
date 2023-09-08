@@ -1,18 +1,18 @@
-#include <ZC/SDL/ZC_API_SDL.h>
+#include <ZC_main.h>
+#include <ZC_EL.h>
 
-void GameLoop();
-
-int main(int argv, char** args)
+void ZC_main(ZC_pAPIFactory apiFactory)
 {
-    ZC_pAPIFactory api = ZC_GetAPI_SDL();
-    ZC_pWindow window = api->CreateWindowCentered(640, 480, "lolka");
+    ZC_pWindow window = apiFactory->CreateWindow("lolka", 640, 480);
+    while (true)
+    {
+        if (!window->HandleEvents())
+        {
+            return;
+        }
+        window->Clear();
 
-    window->MainLoop(GameLoop);
-
-    return 0;
-}
-
-void GameLoop()
-{
-    
+        ZC_Err("lol");
+        window->SwapBuffer();
+    }
 }
