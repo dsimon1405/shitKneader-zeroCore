@@ -20,7 +20,7 @@ ZC_API_SDL::ZC_API_SDL()
     }
 }
 
-ZC_pWindow ZC_API_SDL::CreateWindow(const char* name, const int& width, const int& height)
+ZC_pWindow ZC_API_SDL::MakeWindow(const char* name, const int& width, const int& height)
 {
     return std::dynamic_pointer_cast<ZC_Window>(std::make_shared<ZC_SDL_Window>(name, width, height));
 }

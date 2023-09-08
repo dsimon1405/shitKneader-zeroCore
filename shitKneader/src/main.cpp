@@ -3,7 +3,7 @@
 
 void ZC_main(ZC_pAPIFactory apiFactory)
 {
-    ZC_pWindow window = apiFactory->CreateWindow("lolka", 640, 480);
+    ZC_pWindow window = apiFactory->MakeWindow("lolka", 640, 480);
     while (true)
     {
         if (!window->HandleEvents())

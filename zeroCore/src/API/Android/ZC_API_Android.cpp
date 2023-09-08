@@ -6,7 +6,7 @@ ZC_API_Android::ZC_API_Android(std::shared_ptr<ZC_A_Window> win)
     : window(win)
 {}
 
-ZC_pWindow ZC_API_Android::CreateWindow(const char* name, const int& width, const int& height)
+ZC_pWindow ZC_API_Android::MakeWindow(const char* name, const int& width, const int& height)
 {
     return std::dynamic_pointer_cast<ZC_Window>(window);
 }
