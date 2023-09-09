@@ -1,6 +1,6 @@
 #pragma once
 
-//#include <ZC_Config.h>
+#include <ZC_Config.h>
 
 #ifdef ZC_EL_console
 // #ifdef ZC_API_android

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(zeroCore)
 
+message(STATUS "======================== ZeroCore ========================")
 #========================= options
 #	only one could be ON
 option(ZC_PC "ON - build for PC version" ON)
@@ -95,24 +96,68 @@ if(ZC_PC AND WIN32)
 endif()
 
 #========================= submodules
-#               DOWANLOAD ALL THE SUBMODULES
-find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-#               UPDATE SUBMODULES AS NEDDED
-    option(GIT_SUBMODULE "Check submodules during build" ON)
-    if(GIT_SUBMODULE)
-        message(STATUS "Submodule update")
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
-        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-            message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}")
-        endif()
-    endif()
+if(ZC_API_SDL)
+	set(GIT_SUBMODULES ON)
+else()
+	set(GIT_SUBMODULES OFF)
 endif()
-#               CHECK ALL THE SUBMODULES
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/sdl3/CMakeLists.txt")
-    message(FATAL_ERROR "The sdl submodule was not downloaded!")
+
+if(GIT_SUBMODULES)
+	find_package(Git QUIET)
+	if(GIT_FOUND)
+		#	git init
+		if(NOT EXISTS "${PROJECT_SOURCE_DIR}/.git")
+			message(STATUS "Init Git for submodules download")
+			execute_process(COMMAND ${GIT_EXECUTABLE} init
+		                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		                    RESULT_VARIABLE GIT_INIT_RESULT)
+		    if(NOT GIT_INIT_RESULT EQUAL "0")
+				message(FATAL_ERROR "git init => failed with: ${GIT_SUBMOD_RESULT}")
+		    endif()
+		endif()
+
+
+		#	git submodule add
+		set(SUBMODULES_UPDATE OFF)
+
+		if(ZC_API_SDL)
+			#	check adding to git submodules
+			if(NOT EXISTS "${PROJECT_SOURCE_DIR}/.git/modules/external/sdl3")
+				message(STATUS "Add submodule SDL3")
+				execute_process(COMMAND ${GIT_EXECUTABLE} submodule add https://github.com/libsdl-org/SDL.git external/sdl3
+			                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			                    RESULT_VARIABLE GIT_SUBMODULE_ADD_SDL3_RESULT)
+			    if(NOT GIT_SUBMODULE_ADD_SDL3_RESULT EQUAL "0")
+					message(FATAL_ERROR "git submodule add https://github.com/libsdl-org/SDL.git external/sdl3 => failed with: ${GIT_SUBMODULE_ADD_SDL3_RESULT}")
+			    endif()
+			endif()
+			#	existing check
+			if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/sdl3/CMakeLists.txt")
+				set(SUBMODULES_UPDATE ON)
+				message(STATUS "Submodule SDL3 needs update")
+			endif()
+		endif()
+
+
+		#	git submodule update --init
+		if(SUBMODULES_UPDATE)
+		#	submodele supdate
+		    message(STATUS "Submodules update")
+		    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+		                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		                    RESULT_VARIABLE GIT_SUBMOD_RESULT)
+		    if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+		        message(FATAL_ERROR "git submodule update --init => failed with: ${GIT_SUBMOD_RESULT}")
+		    endif()
+		endif()
+	else()
+		message(FATAL_ERROR "Could not find_package(Git QUiET)!")
+	endif()
+
+	#	total submodules check
+	if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/sdl3/CMakeLists.txt")
+	    message(FATAL_ERROR "The sdl submodule was not downloaded!")
+	endif()
 endif()
 
 #========================= external libs
@@ -151,7 +196,7 @@ else()
 	add_subdirectory(src)
 endif()
 
-message(STATUS "======================== zeroCore OPTIONS ========================")
+message(STATUS "======================== ZeroCore OPTIONS ========================")
 message(STATUS "ZC_PC: ${ZC_PC}")
 message(STATUS "ZC_ANDROID: ${ZC_ANDROID}\n")
 message(STATUS "ZC_API_SDL: ${ZC_API_SDL}")
