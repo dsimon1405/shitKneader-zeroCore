@@ -27,3 +27,6 @@ void ZC_ErrorLogger::SetLogger(ZC_pErrorLogger lgr)
 
 void ZC_ErrorLogger::LogError(const std::string& msg) {}
 void ZC_ErrorLogger::LogWarning(const std::string& msg) {}
+
+
+static bool init = ZC_ErrorLogger::Init();

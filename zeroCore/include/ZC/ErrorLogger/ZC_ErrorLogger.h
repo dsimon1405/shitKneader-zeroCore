@@ -18,7 +18,7 @@ public:
 private:
     static inline ZC_pErrorLogger logger = nullptr;
 
-    static inline bool init = Init();
+    // static inline bool init = Init();
 
     static void SetLogger(ZC_pErrorLogger lgr);
 

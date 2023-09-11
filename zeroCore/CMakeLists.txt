@@ -162,18 +162,18 @@ endif()
 
 #========================= external libs
 #	sdl3
-if(ZC_API_SDL)
-	if(ZC_EXTERNAL_STATIC)
-		set(SDL_STATIC ON)
-		set(SDL_SHARED OFF)
-	elseif(ZC_EXTERNAL_SHARED)
-		set(SDL_STATIC OFF)
-		set(SDL_SHARED ON)
-	endif()
-
-	set(SDL_TEST_LIBRARY OFF)
-	add_subdirectory(external/sdl3)
-endif()
+# if(ZC_API_SDL)
+# 	if(ZC_EXTERNAL_STATIC)
+# 		set(SDL_STATIC ON)
+# 		set(SDL_SHARED OFF)
+# 	elseif(ZC_EXTERNAL_SHARED)
+# 		set(SDL_STATIC OFF)
+# 		set(SDL_SHARED ON)
+# 	endif()
+# 
+# 	set(SDL_TEST_LIBRARY OFF)
+# 	add_subdirectory(external/sdl3)
+# endif()
 
 
 #========================= zeroCore
@@ -182,7 +182,6 @@ endif()
 add_subdirectory(${PROJECT_SOURCE_DIR}/config)
 
 #========================= lib type
-set(ZC_LIB_TYPE STATIC)
 if(ZC_SHARED)
     set(ZC_LIB_TYPE SHARED)
 elseif(ZC_STATIC)

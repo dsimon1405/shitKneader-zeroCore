@@ -3,12 +3,12 @@ project(shitKneader)
 
 #========================= options
 #   only one could be ON
-option(SK_RELEASE "ON - External libraries will be build static" ON)
-option(SK_DEBUG "ON - External libraries will be build shared" OFF)
+option(SK_RELEASE "ON - External libraries will be build static" OFF)
+option(SK_DEBUG "ON - External libraries will be build shared" ON)
 
 #   only one could be ON
-option(SK_PC "Build APK file in Android Studio" ON)
-option(SK_ANDROID "Build APK file in Android Studio" OFF)
+option(SK_PC "Build APK file in Android Studio" OFF)
+option(SK_ANDROID "Build APK file in Android Studio" ON)
 
 #========================= options control
 if(SK_RELEASE)
@@ -38,7 +38,7 @@ if(SK_RELEASE)
     set(ZC_EXTERNAL_STATIC ON)
     set(ZC_EXTERNAL_SHARED OFF)
     set(ZC_ERROR_LOGGER_DATABASE OFF)   #   когда подключу сдечать ON
-    set(ZC_ERROR_LOGGER_CONSOLE OFF)
+    set(ZC_ERROR_LOGGER_CONSOLE ON)
 elseif(SK_DEBUG)
     set(ZC_STATIC OFF)
     set(ZC_SHARED ON)
