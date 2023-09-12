@@ -10,10 +10,12 @@ using ZC_pErrorLogger = std::shared_ptr<ZC_ErrorLogger>;
 class ZC_ErrorLogger : public ZC_Noncopyable
 {
 public:
-    ZC_ErrorLogger() = default;
     static void Error(const std::string& msg);
     static void Warning(const std::string& msg);
     static bool Init();
+    
+protected:
+    ZC_ErrorLogger() = default;
 
 private:
     static inline ZC_pErrorLogger logger = nullptr;

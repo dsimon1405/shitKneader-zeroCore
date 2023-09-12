@@ -3,17 +3,17 @@
 // ErrorLogger
 #define ZC_EL_type ${ZC_EL_type}
 #if ZC_EL_type == 0
-#define ZC_EL_console
+#   define ZC_EL_console
 #elif ZC_EL_type == 1
-#define ZC_EL_database
+#   define ZC_EL_database
 #elif ZC_EL_type == 2
-#define ZC_EL_none
+#   define ZC_EL_none
 #endif  /*ErrorLogger*/
 
 // API
 #define ZC_API_type ${ZC_API_type}
 #if ZC_API_type == 0
-#define ZC_API_sdl
+#   define ZC_API_sdl
 #elif ZC_API_type == 1
-#define ZC_API_android
+#   define ZC_API_android
 #endif  /*API*/

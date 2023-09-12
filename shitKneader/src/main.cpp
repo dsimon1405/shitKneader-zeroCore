@@ -4,6 +4,7 @@
 void ZC_main(ZC_pAPIFactory apiFactory)
 {
     ZC_pWindow window = apiFactory->MakeWindow("lolka", 640, 480);
+    window->SetClearColor(1, 0, 1);
     while (true)
     {
         if (!window->HandleEvents())
@@ -12,7 +13,7 @@ void ZC_main(ZC_pAPIFactory apiFactory)
         }
         window->Clear();
 
-        ZC_Err("lol");
+
         window->SwapBuffer();
     }
 }

@@ -6,11 +6,16 @@
 class ZC_Window : public ZC_Noncopyable
 {
 public:
-    ZC_Window() = default;
     virtual bool HandleEvents() = 0;
-    virtual void Clear() = 0;
     virtual void SwapBuffer() = 0;
-private:
+
+    void SetClearColor(const float& r, const float& g, const float& b);
+    void Clear();
+
+protected:
+    float red = 0.0f, green = 0.0f, blue = 0.0f;
+    
+    ZC_Window() = default;
 };
 
 using ZC_pWindow = std::shared_ptr<ZC_Window>;

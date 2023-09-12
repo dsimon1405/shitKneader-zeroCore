@@ -8,7 +8,6 @@ class ZC_SDL_Window : public ZC_Window
 public:
     ZC_SDL_Window(const char* name = "", const int& width = 0, const int& height = 0);
     ~ZC_SDL_Window();
-    virtual void Clear() override;
     virtual bool HandleEvents() override;
     virtual void SwapBuffer() override;
 

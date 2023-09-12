@@ -11,8 +11,6 @@ ZC_API_SDL::ZC_API_SDL()
     {
         if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
             ZC_Err("SDL_Init - " + std::string(SDL_GetError()));
-        
-        ZC_SDL_LoadOpenGL();
     }
     else
     {
