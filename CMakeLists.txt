@@ -7,8 +7,8 @@ option(SK_RELEASE "ON - External libraries will be build static" OFF)
 option(SK_DEBUG "ON - External libraries will be build shared" ON)
 
 #   only one could be ON
-option(SK_PC "Build APK file in Android Studio" OFF)
-option(SK_ANDROID "Build APK file in Android Studio" ON)
+option(SK_PC "Build APK file in Android Studio" ON)
+option(SK_ANDROID "Build APK file in Android Studio" OFF)
 
 #========================= options control
 if(SK_RELEASE)

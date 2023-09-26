@@ -1,11 +1,6 @@
 #pragma once
 
 #include <ZC/API/Android/ZC_A_Window.h>
-
-#include <android/log.h>
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-
-
 #include <ZC/API/Android/ZC_API_Android.h>
 
 void ZC_main(ZC_pAPIFactory apiFactory);

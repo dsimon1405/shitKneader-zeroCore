@@ -6,7 +6,6 @@
 ZC_A_Window::ZC_A_Window(android_app* androidApp)
     : pAndroidApp(androidApp)
 {
-    
     pAndroidApp->userData = this;
     pAndroidApp->onAppCmd = HandleCMD;
     pAndroidApp->onInputEvent = HandleInput;
@@ -18,7 +17,7 @@ bool ZC_A_Window::HandleEvents()
     static int events;
     static struct android_poll_source* source;
 
-    if ((ident = ALooper_pollOnce( state /* pause  -1 0 */, nullptr, &events,(void**)&source)) >= 0)
+    if ((ident = ALooper_pollOnce( 0 /* pause  -1 0 */, nullptr, &events,(void**)&source)) >= 0)
     {
         // Process this event.
         if (source != nullptr) {
@@ -40,7 +39,7 @@ void ZC_A_Window::SwapBuffer()
 //    currentFrame++;
     eglSwapBuffers(display, surface);
 }
-    
+
 bool ZC_A_Window::InitGraphicOpenGL(ANativeWindow* pWindow)
 {
     const EGLint attribs[] = {EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
@@ -67,15 +66,17 @@ bool ZC_A_Window::InitGraphicOpenGL(ANativeWindow* pWindow)
 
     EGLint contextAttribs[] =
             {
-                    EGL_CONTEXT_CLIENT_VERSION,
-                    3,
+                    EGL_CONTEXT_MAJOR_VERSION, 3,
+                    EGL_CONTEXT_MINOR_VERSION, 2,
                     EGL_NONE
             };
     cont = eglCreateContext(displ, config, NULL, contextAttribs);
 
     if (eglMakeCurrent(displ, surf, surf, cont) == EGL_FALSE)
         return false;
-
+//    GLuint id = 0;
+//    glGenBuffers(1, &id);
+//    GLuint shader = glCreateShader(GL_GEOMETRY_SHADER);
     eglQuerySurface(displ, surf, EGL_WIDTH, &w);
     eglQuerySurface(displ, surf, EGL_HEIGHT, &h);
 
@@ -88,7 +89,7 @@ bool ZC_A_Window::InitGraphicOpenGL(ANativeWindow* pWindow)
     // Open GL states
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
-
+    inited = true;
     return true;
 }
 

@@ -12,6 +12,10 @@ add_library(${PROJECT_NAME} ${ZC_LIB_TYPE}
 		${PROJECT_SOURCE_DIR}/src/ZC/ErrorLogger/ZC_ErroLogger.cpp
 		${PROJECT_SOURCE_DIR}/src/ZC_EL.cpp
         ${PROJECT_SOURCE_DIR}/src/ZC/ZC_Window.cpp
+        ${PROJECT_SOURCE_DIR}/src/ZC/Renderer/ZC_Shader.cpp
+        ${PROJECT_SOURCE_DIR}/src/ZC/Renderer/ZC_Buffer.cpp
+        ${PROJECT_SOURCE_DIR}/src/ZC/Renderer/ZC_VBO.cpp
+        ${PROJECT_SOURCE_DIR}/src/ZC/Renderer/ZC_VAO.cpp
     	)
         
 target_include_directories(${PROJECT_NAME}

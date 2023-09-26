@@ -9,6 +9,10 @@ add_library(${PROJECT_NAME} ${ZC_LIB_TYPE}
     ZC/API/ZC_API_Initialize.cpp
     ZC/ErrorLogger/ZC_EL_Initialize.cpp
     ZC/ZC_Window.cpp
+    ZC/Renderer/ZC_Shader.cpp
+    ZC/Renderer/ZC_Buffer.cpp
+    ZC/Renderer/ZC_VBO.cpp
+    ZC/Renderer/ZC_VAO.cpp
     )
 
 target_include_directories(${PROJECT_NAME}
