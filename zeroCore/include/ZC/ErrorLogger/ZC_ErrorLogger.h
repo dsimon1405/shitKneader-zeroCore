@@ -1,29 +1,48 @@
 #pragma once
 
-#include <ZC/ZC_Noncopyable.h>
 #include <ZC_string.h>
-#include <memory>
 
-class ZC_ErrorLogger;
-using ZC_pErrorLogger = std::shared_ptr<ZC_ErrorLogger>;
-
-class ZC_ErrorLogger : public ZC_Noncopyable
+/*
+Error logging class.
+If CMakeLists.txt(ZC_DEBUG - ON) will throw the ZC_Exception().
+If CMakeLists.txt(ZC_DEBUG - OFF) will save error message.
+*/
+class ZC_ErrorLogger
 {
 public:
-    static void Error(const std::string& msg);
-    static void Warning(const std::string& msg);
-    static bool Init();
-    
-protected:
-    ZC_ErrorLogger() = default;
+    ZC_ErrorLogger() = delete;
+
+    /*
+    Logging the error.
+
+    Params:
+    msg - error message.
+    callingFilePath - path to the file with the error.
+    callingFileLine - error line number.
+    */
+    static void Err(const std::string& msg = "", const char* const& callingFilePath = nullptr, const int& callingFileLine = 0);
+
+    /*
+    Tells if there was an error.
+
+    Return:
+    If there was an error - true, otherwise false.
+    */
+    static bool WasError() noexcept;
+
+    /*
+    Allows to get error message.
+
+    Return:
+    If there was an error - message, otherwise nullptr.
+    */
+    static const char* ErrorMessage() noexcept;
+
+    /*
+    Delete error message.
+    */
+    static void Clear() noexcept;
 
 private:
-    static inline ZC_pErrorLogger logger = nullptr;
-
-    // static inline bool init = Init();
-
-    static void SetLogger(ZC_pErrorLogger lgr);
-
-    virtual void LogError(const std::string& msg);
-    virtual void LogWarning(const std::string& msg);
+    static inline std::string errorMessage;
 };

@@ -1,19 +1,11 @@
 #pragma once
 
-// ErrorLogger
-#define ZC_EL_type ${ZC_EL_type}
-#if ZC_EL_type == 0
-#   define ZC_EL_console
-#elif ZC_EL_type == 1
-#   define ZC_EL_database
-#elif ZC_EL_type == 2
-#   define ZC_EL_none
-#endif  /*ErrorLogger*/
+#define ${ZC_PLATFORM_TYPE}
+#define ${ZC_VIDEO_TYPE}
+#define ${ZC_AUDIO_TYPE}
 
-// API
-#define ZC_API_type ${ZC_API_type}
-#if ZC_API_type == 0
-#   define ZC_API_sdl
-#elif ZC_API_type == 1
-#   define ZC_API_android
-#endif  /*API*/
+#define ${ZC_DEBUG_TYPE}
+
+#define ZC_SRC_ASSETS_PATH "${ZC_SRC_ASSETS_PATH}"
+#define ZC_BUILD_ASSETS_PATH "${ZC_BUILD_ASSETS_PATH}"
+

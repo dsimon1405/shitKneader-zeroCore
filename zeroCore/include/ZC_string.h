@@ -2,10 +2,7 @@
 
 #include <ZC_Config.h>
 
-#ifdef _WIN32
-	#include <string>
-#endif
-#ifdef ZC_API_android
+#if defined(_WIN32) || defined(ZC_ANDROID_NATIVE_APP_GLUE)
 	#include <string>
 #else
 	#include <memory>

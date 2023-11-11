@@ -1,3 +1,6 @@
 [submodule "external/sdl3"]
 	path = external/sdl3
 	url = https://github.com/libsdl-org/SDL.git
+[submodule "external/oboe"]
+	path = external/oboe
+	url = https://github.com/google/oboe.git
