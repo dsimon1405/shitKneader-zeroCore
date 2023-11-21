@@ -1,11 +1,10 @@
 #pragma once
 
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
-
-#include <memory>
+#include <ZC/Tools/ZC_uptr.h>
 
 class ZC_FileReader;
-using ZC_upFileReader = std::unique_ptr<ZC_FileReader>;
+using ZC_upFileReader = ZC_uptr<ZC_FileReader>;
 
 /*
 File read wrapper.
@@ -105,19 +104,4 @@ protected:
     ZC_FileReader(const char* _path) noexcept
         : path(_path)
     {}
-
-private:
-    template<typename TFileReader>
-    static ZC_upFileReader CreateReader(const char* const& path, const char* const& callingFilePath, const int& callingFileLine)
-    {
-        ZC_ErrorLogger::Clear();
-        TFileReader* fileReader = new TFileReader(path, callingFilePath, callingFileLine);
-        if (ZC_ErrorLogger::WasError())
-        {
-            delete fileReader;
-            return nullptr;
-        }
-        
-        return std::unique_ptr<ZC_FileReader>(dynamic_cast<ZC_FileReader*>(fileReader));
-    }
 };

@@ -39,6 +39,8 @@ struct ZC_AudioSet
     */
     ZC_AudioSet(const Channels& _channels, const int& _frequency, const BitsPerSample& _bitsPerSample) noexcept;
 
+    operator bool () const noexcept;
+
     /*
     Compares the ZC_AudioSet pair.
 

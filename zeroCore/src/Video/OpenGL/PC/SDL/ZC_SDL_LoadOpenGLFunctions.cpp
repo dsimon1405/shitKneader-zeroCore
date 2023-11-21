@@ -54,8 +54,12 @@ bool ZC_SDL_LoadOpenGLFunctions()
     if (!pglDeleteProgram) { ZC_ErrorLogger::Err("glDeleteProgram SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     pglUseProgram = (PFNGLUSEPROGRAMPROC)SDL_GL_GetProcAddress("glUseProgram");
     if (!pglUseProgram) { ZC_ErrorLogger::Err("glUseProgram SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
-    pglGenBuffers = (PFNGLGENBUFFERSPROC)SDL_GL_GetProcAddress("glGenBuffers");
+    pglGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)SDL_GL_GetProcAddress("glGetUniformLocation");
+    if (!pglGetUniformLocation) { ZC_ErrorLogger::Err("glGetUniformLocation SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
+    pglUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)SDL_GL_GetProcAddress("glUniformMatrix4fv");
+    if (!pglUniformMatrix4fv) { ZC_ErrorLogger::Err("glUniformMatrix4fv SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     //  buffer
+    pglGenBuffers = (PFNGLGENBUFFERSPROC)SDL_GL_GetProcAddress("glGenBuffers");
     if (!pglGenBuffers) { ZC_ErrorLogger::Err("glGenBuffers SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     pglDeleteBuffers = (PFNGLDELETEBUFFERSPROC)SDL_GL_GetProcAddress("glDeleteBuffers");
     if (!pglDeleteBuffers) { ZC_ErrorLogger::Err("glDeleteBuffers SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
@@ -63,11 +67,11 @@ bool ZC_SDL_LoadOpenGLFunctions()
     if (!pglBindBuffer) { ZC_ErrorLogger::Err("glBindBuffer SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     pglBufferSubData = (PFNGLBUFFERSUBDATAPROC)SDL_GL_GetProcAddress("glBufferSubData");
     if (!pglBufferSubData) { ZC_ErrorLogger::Err("glBufferSubData SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
-    pglBindVertexBuffer = (PFNGLBINDVERTEXBUFFERPROC)SDL_GL_GetProcAddress("glBindVertexBuffer");
     //  vbo
+    pglBindVertexBuffer = (PFNGLBINDVERTEXBUFFERPROC)SDL_GL_GetProcAddress("glBindVertexBuffer");
     if (!pglBindVertexBuffer) { ZC_ErrorLogger::Err("glBindVertexBuffer SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
-    pglGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)SDL_GL_GetProcAddress("glGenVertexArrays");
     //  vao
+    pglGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)SDL_GL_GetProcAddress("glGenVertexArrays");
     if (!pglGenVertexArrays) { ZC_ErrorLogger::Err("glGenVertexArrays SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     pglDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)SDL_GL_GetProcAddress("glDeleteVertexArrays");
     if (!pglDeleteVertexArrays) { ZC_ErrorLogger::Err("glDeleteVertexArrays SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
@@ -136,6 +140,8 @@ PFNGLGETSHADERIVPROC pglGetShaderiv = nullptr;
 PFNGLGETSHADERINFOLOGPROC pglGetShaderInfoLog = nullptr;
 PFNGLDELETEPROGRAMPROC pglDeleteProgram = nullptr;
 PFNGLUSEPROGRAMPROC pglUseProgram = nullptr;
+PFNGLGETUNIFORMLOCATIONPROC pglGetUniformLocation = nullptr;
+PFNGLUNIFORMMATRIX4FVPROC pglUniformMatrix4fv = nullptr;
 
 //  buffer
 PFNGLGENBUFFERSPROC pglGenBuffers = nullptr;

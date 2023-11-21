@@ -50,6 +50,8 @@ public:
 	Activate shader program.
 	*/
     void Use() const noexcept;
+
+	void SetUniformMatrix4fv(const char* const& name, const float* const& pData) const noexcept;
 	
 private:
 	GLuint id = 0;

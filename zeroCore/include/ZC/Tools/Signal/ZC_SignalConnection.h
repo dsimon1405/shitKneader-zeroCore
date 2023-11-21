@@ -6,7 +6,7 @@ Class for managing connection to the ZC_Signal.
 class ZC_SignalConnection
 {
 public:
-    enum ConnectionState
+    enum State
     {
         //  The function will be called.
         Connected,
@@ -21,8 +21,8 @@ public:
     ZC_SignalConnection(const ZC_SignalConnection&) = delete;
     ZC_SignalConnection& operator=(const ZC_SignalConnection&) = delete;
     
-    ZC_SignalConnection(ZC_SignalConnection&&) = delete;
-    ZC_SignalConnection& operator=(ZC_SignalConnection&&) = delete;
+    ZC_SignalConnection(ZC_SignalConnection&& con) noexcept;
+    ZC_SignalConnection& operator=(ZC_SignalConnection&& con) noexcept;
 
     virtual ~ZC_SignalConnection() = default;
 
@@ -32,23 +32,29 @@ public:
     Return:
     ZC_SignalConnection::State.
     */
-    virtual typename ZC_SignalConnection::ConnectionState GetState() noexcept;
+    virtual typename ZC_SignalConnection::State GetState() noexcept;
 
     /*
-    Change state on Disconnected.
+    Disconnects from the signal if connected to it.
+
+    Return:
+    If the connection was disconnected - true, if it was already terminated - false.
     */
-    void Disconnect() noexcept;
+    bool Disconnect() noexcept;
 
     /*
-    Change state on Connected.
+    Connects to the signal if disconnected from it.
+
+    Return:
+    If the connection was connected - true, if it was already terminated - false.
     */
-    void Connect() noexcept;
+    bool Connect() noexcept;
 
     /*
-    Change state on Terminated.
+    Terminates connection to a signal, whether connected or disconnected. Doesn't do anything if already terminated.
     */
     void Terminate() noexcept;
 
 private:
-    ConnectionState connectionState = ConnectionState::Connected;
+    State state = State::Connected;
 };

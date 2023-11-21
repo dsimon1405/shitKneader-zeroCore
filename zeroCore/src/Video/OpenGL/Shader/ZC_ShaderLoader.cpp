@@ -7,16 +7,16 @@ ZC_ShaderCode ZC_ShaderLoader::LoadShaderCode(const char* const& vertexPath, con
 {
 
     ZC_DynamicArray<char> vertexCode = ReadShaderFile(vertexPath, ShaderType::Vertex);
-    if (!vertexCode.array) return {};
+    if (!vertexCode.pArray) return {};
 
     ZC_DynamicArray<char> fragmentCode = ReadShaderFile(fragmentPath, ShaderType::Fragment);
-    if (!fragmentCode.array) return {};
+    if (!fragmentCode.pArray) return {};
 
     ZC_DynamicArray<char> geometryCode;
     if (geometryPath)
     {
         geometryCode = ReadShaderFile(geometryPath, ShaderType::Geometry);
-        if (!geometryCode.array) return {};
+        if (!geometryCode.pArray) return {};
     }
 
     return { std::move(vertexCode), std::move(fragmentCode), std::move(geometryCode) };
@@ -52,19 +52,19 @@ ZC_DynamicArray<char> ZC_ShaderLoader::ReadShaderFile(const char* path, const Sh
     }
 
     ZC_DynamicArray<char> fileData(shaderStartSize + fileSize + 1);
-    fileData.array[fileSize + shaderStartSize] = '\0';
-    if (upFileReader->Read(fileData.array + shaderStartSize, fileSize, __FILE__, __LINE__) == 0) return ZC_DynamicArray<char>();
+    fileData.pArray[fileSize + shaderStartSize] = '\0';
+    if (upFileReader->Read(fileData.pArray + shaderStartSize, fileSize, __FILE__, __LINE__) == 0) return ZC_DynamicArray<char>();
 
     switch (shaderType)
     {
         case ShaderType::Vertex:
-            FillShaderStart(fileData.array, vertexStart);
+            FillShaderStart(fileData.pArray, vertexStart);
             break;
         case ShaderType::Geometry:
-            FillShaderStart(fileData.array, geometryStart);
+            FillShaderStart(fileData.pArray, geometryStart);
             break;
         case ShaderType::Fragment:
-            FillShaderStart(fileData.array, fragmentStart);
+            FillShaderStart(fileData.pArray, fragmentStart);
             break;
     }
 

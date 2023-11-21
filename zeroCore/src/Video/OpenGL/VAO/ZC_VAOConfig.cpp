@@ -21,7 +21,24 @@ ZC_VAOConfig* ZC_VAOConfig::AddFormat(const ZC_VAOConfig::Format& format) noexce
     return this;
 }
 
-GLint ZC_VAOConfig::CalculateStride() const noexcept
+GLint ZC_VAOConfig::MaxCount() noexcept
+{
+    GLint maxCount;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIB_BINDINGS, &maxCount);
+    return maxCount;
+}
+
+void ZC_VAOConfig::Config(const GLuint& config) const noexcept
+{
+    for (auto& format : formats)
+    {
+        glEnableVertexAttribArray(format.attribindex);
+        glVertexAttribFormat(format.attribindex, format.size, format.type, format.normalized, format.relativeoffset);
+        glVertexAttribBinding(format.attribindex, config);
+    }
+}
+
+GLint ZC_VAOConfig::Stride() const noexcept
 {
     GLint stride = 0;
     for (auto& format : formats)
@@ -40,6 +57,7 @@ GLint ZC_VAOConfig::CalculateStride() const noexcept
     return stride;
 }
 
+//  Format
 ZC_VAOConfig::Format::Format(GLuint _attribindex, GLint _size, GLenum _type, GLboolean _normalized, GLuint _relativeoffset) noexcept
         : attribindex(_attribindex),
           size(_size),

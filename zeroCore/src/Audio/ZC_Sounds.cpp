@@ -1,10 +1,11 @@
 #include <ZC/Audio/ZC_Sounds.h>
 
 #include "ZC_WAVHeader.h"
+#include <ZC/Tools/ZC_DynamicArray.h>
 
 bool ZC_Sounds::LoadWAV(const std::string& name, const char* const& path) noexcept
 {
-    std::unique_lock<std::shared_mutex> soundsULock(soundssMutex);
+    std::unique_lock<std::shared_mutex> soundsULock(soundsSMutex);
     auto soundsIter = sounds.find(name);
     if (soundsIter != sounds.end())
     {
@@ -19,7 +20,7 @@ bool ZC_Sounds::LoadWAV(const std::string& name, const char* const& path) noexce
 
     ZC_ErrorLogger::Clear();
     ZC_SoundData soundData = ReadWAV(path);
-
+    
     soundsULock.lock();
     if (soundData.GetAudioSet().frequency == 0)
     {
@@ -42,7 +43,7 @@ bool ZC_Sounds::LoadWAV(const std::string& name, const char* const& path) noexce
 
 ZC_upSound ZC_Sounds::GetSound(const std::string& name) noexcept
 {
-    std::shared_lock<std::shared_mutex> soundsSLock(soundssMutex);
+    std::shared_lock<std::shared_mutex> soundsSLock(soundsSMutex);
     std::map<std::string, ZC_SoundData>::iterator soundsIter;
     soundsCVA.wait(soundsSLock, [&]
         {
@@ -54,7 +55,7 @@ ZC_upSound ZC_Sounds::GetSound(const std::string& name) noexcept
 
     if (soundsIter == sounds.end()) return nullptr;
     
-    return std::make_unique<ZC_Sound>(&soundsIter->second);
+    return ZC_uptrMake<ZC_Sound>(&soundsIter->second);
 }
 
 ZC_SoundData ZC_Sounds::ReadWAV(const char* const& path) noexcept
@@ -201,11 +202,10 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* const& path) noexcept
             break;
     }
 
-    char* data = new char[header.subchunk2Size];
-    if (file->Read(&data[0], header.subchunk2Size, __FILE__, __LINE__) != header.subchunk2Size)
+    ZC_DynamicArray<char> data(header.subchunk2Size);
+    if (file->Read(data.pArray, header.subchunk2Size, __FILE__, __LINE__) != header.subchunk2Size)
     {
         file->Close();
-        delete[] data;
         return ZC_SoundData();
     }
 
@@ -217,7 +217,7 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* const& path) noexcept
             + " bytes in the file: " + std::string(path), __FILE__, __LINE__);
     }
 
-    return ZC_SoundData(data, header.subchunk2Size, audioSet);
+    return ZC_SoundData(std::move(data), audioSet);
 }
 
 bool ZC_Sounds::ConstCharEqual(const char* const& first, char* const& second) noexcept

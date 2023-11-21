@@ -2,8 +2,9 @@
 
 #include "ZC_Window.h"
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
+#include <ZC/Tools/ZC_uptr.h>
 
-using ZC_upWindow = std::unique_ptr<ZC_Window>;
+using ZC_upWindow = ZC_uptr<ZC_Window>;
 
 class ZC_Video
 {
@@ -22,19 +23,4 @@ public:
     On success unique pointer of ZC_Window, otherwise nullptr (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
     */
     static ZC_upWindow MakeWindow(const char* const& name = "", const int& width = 0, const int& height = 0);
-
-private:
-    template<typename TWindow>
-    static ZC_upWindow MakeWin(const char* const& name, const int& width, const int& height)
-    {
-        ZC_ErrorLogger::Clear();
-        TWindow* pZC_SDL_Window = new TWindow(name, width, height);
-        if (ZC_ErrorLogger::WasError())
-        {
-            delete pZC_SDL_Window;
-            return nullptr;
-        }
-        
-        return std::unique_ptr<ZC_Window>(dynamic_cast<ZC_Window*>(pZC_SDL_Window));
-    }
 };

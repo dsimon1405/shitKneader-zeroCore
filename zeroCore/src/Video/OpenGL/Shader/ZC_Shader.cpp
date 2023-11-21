@@ -10,6 +10,7 @@ ZC_Shader::ZC_Shader(ZC_Shader&& shader) noexcept
 
 ZC_Shader& ZC_Shader::operator = (ZC_Shader&& shader) noexcept
 {
+	if (id != 0) glDeleteProgram(id);
     id = shader.id;
     shader.id = 0;
 	return *this;
@@ -53,6 +54,12 @@ void ZC_Shader::Use() const noexcept
 	if (id != 0) glUseProgram(id);
 }
 
+void ZC_Shader::SetUniformMatrix4fv(const char* const& name, const float* const& pData) const noexcept
+{
+	GLint location = glGetUniformLocation(id, name);
+	glUniformMatrix4fv(location, 1, GL_FALSE, pData);
+}
+
 ZC_Shader::ZC_Shader(const ZC_ShaderCode& shaderCode) noexcept
 {
 	CreateShaderProgram(shaderCode);
@@ -60,29 +67,29 @@ ZC_Shader::ZC_Shader(const ZC_ShaderCode& shaderCode) noexcept
 
 void ZC_Shader::CreateShaderProgram(const ZC_ShaderCode& shaderCode) noexcept
 {
-	if (!shaderCode.vertexCode.array)
+	if (!shaderCode.vertexCode.pArray)
 	{
 		ZC_ErrorLogger::Err("ZC_ShaderCode::vertexCode = nullptr!", __FILE__, __LINE__);
 		return;
 	}
-	if (!shaderCode.fragmentCode.array)
+	if (!shaderCode.fragmentCode.pArray)
 	{
 		ZC_ErrorLogger::Err("ZC_ShaderCode::fragmentCode = nullptr!", __FILE__, __LINE__);
 		return;
 	}
 
 	GLuint vertexID = 0;
-	if (!CreateShader(shaderCode.vertexCode.array, GL_VERTEX_SHADER, vertexID)) return;
+	if (!CreateShader(shaderCode.vertexCode.pArray, GL_VERTEX_SHADER, vertexID)) return;
 
 	GLuint fragmentID = 0;
-	if (!CreateShader(shaderCode.fragmentCode.array, GL_FRAGMENT_SHADER, fragmentID))
+	if (!CreateShader(shaderCode.fragmentCode.pArray, GL_FRAGMENT_SHADER, fragmentID))
 	{
 		glDeleteShader(vertexID);
 		return;
 	}
 
 	GLuint geometryID = 0;
-	if (shaderCode.geometryCode.array && !CreateShader(shaderCode.geometryCode.array, GL_GEOMETRY_SHADER, geometryID))
+	if (shaderCode.geometryCode.pArray && !CreateShader(shaderCode.geometryCode.pArray, GL_GEOMETRY_SHADER, geometryID))
 	{
 		glDeleteShader(vertexID);
 		glDeleteShader(fragmentID);
@@ -92,13 +99,13 @@ void ZC_Shader::CreateShaderProgram(const ZC_ShaderCode& shaderCode) noexcept
 	id = glCreateProgram();
 	glAttachShader(id, vertexID);
 	glAttachShader(id, fragmentID);
-	if (shaderCode.geometryCode.array) glAttachShader(id, geometryID);
+	if (shaderCode.geometryCode.pArray) glAttachShader(id, geometryID);
 
 	glLinkProgram(id);
 
 	glDeleteShader(vertexID);
 	glDeleteShader(fragmentID);
-	if (shaderCode.geometryCode.array) glDeleteShader(geometryID);
+	if (shaderCode.geometryCode.pArray) glDeleteShader(geometryID);
 
 	GLint success;
 	glGetProgramiv(id, GL_LINK_STATUS, &success);

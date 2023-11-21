@@ -1,27 +1,33 @@
 #include <ZC/Tools/Signal/ZC_SignalConnection.h>
+    
+ZC_SignalConnection::ZC_SignalConnection(ZC_SignalConnection&& con) noexcept
+    : state(con.state)
+{}
 
-ZC_SignalConnection::ConnectionState ZC_SignalConnection::GetState() noexcept
+ZC_SignalConnection& ZC_SignalConnection::operator=(ZC_SignalConnection&& con) noexcept
 {
-    return connectionState;
+    state = con.state;
+    return *this;
 }
 
-void ZC_SignalConnection::Disconnect() noexcept
+ZC_SignalConnection::State ZC_SignalConnection::GetState() noexcept
 {
-    if (connectionState == ConnectionState::Connected)
-    {
-        connectionState = ConnectionState::Disconnected;
-    }
+    return state;
 }
 
-void ZC_SignalConnection::Connect() noexcept
+bool ZC_SignalConnection::Disconnect() noexcept
 {
-    if (connectionState == ConnectionState::Disconnected)
-    {
-        connectionState = ConnectionState::Connected;
-    }
+    if (state == State::Connected) state = State::Disconnected;
+    return state == State::Disconnected;
+}
+
+bool ZC_SignalConnection::Connect() noexcept
+{
+    if (state == State::Disconnected) state = State::Connected;
+    return state == State::Connected;
 }
 
 void ZC_SignalConnection::Terminate() noexcept
 {
-    connectionState = ConnectionState::Terminated;
+    state = State::Terminated;
 }

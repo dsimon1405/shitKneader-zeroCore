@@ -76,6 +76,12 @@ extern PFNGLDELETEPROGRAMPROC pglDeleteProgram;
 extern PFNGLUSEPROGRAMPROC pglUseProgram;
 #define glUseProgram pglUseProgram
 
+extern PFNGLGETUNIFORMLOCATIONPROC pglGetUniformLocation;
+#define glGetUniformLocation pglGetUniformLocation
+
+extern PFNGLUNIFORMMATRIX4FVPROC pglUniformMatrix4fv;
+#define glUniformMatrix4fv pglUniformMatrix4fv
+
 //  buffer
 extern PFNGLGENBUFFERSPROC pglGenBuffers;
 #define glGenBuffers pglGenBuffers

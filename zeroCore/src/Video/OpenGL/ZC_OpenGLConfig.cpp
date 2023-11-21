@@ -6,13 +6,13 @@
 
 #include <sstream>
 
-#ifdef ZC_PC
+#ifdef ZC_SDL_VIDEO
 void APIENTRY ZC_OpenGLErrorCallback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
-#elif defined(ZC_ANDROID)
+#elif defined(ZC_ANDROID_NATIVE_APP_GLUE)
 void ZC_OpenGLErrorCallback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
 #endif
 {
-// ignore these non-significant error codes
+    // ignore these non-significant error codes
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
     std::stringstream stream;
@@ -55,10 +55,10 @@ void ZC_OpenGLErrorCallback(GLenum source, GLenum type, unsigned int id, GLenum 
 
 void ZC_OpenGLAssigneErrorCallback() noexcept
 {
-    #ifdef ZC_DEBUG
+#ifdef ZC_DEBUG
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(ZC_OpenGLErrorCallback, nullptr);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-    #endif
+#endif
 }

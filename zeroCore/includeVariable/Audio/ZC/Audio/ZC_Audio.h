@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ZC_AudioStream.h"
+#include "ZC/Tools/ZC_uptr.h"
 
 /*
 Class for creating an audio stream.
@@ -11,7 +12,7 @@ public:
     ZC_Audio() = delete;
 
     /*
-    Create ZC_AudioStream object.
+    Create ZC_AudioStream object. Be sure to call Close Audio Stream when the audio stream is no longer needed to correctly release resourcesю
 
     Params:
     _audioSet - a set of audio parameters for an audio stream.
@@ -19,44 +20,19 @@ public:
     Return:
     On success true, else false (ZC_ErrorLogger::ErrorMessage() - for more information).
     */
-    static bool MakeAudioStream(const ZC_AudioSet& _audioSet) noexcept;
+    static bool OpenAudioStream(const ZC_AudioSet& _audioSet) noexcept;
 
-    static void CloseAudioStream() noexcept
-    {
-        upAudioStream = nullptr;
-    }
+    //  Closes the audio stream if it was open.
+    static void CloseAudioStream() noexcept;
 
-    static bool ReopenAudioStream() noexcept
-    {
-        static const ZC_AudioSet& setAudioStream = ZC_AudioStream::GetAudioSet();
-        if (!upAudioStream && setAudioStream.frequency != 0)
-        {
-            MakeAudioStream(setAudioStream);
-            return true;
-        }
+    /*
+    Reopens an audio stream (using the last opened ZC_AudioSet) if it was previously opened and closed.
 
-        return false;
-    }
+    Return:
+    If success - true, otherwise false.
+    */
+    static bool ReopenAudioStream() noexcept;
 
 private:
-    static inline std::unique_ptr<ZC_AudioStream> upAudioStream = nullptr;
-
-    template<typename TClass>
-    static bool CreateAudioStream(const ZC_AudioSet& audioSet) noexcept
-    {
-        if (!upAudioStream)
-        {
-            ZC_AudioStream* pAudioStream = dynamic_cast<ZC_AudioStream*>(new TClass(audioSet));
-            if (!ZC_ErrorLogger::WasError())
-            {
-                upAudioStream = std::unique_ptr<ZC_AudioStream>(pAudioStream);
-                return true;
-            }
-        
-            delete pAudioStream;
-            pAudioStream = nullptr;
-        }
-    
-        return false;
-    }
+    static inline ZC_uptr<ZC_AudioStream> upAudioStream;
 };

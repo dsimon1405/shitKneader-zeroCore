@@ -1,18 +1,24 @@
 #include <ZC/Video/OpenGL/ZC_VBO.h>
 
+ZC_VBO::~ZC_VBO() noexcept
+{
+    glDeleteBuffers(1, &id);
+}
+
 ZC_VBO* ZC_VBO::CreateVBO() noexcept
 {
     return &vbos.emplace_back(ZC_VBO());
 }
 
-void ZC_VBO::BindBuffer() const noexcept
+void ZC_VBO::BindVertexBuffer(const GLuint& vaoConfig, const long& offset, const int& stride) const noexcept
 {
-    glBindBuffer(GL_ARRAY_BUFFER, id);
+    glBindVertexBuffer(vaoConfig, id, offset, stride);
 }
 
-void ZC_VBO::UnbindBuffer() noexcept
+bool ZC_VBO::BufferData(const long& size, const GLenum& _usage) noexcept
 {
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    ZC_DynamicArray<GLbyte> emptyData(nullptr, size);
+    return BufferData(std::move(emptyData), _usage);
 }
 
 ZC_VBO::ZC_VBO() noexcept
@@ -20,9 +26,14 @@ ZC_VBO::ZC_VBO() noexcept
     glGenBuffers(1, &id);
 }
 
-void ZC_VBO::BindVertexBuffer(const GLuint& vaoConfig, const long& offset, const int& stride) const noexcept
+void ZC_VBO::UnbindBuffer() noexcept
 {
-    glBindVertexBuffer(vaoConfig, id, offset, stride);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void ZC_VBO::BindBuffer() const noexcept
+{
+    glBindBuffer(GL_ARRAY_BUFFER, id);
 }
 #ifdef ZC_PC
 ZC_VBO::ZC_VBO(ZC_VBO&& vbo) noexcept
@@ -33,29 +44,11 @@ ZC_VBO::ZC_VBO(ZC_VBO&& vbo) noexcept
 
 ZC_VBO& ZC_VBO::operator = (ZC_VBO&& vbo) noexcept
 {
+    if (id != 0) glDeleteBuffers(1, &id);
     id = vbo.id;
 
     vbo.id = 0;
     return *this;
-}
-
-ZC_VBO::~ZC_VBO() noexcept
-{
-    glDeleteBuffers(1, &id);
-}
-
-void ZC_VBO::BufferData(const long& size, void* const& pData, const GLenum& usage) noexcept
-{
-    BindBuffer();
-    glBufferData(GL_ARRAY_BUFFER, size, static_cast<void*>(pData), usage);
-    UnbindBuffer();
-}
-
-void ZC_VBO::BufferSubData(const long& offset, const long& size, void* const& pData) noexcept
-{
-    BindBuffer();
-    glBufferSubData(GL_ARRAY_BUFFER, offset, size, static_cast<void*>(pData));
-    UnbindBuffer();
 }
 #elif defined ZC_ANDROID
 ZC_VBO::ZC_VBO(ZC_VBO&& vbo) noexcept
@@ -68,6 +61,7 @@ ZC_VBO::ZC_VBO(ZC_VBO&& vbo) noexcept
 
 ZC_VBO& ZC_VBO::operator = (ZC_VBO&& vbo) noexcept
 {
+    if (id != 0) glDeleteBuffers(1, &id);
     id = vbo.id;
     vboDatas = std::move(vbo.vboDatas);
     usage = vbo.usage;
@@ -76,32 +70,16 @@ ZC_VBO& ZC_VBO::operator = (ZC_VBO&& vbo) noexcept
     return *this;
 }
 
-ZC_VBO::~ZC_VBO() noexcept
+void ZC_VBO::ClearvboDatas() noexcept
 {
-    glDeleteBuffers(1, &id);
-}
-
-void ZC_VBO::BufferData(const long& size, void* const& pData, const GLenum& _usage) noexcept
-{
-    usage = _usage;
-    BindBuffer();
-    glBufferData(GL_ARRAY_BUFFER, size, pData, usage);
-    UnbindBuffer();
-
+    for (auto& vboData : vboDatas)
+    {
+        vboData.size = 0;
+    }
     vboDatas.clear();
-    vboDatas.emplace_back(size, static_cast<char*>(pData), static_cast<char*>(pData));
 }
 
-void ZC_VBO::BufferSubData(const long& offset, const long& size, void* const& pData) noexcept
-{
-    BindBuffer();
-    glBufferSubData(GL_ARRAY_BUFFER, offset, size, pData);
-    UnbindBuffer();
-
-    EditvboDatas(offset, size, static_cast<char*>(pData));
-}
-
-void ZC_VBO::EditvboDatas(const long& offset, const long& size, char* const& pData) noexcept
+void ZC_VBO::AddVBOData(const long& offset, const long& size, char* const& pData) noexcept
 {
     auto emplacePosition = vboDatas.end();
     long endPos = offset + size;
@@ -156,16 +134,16 @@ void ZC_VBO::ResetVBOs() noexcept
     for (ZC_VBO& vbo : vbos)
     {
         glGenBuffers(1, &vbo.id);
-        vbo.BindBuffer();
         if (vbo.vboDatas.empty()) continue;
+        vbo.BindBuffer();
         auto vboDatasIter = vbo.vboDatas.begin();
         glBufferData(GL_ARRAY_BUFFER, vboDatasIter->size, vboDatasIter->pData, vbo.usage);
         for (++vboDatasIter; vboDatasIter != vbo.vboDatas.end(); ++vboDatasIter)
         {
             glBufferSubData(GL_ARRAY_BUFFER, vboDatasIter->offset, vboDatasIter->size, vboDatasIter->pData);
         }
-        vbo.UnbindBuffer();
     }
+    UnbindBuffer();
 }
 
 //  VBOData

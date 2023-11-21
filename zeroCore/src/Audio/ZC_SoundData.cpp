@@ -1,34 +1,23 @@
 #include <ZC/Audio/ZC_SoundData.h>
 
-ZC_SoundData::ZC_SoundData(char* _data, const unsigned int& _size, const ZC_AudioSet& _audioSet) noexcept
-  : data(_data),
-  dataSize(_size),
+ZC_SoundData::ZC_SoundData(ZC_DynamicArray<char> _data, const ZC_AudioSet& _audioSet) noexcept
+  : data(std::move(_data)),
   audioSet(_audioSet)
 {}
 
 ZC_SoundData::ZC_SoundData(ZC_SoundData&& soundData) noexcept
-  : ZC_SoundData(soundData.data, soundData.dataSize, soundData.audioSet)
+  : ZC_SoundData(std::move(soundData.data), soundData.audioSet)
 {
-  soundData.data = nullptr;
-  soundData.dataSize = 0;
   soundData.audioSet.frequency = 0;
 }
 
 ZC_SoundData& ZC_SoundData::operator = (ZC_SoundData&& soundData) noexcept
 {
-  data = soundData.data;
-  dataSize = soundData.dataSize;
+  data = std::move(soundData.data);
   audioSet = soundData.audioSet;
 
-  soundData.data = nullptr;
-  soundData.dataSize = 0;
   soundData.audioSet.frequency = 0;
   return *this;
-}
-
-ZC_SoundData::~ZC_SoundData() noexcept
-{
-  delete[] data;
 }
 
 ZC_AudioSet ZC_SoundData::GetAudioSet() const noexcept

@@ -1,12 +1,26 @@
 #pragma once
 
 #include "ZC_OpenGL.h"
+#include <ZC/Tools/ZC_DynamicArray.h>
+#include <ZC/ErrorLogger/ZC_ErrorLogger.h>
 #ifdef ZC_ANDROID
 #include <ZC/Video/ZC_AndroidNativeAppGlue_Window.h>
 #endif
 
+#include <concepts>
 #include <list>
 
+template <typename T>
+concept ZC_cOpenGLType = std::same_as<T, GLbyte>
+						 || std::same_as<T, GLubyte>
+						 || std::same_as<T, GLshort>
+						 || std::same_as<T, GLushort>
+						 || std::same_as<T, GLhalf>
+						 || std::same_as<T, GLint>
+						 || std::same_as<T, GLuint>
+						 || std::same_as<T, GLfloat>;
+
+//	Wrapper OpenGL vertex buffer object.
 class ZC_VBO
 {
 public:
@@ -18,19 +32,66 @@ public:
 
 	virtual ~ZC_VBO() noexcept;
 
-	static ZC_VBO* CreateVBO() noexcept;
-	static void UnbindBuffer() noexcept;
+	/*
+	Create a vertex array buffer to store data in graphics memory.
 
-	void BindBuffer() const noexcept;
-	void BufferData(const long& size, void* const& pData, const GLenum& usage = GL_STATIC_DRAW) noexcept;
-	void BufferSubData(const long& offset, const long& size, void* const& pData) noexcept;
+	Return:
+	On success pointer to ZC_VBO, otherwise nullptr (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
+	*/
+	static ZC_VBO* CreateVBO() noexcept;
+
+	/*
+	Maybe baby
+	*/
 	void BindVertexBuffer(const GLuint& vaoConfig, const long& offset, const int& stride) const noexcept;
+
+	/*
+	Reserve place in vbo.
+
+	Params:
+	size - number of bytes to reserve.
+	_usege - style of using stored data (GL_STREAM_DRAW, GL_STREAM_READ, GL_STREAM_COPY, GL_STATIC_DRAW, GL_STATIC_READ, GL_STATIC_COPY, GL_DYNAMIC_DRAW, GL_DYNAMIC_READ, or GL_DYNAMIC_COPY).
+	
+	Return:
+	On success true, otherwise false (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
+	*/
+    bool BufferData(const long& size, const GLenum& _usage = GL_STATIC_DRAW) noexcept;
+
+	/*
+	Saves data to a buffer.
+
+	Params:
+	data - data to save.
+	_usege - style of using stored data (GL_STREAM_DRAW, GL_STREAM_READ, GL_STREAM_COPY, GL_STATIC_DRAW, GL_STATIC_READ, GL_STATIC_COPY, GL_DYNAMIC_DRAW, GL_DYNAMIC_READ, or GL_DYNAMIC_COPY).
+	
+	Return:
+	On success true, otherwise false (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
+	*/
+	template<ZC_cOpenGLType TOpenGL>
+	bool BufferData(ZC_DynamicArray<TOpenGL> data, const GLenum& _usage) noexcept;
+
+	/*
+	Save new data in vbo.
+
+	Params:
+	offset - offset in bytes before editing starts.
+	data - data to save.
+	
+	Return:
+	On success true, otherwise false (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
+	*/
+	template<ZC_cOpenGLType TOpenGL>
+	bool BufferSubData(const long& offset, ZC_DynamicArray<TOpenGL> data) noexcept;
 
 private:
 	GLuint id = 0;
     static inline std::list<ZC_VBO> vbos;
 
 	ZC_VBO() noexcept;
+
+	static void UnbindBuffer() noexcept;
+	
+	void BindBuffer() const noexcept;
 
 #ifdef ZC_ANDROID
 	friend class ZC_AndroidNativeAppGlue_Window;
@@ -63,6 +124,41 @@ private:
 
 	static void ResetVBOs() noexcept;
 
-    void EditvboDatas(const long& offset, const long& size, char* const& pData) noexcept;
+	void ClearvboDatas() noexcept;
+    void AddVBOData(const long& offset, const long& size, char* const& pData) noexcept;
 #endif
 };
+
+template<ZC_cOpenGLType TOpenGL>
+bool ZC_VBO::BufferData(ZC_DynamicArray<TOpenGL> data, const GLenum& _usage) noexcept
+{
+	BindBuffer();
+	ZC_ErrorLogger::Clear();
+	size_t dataBytesSize = data.size * sizeof(TOpenGL);
+	glBufferData(GL_ARRAY_BUFFER, dataBytesSize, static_cast<void*>(data.pArray), _usage);
+	UnbindBuffer();
+	if (ZC_ErrorLogger::WasError()) return false;
+#ifdef ZC_ANDROID
+	usage = _usage;
+	ClearvboDatas();
+	vboDatas.emplace_back(dataBytesSize, reinterpret_cast<char*>(data.pArray), reinterpret_cast<char*>(data.pArray));
+	data.pArray = nullptr;
+#endif
+	return true;
+}
+
+template<ZC_cOpenGLType TOpenGL>
+bool ZC_VBO::BufferSubData(const long& offset, ZC_DynamicArray<TOpenGL> data) noexcept
+{
+	BindBuffer();
+	ZC_ErrorLogger::Clear();
+	size_t bytesSize = data.size * sizeof(TOpenGL);
+	glBufferSubData(GL_ARRAY_BUFFER, offset, bytesSize, static_cast<void*>(data.pArray));
+	UnbindBuffer();
+	if (ZC_ErrorLogger::WasError()) return false;
+#ifdef ZC_ANDROID
+	AddVBOData(offset, bytesSize, reinterpret_cast<char*>(data.pArray));
+	data.pArray = nullptr;
+#endif
+	return true;
+}

@@ -2,35 +2,28 @@
 
 #include "ZC/Tools/Function/ZC_Function.h"
 #include "ZC_SignalConnectionShared.h"
+#include <ZC/Tools/ZC_uptr.h>
 
 #include <map>
 #include <vector>
 #include <concepts>
 #include <condition_variable>
-#include <thread>
-
-template<typename TFirst, typename TSecond>
-concept ZC_cSameTypes = std::same_as<TFirst, TSecond>;
 
 template<typename TUnused>
 class ZC_Signal;
-/*
-Class for calling any number of ZC_Functions with the same signature.
-*/
+//  Class for calling any number of ZC_Functions with the same signature.
 template<typename TReturn, typename... TParams>
 class ZC_Signal<TReturn(TParams...)>
 {
 public:
-    /*
-    Class for connecting ZC_Function to ZC_Signal.
-    */
+    //  Class for connecting ZC_Function to ZC_Signal.
     class Connector
     {
     public:
         Connector() = delete;
 
         /*
-        Create Connector to ZC_Signal.
+        Creates Connector to ZC_Signal.
 
         Params:
         _pSignal - ZC_Signal pointer.
@@ -40,7 +33,7 @@ public:
         ~Connector() noexcept = default;
 
         /*
-        Connect ZC_Function to ZC_Signal.
+        Connects ZC_Function to ZC_Signal.
 
         Params:
         func - ZC_Function for connection.
@@ -52,7 +45,7 @@ public:
         ZC_SignalConnection* Connect(ZC_Function<TReturn(TParams...)> func, const unsigned short& callNumber = 0) noexcept;
 
         /*
-        Connect ZC_Function to ZC_Signal.
+        Connects ZC_Function to ZC_Signal.
 
         Params:
         func - ZC_Function for connection.
@@ -70,20 +63,20 @@ public:
     };
 
     /*
-    Create a ZC_Signal with the function signature <TReturn(TParams...)>.
+    Creates a ZC_Signal with the function signature <TReturn(TParams...)>.
     */
-    ZC_Signal() noexcept;
+    ZC_Signal() = default;
 
     ZC_Signal(const ZC_Signal<TReturn(TParams...)>&) = delete;
-    ZC_Signal<TReturn(TParams...)>& operator=(const ZC_Signal<TReturn(TParams...)>&) = delete;
+    ZC_Signal<TReturn(TParams...)>& operator = (const ZC_Signal<TReturn(TParams...)>&) = delete;
 
-    ZC_Signal(ZC_Signal<TReturn(TParams...)>&&) = delete;
-    ZC_Signal<TReturn(TParams...)>& operator=(ZC_Signal<TReturn(TParams...)>&&) = delete;
+    ZC_Signal(ZC_Signal<TReturn(TParams...)>&& sig) noexcept;
+    ZC_Signal<TReturn(TParams...)>& operator = (ZC_Signal<TReturn(TParams...)>&& sig) noexcept;
 
-    ~ZC_Signal() noexcept;
+    ~ZC_Signal() = default;
 
     /*
-    Connect ZC_Function to ZC_Signal.
+    Connects ZC_Function to ZC_Signal.
 
     Params:
     func - ZC_Function for connection.
@@ -95,7 +88,7 @@ public:
     ZC_SignalConnection* Connect(ZC_Function<TReturn(TParams...)> func, const unsigned short& callNumber = 0) noexcept;
     
     /*
-    Connect ZC_Function to ZC_Signal.
+    Connects ZC_Function to ZC_Signal.
 
     Params:
     func - ZC_Function for connection.
@@ -106,10 +99,10 @@ public:
     ZC_SignalConnection pointer.
     */
     template<typename TShared>
-    ZC_SignalConnection* Connect(ZC_Function<TReturn(TParams...)> func, std::shared_ptr<TShared> pShared, const unsigned short& callNumber = 0) noexcept;
+    ZC_SignalConnection* Connect(ZC_Function<TReturn(TParams...)> func, const std::shared_ptr<TShared>& pShared, const unsigned short& callNumber = 0) noexcept;
     
     /*
-    Call all connected ZC_Function.
+    Calls all connected ZC_Function.
 
     Params:
     params - parameters of the functions.
@@ -117,14 +110,13 @@ public:
     void operator()(TParams... params) noexcept;
     
     /*
-    Call all connected ZC_Function.
+    Calls all connected ZC_Function.
 
     Params:
     vec - a reference to a vector that will be filled with the function's return values.
     params - parameters of the functions.
     */
-    template<ZC_cSameTypes<TReturn> _TReturn>
-    void operator()(std::vector<_TReturn>& vec, TParams... params) noexcept;
+    void operator()(std::vector<TReturn>& vec, TParams... params) noexcept;
     
     /*
     Help to get Connector to the current ZC_Signal.
@@ -135,24 +127,14 @@ public:
     typename ZC_Signal<TReturn(TParams...)>::Connector GetConnector() noexcept;
 
 private:
-    enum FunctionsState
-    {
-        Active,
-        Terminate,
-        Finish
-    };
-
-    std::map<unsigned short, std::map<ZC_SignalConnection*, ZC_Function<TReturn(TParams...)>>> functions;
+    std::map<unsigned short, std::map<ZC_uptr<ZC_SignalConnection>, ZC_Function<TReturn(TParams...)>>> functions;
     std::mutex functionsMutex;
-    std::condition_variable functionsCV;
-    FunctionsState functionState = FunctionsState::Active;
 
-    void AddFunction(ZC_SignalConnection* pConnection, ZC_Function<TReturn(TParams...)>& func, const unsigned short& callNumber) noexcept;
-    void FunctionsTerminate() noexcept;
-    void FunctionsFinish() noexcept;
+    void AddFunction(ZC_uptr<ZC_SignalConnection>& pConnection, ZC_Function<TReturn(TParams...)>& func, const unsigned short& callNumber) noexcept;
 };
 
 //  start  ZC_Signal<TReturn(TParams...)>::Connector
+
 template<typename TReturn, typename... TParams>
 ZC_Signal<TReturn(TParams...)>::Connector::Connector(ZC_Signal<TReturn(TParams...)>* _pSignal) noexcept
 {
@@ -174,96 +156,68 @@ ZC_SignalConnection* ZC_Signal<TReturn(TParams...)>::Connector::Connect(ZC_Funct
 //  end  ZC_Signal<TReturn(TParams...)>::Connector
 
 //  start  ZC_Signal<TReturn(TParams...)>
-template<typename TReturn, typename... TParams>
-ZC_Signal<TReturn(TParams...)>::ZC_Signal() noexcept
-{
-    std::thread functionsTerminateTh([&]
-    {
-        while (true)
-        {
-            std::unique_lock<std::mutex> lock(functionsMutex);
-            functionsCV.wait(lock, [&]
-                {
-                    return functionState != FunctionsState::Active;
-                });
-            
-            if (functionState == FunctionsState::Finish)
-            {
-                FunctionsFinish();
-                break;
-            }
-            
-            FunctionsTerminate();
-
-            functionState = FunctionsState::Active;
-        }
-    });
-
-    functionsTerminateTh.detach();
-}
 
 template<typename TReturn, typename... TParams>
-ZC_Signal<TReturn(TParams...)>::~ZC_Signal() noexcept
+ZC_Signal<TReturn(TParams...)>::ZC_Signal(ZC_Signal<TReturn(TParams...)>&& sig) noexcept
+    : functions(std::move(sig.functions))
+{}
+
+template<typename TReturn, typename... TParams>
+ZC_Signal<TReturn(TParams...)>& ZC_Signal<TReturn(TParams...)>::operator = (ZC_Signal<TReturn(TParams...)>&& sig) noexcept
 {
-    std::unique_lock<std::mutex> lock(functionsMutex);
-    functionState = FunctionsState::Finish;
-    lock.unlock();
-    functionsCV.notify_one();
+    functions = std::move(sig.functions);
 }
 
 template<typename TReturn, typename... TParams>
 ZC_SignalConnection* ZC_Signal<TReturn(TParams...)>::Connect(ZC_Function<TReturn(TParams...)> func, const unsigned short& callNumber) noexcept
 {
-    ZC_SignalConnection* pConnection = new ZC_SignalConnection();
+    ZC_uptr<ZC_SignalConnection> pConnection = ZC_uptrMake<ZC_SignalConnection>(ZC_SignalConnection());
+    ZC_SignalConnection* con = pConnection.Get();
     AddFunction(pConnection, func, callNumber);
-    return pConnection;
+    return con;
 }
 
 template<typename TReturn, typename... TParams>
 template<typename TShared>
-ZC_SignalConnection* ZC_Signal<TReturn(TParams...)>::Connect(ZC_Function<TReturn(TParams...)> func, std::shared_ptr<TShared> pShared, const unsigned short& callNumber) noexcept
+ZC_SignalConnection* ZC_Signal<TReturn(TParams...)>::Connect(ZC_Function<TReturn(TParams...)> func, const std::shared_ptr<TShared>& pShared, const unsigned short& callNumber) noexcept
 {
-    ZC_SignalConnection* pConnection = dynamic_cast<ZC_SignalConnection*>(new ZC_SignalConnectionShared(pShared));
+    ZC_uptr<ZC_SignalConnection> pConnection = ZC_uptrMakeFromChild<ZC_SignalConnection, ZC_SignalConnection>(pShared); 
+    ZC_SignalConnection* con = pConnection.Get();
     AddFunction(pConnection, func, callNumber);
-    return pConnection;
+    return con;
 }
 
 template<typename TReturn, typename... TParams>
 void ZC_Signal<TReturn(TParams...)>::operator () (TParams... params) noexcept
 {
-    std::unique_lock<std::mutex> lock(functionsMutex);
-
-    for (std::pair<const unsigned short, std::map<ZC_SignalConnection*, ZC_Function<TReturn(TParams...)>>>& callPair : functions)
+    std::lock_guard<std::mutex> lock(functionsMutex);
+    for (auto callPairIter = functions.begin(); callPairIter != functions.end();)
     {
-        for (std::pair<ZC_SignalConnection*const, ZC_Function<TReturn(TParams...)>>& funcPair : callPair.second)
+        for (auto funcPairIter = callPairIter->second.begin(); funcPairIter != callPairIter->second.end();)
         {
-            switch (funcPair.first->GetState())
+            switch (funcPairIter->first->GetState())
             {
-                case ZC_SignalConnection::ConnectionState::Connected:
-                    funcPair.second(params...);
+                case ZC_SignalConnection::State::Connected:
+                    funcPairIter->second(params...);
+                    ++funcPairIter;
                     break;
-                case ZC_SignalConnection::ConnectionState::Terminated:
-                    functionState = FunctionsState::Terminate;
+                case ZC_SignalConnection::State::Terminated:
+                    funcPairIter = callPairIter->second.erase(funcPairIter);
                     break;
-                case ZC_SignalConnection::ConnectionState::Disconnected:
+                case ZC_SignalConnection::State::Disconnected:
+                    ++funcPairIter;
                     break;
             }
         }
-    }
 
-    if (functionState == FunctionsState::Terminate)
-    {
-        lock.unlock();
-        functionsCV.notify_one();
+        callPairIter = callPairIter->second.size() == 0 ? functions.erase(callPairIter) : ++callPairIter;
     }
 }
 
 template<typename TReturn, typename... TParams>
-template<ZC_cSameTypes<TReturn> TRet>
-void ZC_Signal<TReturn(TParams...)>::operator () (std::vector<TRet>& vec, TParams... params) noexcept
+void ZC_Signal<TReturn(TParams...)>::operator () (std::vector<TReturn>& vec, TParams... params) noexcept
 {
-    std::unique_lock<std::mutex> lock(functionsMutex);
-
+    std::lock_guard<std::mutex> lock(functionsMutex);
     int vecSize = 0;
     for (auto& callPair : functions)
     {
@@ -271,28 +225,26 @@ void ZC_Signal<TReturn(TParams...)>::operator () (std::vector<TRet>& vec, TParam
     }
     vec.reserve(vecSize);
 
-    for (std::pair<const unsigned short, std::map<ZC_SignalConnection*, ZC_Function<TReturn(TParams...)>>>& callPair : functions)
+    for (auto callPairIter = functions.begin(); callPairIter != functions.end();)
     {
-        for (std::pair<ZC_SignalConnection*const, ZC_Function<TReturn(TParams...)>>& funcPair : callPair.second)
+        for (auto funcPairIter = callPairIter->second.begin(); funcPairIter != callPairIter->second.end();)
         {
-            switch (funcPair.first->GetState())
+            switch (funcPairIter->first->GetState())
             {
-                case ZC_SignalConnection::ConnectionState::Connected:
-                    vec.emplace_back(funcPair.second(params...));
+                case ZC_SignalConnection::State::Connected:
+                    vec.emplace_back(funcPairIter->second(params...));
+                    ++funcPairIter;
                     break;
-                case ZC_SignalConnection::ConnectionState::Terminated:
-                    functionState = FunctionsState::Terminate;
+                case ZC_SignalConnection::State::Terminated:
+                    funcPairIter = callPairIter->second.erase(funcPairIter);
                     break;
-                case ZC_SignalConnection::ConnectionState::Disconnected:
+                case ZC_SignalConnection::State::Disconnected:
+                    ++funcPairIter;
                     break;
             }
         }
-    }
 
-    if (functionState == FunctionsState::Terminate)
-    {
-        lock.unlock();
-        functionsCV.notify_one();
+        callPairIter = callPairIter->second.size() == 0 ? functions.erase(callPairIter) : ++callPairIter;
     }
 }
 
@@ -303,54 +255,18 @@ typename ZC_Signal<TReturn(TParams...)>::Connector ZC_Signal<TReturn(TParams...)
 }
 
 template<typename TReturn, typename... TParams>
-void ZC_Signal<TReturn(TParams...)>::AddFunction(ZC_SignalConnection* pConnection, ZC_Function<TReturn(TParams...)>& func, const unsigned short& callNumber) noexcept
+void ZC_Signal<TReturn(TParams...)>::AddFunction(ZC_uptr<ZC_SignalConnection>& pConnection, ZC_Function<TReturn(TParams...)>& func, const unsigned short& callNumber) noexcept
 {
     std::lock_guard<std::mutex> lock(functionsMutex);
     auto callPairIter = functions.find(callNumber);
     if (callPairIter != functions.end())
     {
-        callPairIter->second.emplace(pConnection, std::move(func));
+        callPairIter->second.emplace(std::move(pConnection), std::move(func));
     }
     else
     {
-        std::map<ZC_SignalConnection*, ZC_Function<TReturn(TParams...)>> map;
-        map.emplace(pConnection, std::move(func));
+        std::map<ZC_uptr<ZC_SignalConnection>, ZC_Function<TReturn(TParams...)>> map;
+        map.emplace(std::move(pConnection), std::move(func));
         functions.emplace(callNumber, std::move(map));
     }
 }
-
-template<typename TReturn, typename... TParams>
-void ZC_Signal<TReturn(TParams...)>::FunctionsTerminate() noexcept
-{
-    for (auto callPairIter = functions.begin(); callPairIter != functions.end();)
-    {
-        for (auto funcPairIter = callPairIter->second.begin(); funcPairIter != callPairIter->second.end();)
-        {
-            if (funcPairIter->first->GetState() == ZC_SignalConnection::ConnectionState::Terminated)
-            {
-                delete funcPairIter->first;
-                funcPairIter = callPairIter->second.erase(funcPairIter);
-            }
-            else
-            {
-                ++funcPairIter;
-            }
-        }
-
-        callPairIter = callPairIter->second.size() == 0 ? functions.erase(callPairIter) : ++callPairIter;
-    }
-}
-
-template<typename TReturn, typename... TParams>
-void ZC_Signal<TReturn(TParams...)>::FunctionsFinish() noexcept
-{
-    for (auto& callPair : functions)
-    {
-        for (auto& funcPair : callPair.second)
-        {
-            funcPair.first->Terminate();
-            delete funcPair.first;
-        }
-    }
-}
-//  end  ZC_Signal<TReturn(TParams...)>

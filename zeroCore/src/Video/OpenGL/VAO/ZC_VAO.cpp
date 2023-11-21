@@ -12,6 +12,7 @@ ZC_VAO::ZC_VAO(ZC_VAO&& vao) noexcept
 
 ZC_VAO& ZC_VAO::operator = (ZC_VAO&& vao) noexcept
 {
+    if (id != 0) glDeleteVertexArrays(1, &id);
     id = vao.id;
     config = vao.config;
     stride = vao.stride;
@@ -23,13 +24,6 @@ ZC_VAO& ZC_VAO::operator = (ZC_VAO&& vao) noexcept
 ZC_VAO::~ZC_VAO()
 {
     glDeleteVertexArrays(1, &id);
-}
-
-GLint ZC_VAO::GetVAOConfigMaxCount() noexcept
-{
-    GLint maxCount;
-    glGetIntegerv(GL_MAX_VERTEX_ATTRIB_BINDINGS, &maxCount);
-    return maxCount;
 }
 
 ZC_VAO* ZC_VAO::GetVAO(const ZC_VAOConfig& vaoConfig) noexcept
@@ -84,7 +78,7 @@ ZC_VAO::ZC_VAO(const GLuint& _config)
     glGenVertexArrays(1, &id);
 }
 
-bool ZC_VAO::ReserveVAOsCount(const GLint& count) noexcept
+bool ZC_VAO::ReserveVAOs(const GLint& count) noexcept
 {
     vaos.reserve(count);
     return true;
@@ -92,21 +86,31 @@ bool ZC_VAO::ReserveVAOsCount(const GLint& count) noexcept
 
 ZC_VAO ZC_VAO::CreateVAO(const ZC_VAOConfig& vaoConfig) noexcept
 {
-    static bool vaosReserveCount = ReserveVAOsCount(GetVAOConfigMaxCount());
+    static bool vaosReserveCount = ReserveVAOs(ZC_VAOConfig::MaxCount());
     
+    static GLint configMaxCount = ZC_VAOConfig::MaxCount();
     GLuint config = vaos.size();
-    ZC_VAO vao(config);
-    
-    vao.BindVertexArray();
-    for (auto& format : vaoConfig.formats)
-    {
-        glEnableVertexAttribArray(format.attribindex);
-        glVertexAttribFormat(format.attribindex, format.size, format.type, format.normalized, format.relativeoffset);
-        glVertexAttribBinding(format.attribindex, config);
-    }
-    vao.UnbindVertexArray();
 
-    vao.stride = vaoConfig.CalculateStride();
+    ZC_VAO vao(config);
+    vao.BindVertexArray();
+    vaoConfig.Config(config);
+    UnbindVertexArray();
+
+    if (ZC_ErrorLogger::WasError()) return vao;
+
+    vao.stride = vaoConfig.Stride();
 
     return vao; 
 }
+#ifdef ZC_ANDROID
+void ZC_VAO::ResetVAOs() noexcept
+{
+    for (auto& vaosPair : vaos)
+    {
+        glGenVertexArrays(1, &vaosPair.second.id);
+        vaosPair.second.BindVertexArray();
+        vaosPair.first.Config(vaosPair.second.config);
+    }
+    UnbindVertexArray();
+}
+#endif

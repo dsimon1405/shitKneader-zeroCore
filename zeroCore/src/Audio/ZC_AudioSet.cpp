@@ -6,6 +6,11 @@ ZC_AudioSet::ZC_AudioSet(const Channels& _channels, const int& _frequency, const
     bitsPerSample(_bitsPerSample)
 {}
 
+ZC_AudioSet::operator bool () const noexcept
+{
+    return frequency != 0;
+}
+
 bool ZC_AudioSet::operator == (const ZC_AudioSet& audioSet) const noexcept
 {
     return channels == audioSet.channels &&

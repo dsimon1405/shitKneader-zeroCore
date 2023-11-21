@@ -5,6 +5,7 @@
 #include "../../OpenGL/ZC_OpenGLConfig.h"
 #include <ZC/Video/OpenGL/ZC_VBO.h>
 #include <ZC/Video/OpenGL/Shader/ZC_Shader.h>
+#include <ZC/Video/OpenGL/VAO/ZC_VAO.h>
 
 //#include <ZC/Audio/ZC_AudioStream.h>
 #include <ZC/Audio/ZC_Audio.h>
@@ -33,6 +34,11 @@ bool ZC_AndroidNativeAppGlue_Window::HandleEvents() noexcept
     static int events;
     static struct android_poll_source* pSource;
 
+    if(display)
+    {
+
+    }
+
     if (ALooper_pollOnce( 0, nullptr, &events, (void**)&pSource) >= 0)
     {
         // Process this event.
@@ -57,7 +63,7 @@ void ZC_AndroidNativeAppGlue_Window::SwapBuffer() noexcept
     eglSwapBuffers(display, surface);
 }
 
-bool ZC_AndroidNativeAppGlue_Window::InitGraphicOpenGL(ANativeWindow* pWindow) noexcept
+bool ZC_AndroidNativeAppGlue_Window::InitGraphicOpenGL(ANativeWindow* const& pWindow) noexcept
 {
     const EGLint attribs[] = {EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
                               EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
@@ -222,21 +228,18 @@ void ZC_AndroidNativeAppGlue_Window::CloseGraphicOpenGL() noexcept
     context = nullptr;
     surface = nullptr;
 }
-
+#include <ZC/Tools/Console/ZC_cout.h>
 int ZC_AndroidNativeAppGlue_Window::HandleInput(struct android_app* app, AInputEvent* pEvent)
 {
-    if (!app->userData)
-    {
-        ZC_ErrorLogger::Err("app->userData = nullptr!", __FILE__, __LINE__);
-        return false;
-    }
-
-    auto pWindow = reinterpret_cast<ZC_AndroidNativeAppGlue_Window*>(app->userData);
+    auto pWindow = static_cast<ZC_AndroidNativeAppGlue_Window*>(app->userData);
 //    static int frame = 0;
 //    if (pWindow->currentFrame != frame)
 //    {
 //        frame = pWindow->currentFrame;
-//        if (AInputEvent_getType(pEvent) == AINPUT_EVENT_TYPE_MOTION)
+        if (AInputEvent_getType(pEvent) == AINPUT_EVENT_TYPE_MOTION)
+        {
+            ZC_cout("motion");
+        }
 //        {
 //            auto x = AMotionEvent_getX(pEvent, 0);
 //            auto y = AMotionEvent_getY(pEvent, 0);
@@ -274,13 +277,7 @@ int ZC_AndroidNativeAppGlue_Window::HandleInput(struct android_app* app, AInputE
 
 void ZC_AndroidNativeAppGlue_Window::HandleCMD(struct android_app* app, int cmd)
 {
-    if (!app->userData)
-    {
-        ZC_ErrorLogger::Err("app->userData = nullptr!", __FILE__, __LINE__);
-        return;
-    }
-
-    auto pWindow = reinterpret_cast<ZC_AndroidNativeAppGlue_Window*>(app->userData);
+    auto pWindow = static_cast<ZC_AndroidNativeAppGlue_Window*>(app->userData);
     switch (cmd)
     {
         case APP_CMD_SAVE_STATE:
@@ -299,20 +296,16 @@ void ZC_AndroidNativeAppGlue_Window::HandleCMD(struct android_app* app, int cmd)
         {
             if (app->window && pWindow->InitGraphicOpenGL(app->window))
             {
-                pWindow->inited = true;
                 ZC_Shader::ResetShaders();
                 ZC_VBO::ResetVBOs();
+                ZC_VAO::ResetVAOs();
             }
             break;
         }
 
         case APP_CMD_TERM_WINDOW:
         {
-            // The window is being hidden or closed, clean it up.
             pWindow->CloseGraphicOpenGL();
-
-            pWindow->inited = false;
-
             break;
         }
 

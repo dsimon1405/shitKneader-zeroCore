@@ -19,13 +19,5 @@ private:
     SDL_Window* window;
     SDL_GLContext glContext;
 
-    static void APIENTRY GLDebugOutput(
-	    GLenum source,
-	    GLenum type,
-	    unsigned int id,
-	    GLenum severity,
-	    GLsizei length,
-	    const char* message,
-	    const void* userParam);
     bool SetOpenGLAttributes() noexcept;
 };

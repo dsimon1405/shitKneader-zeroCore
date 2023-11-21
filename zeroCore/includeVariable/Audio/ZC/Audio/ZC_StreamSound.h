@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ZC_SoundData.h"
-#include <ZC/Tools/Signal/ZC_Signal.h>
+#include <ZC/Tools/Signal/ZC_SignalConnection.h>
 
 #include <mutex>
 
@@ -25,10 +25,10 @@ public:
 
     virtual ~ZC_StreamSound() = default;
 
-    template <ZC_cBitsPerSample TType>
-    bool Pop(TType& value) noexcept
+    template <ZC_cBitsPerSample T>
+    bool Pop(T& value) noexcept
     {
-        static unsigned int soundDataSize = soundData->Size<TType>();
+        unsigned long soundDataSize = soundData->Size<T>();
         std::lock_guard<std::mutex> lock(soundStateMutex);
         if (soundState == SoundState::Stop || soundState == SoundState::Pause || soundDataSize == 0)
         {
@@ -36,7 +36,7 @@ public:
             return false;
         }
         
-        value = soundData->GetValue<TType>(soundDataIndex++) * volume;
+        value = soundData->GetValue<T>(soundDataIndex++) * volume;
         if (soundDataIndex >= soundDataSize)
         {
             soundDataIndex = 0;
@@ -54,10 +54,10 @@ public:
 protected:
     SoundState soundState = SoundState::Stop;
     const ZC_SoundData* soundData;
-    unsigned int soundDataIndex = 0;
+    unsigned long soundDataIndex = 0;
     double volume = 1.0;
     ZC_SignalConnection* conGetpZC_StreamSound;
     std::mutex soundStateMutex;
 
-    ZC_StreamSound(const ZC_SoundData* _soundData) noexcept;
+    ZC_StreamSound(const ZC_SoundData* const& _soundData) noexcept;
 };

@@ -5,6 +5,7 @@
 
 #include <map>
 #include <shared_mutex>
+#include <condition_variable>
 
 //  Class for loading WAV files, and getting sounds.
 class ZC_Sounds
@@ -37,15 +38,15 @@ public:
 
 private:
     static inline std::map<std::string, ZC_SoundData> sounds;
-    static inline std::shared_mutex soundssMutex;
+    static inline std::shared_mutex soundsSMutex;
     static inline std::condition_variable_any soundsCVA;
 
     static ZC_SoundData ReadWAV(const char* const& path) noexcept;
 
-    template<ZC_cBitsPerSample TType>
+    template<ZC_cBitsPerSample T>
     static bool DeleteStartNullData(ZC_upFileReader& file, int32_t& size, const char* const& path) noexcept
     {
-        TType readData = 0;
+        T readData = 0;
         static size_t readDataSizeof = sizeof(readData);
         do
         {
@@ -57,7 +58,7 @@ private:
             }
             if (file->Eof())
             {
-                ZC_ErrorLogger::Err("There's no not 0 data in file: " + std::string(path), __FILE__, __LINE__);
+                ZC_ErrorLogger::Err("All data is 0 in the file: " + std::string(path), __FILE__, __LINE__);
                 file->Close();
                 return false;
             }

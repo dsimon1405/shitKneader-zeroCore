@@ -20,14 +20,14 @@ private:
     EGLDisplay display = nullptr;
     EGLSurface surface = nullptr;
     EGLContext context = nullptr;
-    int width = 0;
-    int height = 0;
+    // int width = 0;
+    // int height = 0;
 //    int currentFrame = 0;
 
     static void HandleCMD(struct android_app* app, int cmd);
     static int HandleInput(struct android_app* app, AInputEvent* pEvent);
 
-    bool InitGraphicOpenGL(ANativeWindow* pWindow) noexcept;
+    bool InitGraphicOpenGL(ANativeWindow* const& pWindow) noexcept;
     void CloseGraphicOpenGL() noexcept;
 };
 

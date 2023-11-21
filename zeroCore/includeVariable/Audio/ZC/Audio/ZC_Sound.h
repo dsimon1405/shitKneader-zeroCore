@@ -1,16 +1,17 @@
 #pragma once
 
-#include "ZC_AudioStream.h"
+#include "ZC_StreamSound.h"
+#include "ZC/Tools/ZC_uptr.h"
 
 class ZC_Sound;
 //  Unique pointer to ZC_Sound.
-using ZC_upSound = std::unique_ptr<ZC_Sound>;
+using ZC_upSound = ZC_uptr<ZC_Sound>;
 
 //  Class for controlling sound in an audio stream.
-class ZC_Sound : protected ZC_StreamSound, protected ZC_AudioStream
+class ZC_Sound : protected ZC_StreamSound
 {
 public:
-    ZC_Sound(const ZC_SoundData* _sound) noexcept;
+    ZC_Sound(const ZC_SoundData* const& _sound) noexcept;
 
     ~ZC_Sound() noexcept override;
     
@@ -27,7 +28,7 @@ public:
     void Stop() noexcept;
 
     /*
-    Helps to get sound state.
+    Sounds state.
 
     Return:
     Current sound state.

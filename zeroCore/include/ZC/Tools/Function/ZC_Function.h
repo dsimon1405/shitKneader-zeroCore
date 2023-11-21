@@ -2,6 +2,7 @@
 
 #include "ZC_FunctionHolder.h"
 #include <ZC/Tools/Exception/ZC_Exception.h>
+#include <ZC/Tools/ZC_uptr.h>
 
 #include <memory>
 
@@ -60,7 +61,7 @@ public:
     ZC_Function(ZC_Function<TReturn(TParams...)>&& pFunc) noexcept;
     ZC_Function<TReturn(TParams...)>& operator = (ZC_Function<TReturn(TParams...)>&& func) noexcept;
 
-    ~ZC_Function() noexcept;
+    // ~ZC_Function() noexcept;
 
     /*
     Call function(method). If function is nullptr throw exception.
@@ -74,61 +75,47 @@ public:
     TReturn operator () (TParams... params) const;
 
 private:
-    ZC_IFunctionHolder<TReturn(TParams...)>* pFuncHolder = nullptr;
+    ZC_uptr<ZC_IFunctionHolder<TReturn(TParams...)>> pFuncHolder = nullptr;
 };
 
 template <typename TReturn, typename... TParams>
 ZC_Function<TReturn(TParams...)>::ZC_Function(TReturn(*pFunc)(TParams...)) noexcept
-{
-    pFuncHolder = dynamic_cast<ZC_IFunctionHolder<TReturn(TParams...)>*>(new ZC_FunctionHolder<TReturn(TParams...)>(pFunc));
-}
+    : pFuncHolder(ZC_uptrMakeFromChild<ZC_IFunctionHolder<TReturn(TParams...)>, ZC_FunctionHolder<TReturn(TParams...)>>(pFunc))
+{}
 
 template <typename TReturn, typename... TParams>
 template <typename TClass>
 ZC_Function<TReturn(TParams...)>::ZC_Function(TReturn(TClass::*pFunc)(TParams...), TClass* pClass) noexcept
-{
-    pFuncHolder = dynamic_cast<ZC_IFunctionHolder<TReturn(TParams...)>*>(new ZC_FunctionHolder<TReturn(TParams...), TClass>(pFunc, pClass));
-}
+    : pFuncHolder(ZC_uptrMakeFromChild<ZC_IFunctionHolder<TReturn(TParams...)>, ZC_FunctionHolder<TReturn(TParams...), TClass>>(pFunc, pClass))
+{}
 
 template <typename TReturn, typename... TParams>
 template <typename TClass>
 ZC_Function<TReturn(TParams...)>::ZC_Function(TReturn(TClass::*pFunc)(TParams...) const, TClass* pClass) noexcept
-{
-    pFuncHolder = dynamic_cast<ZC_IFunctionHolder<TReturn(TParams...)>*>(new ZC_FunctionHolder<TReturn(TParams...), TClass>(pFunc, pClass));
-}
+    : pFuncHolder(ZC_uptrMakeFromChild<ZC_IFunctionHolder<TReturn(TParams...)>, ZC_FunctionHolder<TReturn(TParams...), TClass>>(pFunc, pClass))
+{}
 
 template <typename TReturn, typename... TParams>
 template <typename TClass>
 ZC_Function<TReturn(TParams...)>::ZC_Function(TReturn(TClass::*pFunc)(TParams...) const, const TClass* pClass) noexcept
-{
-    pFuncHolder = dynamic_cast<ZC_IFunctionHolder<TReturn(TParams...)>*>(new ZC_FunctionHolder<TReturn(TParams...), TClass>(pFunc, pClass));
-}
+    : pFuncHolder(ZC_uptrMakeFromChild<ZC_IFunctionHolder<TReturn(TParams...)>, ZC_FunctionHolder<TReturn(TParams...), TClass>>(pFunc, pClass))
+{}
 
 template <typename TReturn, typename... TParams>
 ZC_Function<TReturn(TParams...)>::ZC_Function(ZC_Function<TReturn(TParams...)>&& pFunc) noexcept
-    : pFuncHolder(pFunc.pFuncHolder)
-{
-    pFunc.pFuncHolder = nullptr;
-}
+    : pFuncHolder(std::move(pFunc.pFuncHolder))
+{}
 
 template <typename TReturn, typename... TParams>
 ZC_Function<TReturn(TParams...)>& ZC_Function<TReturn(TParams...)>::operator = (ZC_Function<TReturn(TParams...)>&& func) noexcept
 {
-    pFuncHolder = func.pFuncHolder;
-    func.pFuncHolder = nullptr;
+    pFuncHolder = std::move(func.pFuncHolder);
     return *this;
-}
-
-template <typename TReturn, typename... TParams>
-ZC_Function<TReturn(TParams...)>::~ZC_Function() noexcept
-{
-    delete pFuncHolder;
-    pFuncHolder = nullptr;
 }
 
 template <typename TReturn, typename... TParams>
 TReturn ZC_Function<TReturn(TParams...)>::operator () (TParams... params) const
 {
     if (!pFuncHolder) throw ZC_Exception(ZC_MakeErrorString("Call ZC_Function() with function pointer = nullptr!", __FILE__, __LINE__));
-    return (*pFuncHolder)(params...);
+    return (*pFuncHolder.Get())(params...);
 }
