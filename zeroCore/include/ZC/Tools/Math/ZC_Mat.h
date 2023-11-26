@@ -24,7 +24,7 @@ namespace ZC_Mat
     Perspective matrix.
     */
     template<ZC_cVecTypes TValue>
-    ZC_Mat4<TValue> Perspective(const TValue& fovy, const TValue& aspect, const TValue& near, const TValue& far) noexcept
+    ZC_Mat4<TValue> Perspective(TValue fovy, TValue aspect, TValue near, TValue far) noexcept
     {
         ZC_Mat4<TValue> result;
 

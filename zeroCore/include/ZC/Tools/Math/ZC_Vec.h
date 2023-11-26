@@ -66,7 +66,7 @@ namespace ZC_Vec
     Angle in radians.
     */
     template<ZC_cVecTypes TValue>
-    TValue Radians(const TValue& angle) noexcept
+    TValue Radians(TValue angle) noexcept
     {
         static const TValue radiansCoef = static_cast<TValue>(M_PI / 180.0);
         return angle * radiansCoef;

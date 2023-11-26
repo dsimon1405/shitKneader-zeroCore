@@ -22,13 +22,13 @@ template<ZC_cVecTypes TValue = float>
 struct ZC_Mat4
 {
 
-    ZC_Mat4(const TValue& value = 0) noexcept;
+    ZC_Mat4(TValue value = 0) noexcept;
 
-    ZC_Vec4<TValue>& operator [] (const int& index);
-    const ZC_Vec4<TValue>& operator [] (const int& index) const;
+    ZC_Vec4<TValue>& operator [] (int index);
+    const ZC_Vec4<TValue>& operator [] (int index) const;
 
-    ZC_Mat4<TValue>& operator *= (const TValue& value) noexcept;
-    ZC_Mat4<TValue> operator * (const TValue& value) const noexcept;
+    ZC_Mat4<TValue>& operator *= (TValue value) noexcept;
+    ZC_Mat4<TValue> operator * (TValue value) const noexcept;
     ZC_Vec4<TValue> operator * (const ZC_Vec4<TValue>& vec) const noexcept;
     ZC_Mat4<TValue>& operator *= (const ZC_Mat4& mat) noexcept;
     ZC_Mat4<TValue> operator * (const ZC_Mat4& mat) const noexcept;
@@ -54,7 +54,7 @@ struct ZC_Mat4
     Return:
     Rotation matrix.
     */
-    ZC_Mat4<TValue>& Rotate(const TValue& angle, const ZC_Vec3<TValue>& axiss) noexcept;
+    ZC_Mat4<TValue>& Rotate(TValue angle, const ZC_Vec3<TValue>& axiss) noexcept;
 
     /*
     Transform the matrix for vector translation.
@@ -77,7 +77,7 @@ private:
 };
 
 template<ZC_cVecTypes TValue>
-ZC_Mat4<TValue>::ZC_Mat4(const TValue& value) noexcept
+ZC_Mat4<TValue>::ZC_Mat4(TValue value) noexcept
     :columns
     {
         {static_cast<TValue>(value)},
@@ -88,26 +88,26 @@ ZC_Mat4<TValue>::ZC_Mat4(const TValue& value) noexcept
 {}
 
 template<ZC_cVecTypes TValue>
-ZC_Vec4<TValue>& ZC_Mat4<TValue>::operator [] (const int& index)
+ZC_Vec4<TValue>& ZC_Mat4<TValue>::operator [] (int index)
 {
     return columns[index];
 }
 
 template<ZC_cVecTypes TValue>
-const ZC_Vec4<TValue>& ZC_Mat4<TValue>::operator [] (const int& index) const
+const ZC_Vec4<TValue>& ZC_Mat4<TValue>::operator [] (int index) const
 {
     return const_cast<const ZC_Vec4<TValue>&>(columns[index]);
 }
 
 template<ZC_cVecTypes TValue>
-ZC_Mat4<TValue>& ZC_Mat4<TValue>::operator *= (const TValue& value) noexcept
+ZC_Mat4<TValue>& ZC_Mat4<TValue>::operator *= (TValue value) noexcept
 {
     ZC_MatArithmetic::MultiplyValue(*this, 4, value);
     return *this;
 }
 
 template<ZC_cVecTypes TValue>
-ZC_Mat4<TValue> ZC_Mat4<TValue>::operator * (const TValue& value) const noexcept
+ZC_Mat4<TValue> ZC_Mat4<TValue>::operator * (TValue value) const noexcept
 {
     ZC_Mat4 result = *this;
     return result *= value;
@@ -145,7 +145,7 @@ ZC_Mat4<TValue>& ZC_Mat4<TValue>::Scale(const ZC_Vec3<TValue>& scale) noexcept
 }
 
 template<ZC_cVecTypes TValue>
-ZC_Mat4<TValue>& ZC_Mat4<TValue>::Rotate(const TValue& angle, const ZC_Vec3<TValue>& axiss) noexcept
+ZC_Mat4<TValue>& ZC_Mat4<TValue>::Rotate(TValue angle, const ZC_Vec3<TValue>& axiss) noexcept
 {
     const TValue radAngle = ZC_Vec::Radians(angle);
     const TValue c = cos(radAngle);

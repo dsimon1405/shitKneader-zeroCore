@@ -10,7 +10,7 @@
 //#include <ZC/Audio/ZC_AudioStream.h>
 #include <ZC/Audio/ZC_Audio.h>
 
-ZC_AndroidNativeAppGlue_Window::ZC_AndroidNativeAppGlue_Window(const char* const& name, const int& width, const int& height) noexcept
+ZC_AndroidNativeAppGlue_Window::ZC_AndroidNativeAppGlue_Window(const char* name, int width, int height) noexcept
 {
     if (!pAndroidApp)
     {
@@ -61,172 +61,6 @@ void ZC_AndroidNativeAppGlue_Window::SwapBuffer() noexcept
 {
 //    currentFrame++;
     eglSwapBuffers(display, surface);
-}
-
-bool ZC_AndroidNativeAppGlue_Window::InitGraphicOpenGL(ANativeWindow* const& pWindow) noexcept
-{
-    const EGLint attribs[] = {EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
-                              EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-                              EGL_BLUE_SIZE,    ZC_OPEN_GL_COLLOR_BUFFER_SIZE,
-                              EGL_GREEN_SIZE,   ZC_OPEN_GL_COLLOR_BUFFER_SIZE,
-                              EGL_RED_SIZE,     ZC_OPEN_GL_COLLOR_BUFFER_SIZE,
-                              EGL_DEPTH_SIZE, ZC_OPEN_GL_DEPTH_BUFFER_SIZE,
-                              EGL_NONE};
-    EGLint format = 0;
-
-    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    if (display == nullptr)
-    {
-        ZC_ErrorLogger::Err("eglGetDisplay() fail!", __FILE__, __LINE__);
-        return false;
-    }
-
-    if (eglInitialize(display, nullptr, nullptr) == EGL_FALSE)
-    {
-        eglTerminate(display);
-        display = nullptr;
-        ZC_ErrorLogger::Err("eglInitialize() fail!", __FILE__, __LINE__);
-        return false;
-    }
-
-    EGLint numConfigs = 0;
-    if (eglChooseConfig(display, attribs, nullptr, 0, &numConfigs) == EGL_FALSE)
-    {
-        eglTerminate(display);
-        display = nullptr;
-        ZC_ErrorLogger::Err("eglChooseConfig() fail!", __FILE__, __LINE__);
-        return false;
-    }
-
-    EGLConfig supportedConfigs[numConfigs];
-    if (eglChooseConfig(display, attribs, supportedConfigs, numConfigs, &numConfigs) == EGL_FALSE)
-    {
-        eglTerminate(display);
-        display = nullptr;
-        ZC_ErrorLogger::Err("eglChooseConfig() fail!", __FILE__, __LINE__);
-        return false;
-    }
-
-    EGLConfig config = nullptr;
-    for (int i = 0; i < numConfigs; ++i)
-    {
-        EGLint red, green, blue, depth;
-        if (eglGetConfigAttrib(display, supportedConfigs[i], EGL_RED_SIZE, &red)
-            && eglGetConfigAttrib(display, supportedConfigs[i], EGL_GREEN_SIZE, &green)
-            && eglGetConfigAttrib(display, supportedConfigs[i], EGL_BLUE_SIZE, &blue)
-            && eglGetConfigAttrib(display, supportedConfigs[i], EGL_DEPTH_SIZE, &depth)
-            && red == ZC_OPEN_GL_COLLOR_BUFFER_SIZE
-            && green == ZC_OPEN_GL_COLLOR_BUFFER_SIZE
-            && blue == ZC_OPEN_GL_COLLOR_BUFFER_SIZE
-            && depth == ZC_OPEN_GL_DEPTH_BUFFER_SIZE)
-        {
-            config = supportedConfigs[i];
-            break;
-        }
-    }
-    if (!config) config = supportedConfigs[0];
-
-    if (eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format) == EGL_FALSE)
-    {
-        eglTerminate(display);
-        display = nullptr;
-        ZC_ErrorLogger::Err("eglGetConfigAttrib() fail!", __FILE__, __LINE__);
-        return false;
-    }
-
-    surface = eglCreateWindowSurface(display, config, pWindow, NULL);
-    if (surface == nullptr)
-    {
-        eglTerminate(display);
-        display = nullptr;
-        ZC_ErrorLogger::Err("eglCreateWindowSurface() fail!", __FILE__, __LINE__);
-        return false;
-    }
-
-    EGLint contextAttribs[] =
-            {
-                    EGL_CONTEXT_MAJOR_VERSION, ZC_OPEN_GL_MAJOR_VERSION,
-                    EGL_CONTEXT_MINOR_VERSION, ZC_OPEN_GL_MINOR_VERSION,
-                    EGL_NONE
-            };
-
-    context = eglCreateContext(display, config, NULL, contextAttribs);
-    if (context == nullptr)
-    {
-        eglDestroySurface(display, surface);
-        eglTerminate(display);
-        display = nullptr;
-        surface = nullptr;
-        ZC_ErrorLogger::Err("eglCreateContext() fail!", __FILE__, __LINE__);
-        return false;
-    }
-
-    if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE)
-    {
-        eglDestroySurface(display, surface);
-        eglDestroyContext(display, context);
-        eglTerminate(display);
-        display = nullptr;
-        context = nullptr;
-        surface = nullptr;
-        ZC_ErrorLogger::Err("eglMakeCurrent() fail!", __FILE__, __LINE__);
-        return false;
-    }
-
-    if (eglQuerySurface(display, surface, EGL_WIDTH, &width) == EGL_FALSE)
-    {
-        eglDestroySurface(display, surface);
-        eglDestroyContext(display, context);
-        eglTerminate(display);
-        display = nullptr;
-        context = nullptr;
-        surface = nullptr;
-        ZC_ErrorLogger::Err("eglQuerySurface(EGL_WIDTH) fail!", __FILE__, __LINE__);
-        return false;
-    }
-    if (eglQuerySurface(display, surface, EGL_HEIGHT, &height) == EGL_FALSE)
-    {
-        eglDestroySurface(display, surface);
-        eglDestroyContext(display, context);
-        eglTerminate(display);
-        display = nullptr;
-        context = nullptr;
-        surface = nullptr;
-        ZC_ErrorLogger::Err("eglQuerySurface(EGL_HEIGHT) fail!", __FILE__, __LINE__);
-        return false;
-    }
-
-//    const char* a = (const char*)glGetString(GL_VERSION);
-    ZC_OpenGLAssigneErrorCallback();
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-
-    ZC_ErrorLogger::Clear();
-    return true;
-}
-
-void ZC_AndroidNativeAppGlue_Window::CloseGraphicOpenGL() noexcept
-{
-    if (display != EGL_NO_DISPLAY)
-    {
-        eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-
-        if (context != EGL_NO_CONTEXT)
-        {
-            eglDestroyContext(display, context);
-        }
-
-        if (surface != EGL_NO_SURFACE)
-        {
-            eglDestroySurface(display, surface);
-        }
-
-        eglTerminate(display);
-    }
-
-    display = nullptr;
-    context = nullptr;
-    surface = nullptr;
 }
 #include <ZC/Tools/Console/ZC_cout.h>
 int ZC_AndroidNativeAppGlue_Window::HandleInput(struct android_app* app, AInputEvent* pEvent)
@@ -399,4 +233,170 @@ void ZC_AndroidNativeAppGlue_Window::HandleCMD(struct android_app* app, int cmd)
         default:
             break;
     }
+}
+
+bool ZC_AndroidNativeAppGlue_Window::InitGraphicOpenGL(ANativeWindow* pWindow) noexcept
+{
+    const EGLint attribs[] = {EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+                              EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+                              EGL_BLUE_SIZE,    ZC_OPEN_GL_COLLOR_BUFFER_SIZE,
+                              EGL_GREEN_SIZE,   ZC_OPEN_GL_COLLOR_BUFFER_SIZE,
+                              EGL_RED_SIZE,     ZC_OPEN_GL_COLLOR_BUFFER_SIZE,
+                              EGL_DEPTH_SIZE, ZC_OPEN_GL_DEPTH_BUFFER_SIZE,
+                              EGL_NONE};
+
+    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (display == nullptr)
+    {
+        ZC_ErrorLogger::Err("eglGetDisplay() fail!", __FILE__, __LINE__);
+        return false;
+    }
+
+    if (eglInitialize(display, nullptr, nullptr) == EGL_FALSE)
+    {
+        eglTerminate(display);
+        display = nullptr;
+        ZC_ErrorLogger::Err("eglInitialize() fail!", __FILE__, __LINE__);
+        return false;
+    }
+
+    EGLint numConfigs = 0;
+    if (eglChooseConfig(display, attribs, nullptr, 0, &numConfigs) == EGL_FALSE)
+    {
+        eglTerminate(display);
+        display = nullptr;
+        ZC_ErrorLogger::Err("eglChooseConfig() fail!", __FILE__, __LINE__);
+        return false;
+    }
+
+    EGLConfig supportedConfigs[numConfigs];
+    if (eglChooseConfig(display, attribs, supportedConfigs, numConfigs, &numConfigs) == EGL_FALSE)
+    {
+        eglTerminate(display);
+        display = nullptr;
+        ZC_ErrorLogger::Err("eglChooseConfig() fail!", __FILE__, __LINE__);
+        return false;
+    }
+
+    EGLConfig config = nullptr;
+    for (int i = 0; i < numConfigs; ++i)
+    {
+        EGLint red, green, blue, depth;
+        if (eglGetConfigAttrib(display, supportedConfigs[i], EGL_RED_SIZE, &red)
+            && eglGetConfigAttrib(display, supportedConfigs[i], EGL_GREEN_SIZE, &green)
+            && eglGetConfigAttrib(display, supportedConfigs[i], EGL_BLUE_SIZE, &blue)
+            && eglGetConfigAttrib(display, supportedConfigs[i], EGL_DEPTH_SIZE, &depth)
+            && red == ZC_OPEN_GL_COLLOR_BUFFER_SIZE
+            && green == ZC_OPEN_GL_COLLOR_BUFFER_SIZE
+            && blue == ZC_OPEN_GL_COLLOR_BUFFER_SIZE
+            && depth == ZC_OPEN_GL_DEPTH_BUFFER_SIZE)
+        {
+            config = supportedConfigs[i];
+            break;
+        }
+    }
+    if (!config) config = supportedConfigs[0];
+
+    EGLint format = 0;
+    if (eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format) == EGL_FALSE)
+    {
+        eglTerminate(display);
+        display = nullptr;
+        ZC_ErrorLogger::Err("eglGetConfigAttrib() fail!", __FILE__, __LINE__);
+        return false;
+    }
+
+    surface = eglCreateWindowSurface(display, config, pWindow, NULL);
+    if (surface == nullptr)
+    {
+        eglTerminate(display);
+        display = nullptr;
+        ZC_ErrorLogger::Err("eglCreateWindowSurface() fail!", __FILE__, __LINE__);
+        return false;
+    }
+
+    EGLint contextAttribs[] =
+            {
+                    EGL_CONTEXT_MAJOR_VERSION, ZC_OPEN_GL_MAJOR_VERSION,
+                    EGL_CONTEXT_MINOR_VERSION, ZC_OPEN_GL_MINOR_VERSION,
+                    EGL_NONE
+            };
+
+    context = eglCreateContext(display, config, NULL, contextAttribs);
+    if (context == nullptr)
+    {
+        eglDestroySurface(display, surface);
+        eglTerminate(display);
+        display = nullptr;
+        surface = nullptr;
+        ZC_ErrorLogger::Err("eglCreateContext() fail!", __FILE__, __LINE__);
+        return false;
+    }
+
+    if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE)
+    {
+        eglDestroySurface(display, surface);
+        eglDestroyContext(display, context);
+        eglTerminate(display);
+        display = nullptr;
+        context = nullptr;
+        surface = nullptr;
+        ZC_ErrorLogger::Err("eglMakeCurrent() fail!", __FILE__, __LINE__);
+        return false;
+    }
+
+    if (eglQuerySurface(display, surface, EGL_WIDTH, &width) == EGL_FALSE)
+    {
+        eglDestroySurface(display, surface);
+        eglDestroyContext(display, context);
+        eglTerminate(display);
+        display = nullptr;
+        context = nullptr;
+        surface = nullptr;
+        ZC_ErrorLogger::Err("eglQuerySurface(EGL_WIDTH) fail!", __FILE__, __LINE__);
+        return false;
+    }
+    if (eglQuerySurface(display, surface, EGL_HEIGHT, &height) == EGL_FALSE)
+    {
+        eglDestroySurface(display, surface);
+        eglDestroyContext(display, context);
+        eglTerminate(display);
+        display = nullptr;
+        context = nullptr;
+        surface = nullptr;
+        ZC_ErrorLogger::Err("eglQuerySurface(EGL_HEIGHT) fail!", __FILE__, __LINE__);
+        return false;
+    }
+
+//    const char* a = (const char*)glGetString(GL_VERSION);
+    ZC_OpenGLAssigneErrorCallback();
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+
+    ZC_ErrorLogger::Clear();
+    return true;
+}
+
+void ZC_AndroidNativeAppGlue_Window::CloseGraphicOpenGL() noexcept
+{
+    if (display != EGL_NO_DISPLAY)
+    {
+        eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+
+        if (context != EGL_NO_CONTEXT)
+        {
+            eglDestroyContext(display, context);
+        }
+
+        if (surface != EGL_NO_SURFACE)
+        {
+            eglDestroySurface(display, surface);
+        }
+
+        eglTerminate(display);
+    }
+
+    display = nullptr;
+    context = nullptr;
+    surface = nullptr;
 }

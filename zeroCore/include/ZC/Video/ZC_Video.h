@@ -22,5 +22,5 @@ public:
     Return:
     On success unique pointer of ZC_Window, otherwise nullptr (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
     */
-    static ZC_upWindow MakeWindow(const char* const& name = "", const int& width = 0, const int& height = 0);
+    static ZC_upWindow MakeWindow(const char* name = "", int width = 0, int height = 0);
 };

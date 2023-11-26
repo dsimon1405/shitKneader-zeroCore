@@ -12,7 +12,7 @@ std::string ZC_MakePathToAssets()
     return ZC_BUILD_ASSETS_PATH + srcPath.substr(sleshIndex, srcPath.size()) + "/";
 }
 
-const char* ZC_MakeAbsolutePath(const char* const& localPath)
+const char* ZC_MakeAbsolutePath(const char* localPath)
 {
     if (ZC_BUILD_ASSETS_PATH == "")
     {
@@ -28,7 +28,7 @@ const char* ZC_MakeAbsolutePath(const char* const& localPath)
         }
         else
         {
-            static std::string pathToAssets = ZC_MakePathToAssets();
+            static const std::string pathToAssets = ZC_MakePathToAssets();
             return paths.emplace(localPath, pathToAssets + std::string(localPath)).first->second.c_str();
         }
     }

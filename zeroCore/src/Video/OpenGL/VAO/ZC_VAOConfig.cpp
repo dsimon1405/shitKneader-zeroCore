@@ -10,9 +10,9 @@ ZC_VAOConfig& ZC_VAOConfig::operator = (ZC_VAOConfig&& vaoConfig) noexcept
     return *this;
 }
 
-bool ZC_VAOConfig::operator == (const ZC_VAOConfig& vaoConfig) const noexcept
+bool ZC_VAOConfig::operator < (const ZC_VAOConfig& vaoConfig) const noexcept
 {
-    return formats == vaoConfig.formats;
+    return formats < vaoConfig.formats;
 }
 
 ZC_VAOConfig* ZC_VAOConfig::AddFormat(const ZC_VAOConfig::Format& format) noexcept
@@ -23,8 +23,7 @@ ZC_VAOConfig* ZC_VAOConfig::AddFormat(const ZC_VAOConfig::Format& format) noexce
 
 GLint ZC_VAOConfig::MaxCount() noexcept
 {
-    GLint maxCount;
-    glGetIntegerv(GL_MAX_VERTEX_ATTRIB_BINDINGS, &maxCount);
+    static GLint maxCount = GetMaxCount();
     return maxCount;
 }
 
@@ -57,7 +56,15 @@ GLint ZC_VAOConfig::Stride() const noexcept
     return stride;
 }
 
-//  Format
+GLint ZC_VAOConfig::GetMaxCount() noexcept
+{
+    GLint maxCount = 0;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIB_BINDINGS, &maxCount);
+    return maxCount;
+}
+
+//  Format start
+
 ZC_VAOConfig::Format::Format(GLuint _attribindex, GLint _size, GLenum _type, GLboolean _normalized, GLuint _relativeoffset) noexcept
         : attribindex(_attribindex),
           size(_size),
@@ -66,12 +73,13 @@ ZC_VAOConfig::Format::Format(GLuint _attribindex, GLint _size, GLenum _type, GLb
           relativeoffset(_relativeoffset)
 {}
 
-bool ZC_VAOConfig::Format::operator == (const Format& format) const noexcept
+bool ZC_VAOConfig::Format::operator < (const Format& format) const noexcept
 {
-    if (attribindex != format.attribindex) return false;
-    if (size != format.size) return false;
-    if (type != format.type) return false;
-    if (normalized != format.normalized) return false;
-    if (relativeoffset != format.relativeoffset) return false;
-    return true;
+    if (attribindex < format.attribindex
+        || size < format.size
+        || type < format.type
+        || normalized < format.normalized
+        || relativeoffset < format.relativeoffset) return true;
+    return false;
 }
+//  Format end

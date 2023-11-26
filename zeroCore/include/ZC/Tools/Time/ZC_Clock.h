@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <concepts>
 #include <utility>
 
 typedef typename std::chrono::nanoseconds ZC_Nanoseconds;
@@ -44,15 +45,18 @@ public:
     //  Starts counting down time.
     void Start() noexcept;
 
-    /*
-    Calculate the duration since the previous Start and Stop call. Starts counting down time.
-    */
+    //  Calculate the duration since the previous Start or Stop call. Starts counting down time.
     template<ZC_cTimeMeasure TTimeMeasue>
     long Stop() noexcept;
 
+    //  Calculate the duration since the previous Start or Stop call.
+    template<ZC_cTimeMeasure TTimeMeasue>
+    long Time() noexcept;
+
 private:
     typedef typename std::chrono::high_resolution_clock Clock;
-    typedef typename std::chrono::_V2::system_clock::time_point TimePoint;
+//    typedef typename std::chrono::duration<double, std::ratio<1>> Second;
+    typedef typename std::chrono::time_point<Clock> TimePoint;
 
     TimePoint start;
 };
@@ -61,6 +65,13 @@ template<ZC_cTimeMeasure TTimeMeasue>
 long ZC_Clock::Stop() noexcept
 {
     TimePoint now = Clock::now();
-    return std::chrono::duration_cast<TTimeMeasue>(now - start).count();
+    auto result = std::chrono::duration_cast<TTimeMeasue>(now - start).count();
     start = std::move(now);
+    return result;
+}
+
+template<ZC_cTimeMeasure TTimeMeasue>
+long ZC_Clock::Time() noexcept
+{
+    return std::chrono::duration_cast<TTimeMeasue>(Clock::now() - start).count();
 }

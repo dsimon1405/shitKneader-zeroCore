@@ -1,3 +1,3 @@
 #pragma once
 
-const char* ZC_MakeAbsolutePath(const char* const& localPath);
+const char* ZC_MakeAbsolutePath(const char* localPath);

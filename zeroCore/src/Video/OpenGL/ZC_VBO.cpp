@@ -10,12 +10,12 @@ ZC_VBO* ZC_VBO::CreateVBO() noexcept
     return &vbos.emplace_back(ZC_VBO());
 }
 
-void ZC_VBO::BindVertexBuffer(const GLuint& vaoConfig, const long& offset, const int& stride) const noexcept
+void ZC_VBO::BindVertexBuffer(GLuint vaoConfig, long offset, int stride) const noexcept
 {
     glBindVertexBuffer(vaoConfig, id, offset, stride);
 }
 
-bool ZC_VBO::BufferData(const long& size, const GLenum& _usage) noexcept
+bool ZC_VBO::BufferData(long size, GLenum _usage) noexcept
 {
     ZC_DynamicArray<GLbyte> emptyData(nullptr, size);
     return BufferData(std::move(emptyData), _usage);
@@ -79,7 +79,7 @@ void ZC_VBO::ClearvboDatas() noexcept
     vboDatas.clear();
 }
 
-void ZC_VBO::AddVBOData(const long& offset, const long& size, char* const& pData) noexcept
+void ZC_VBO::AddVBOData(long offset, long size, char* pData) noexcept
 {
     auto emplacePosition = vboDatas.end();
     long endPos = offset + size;
@@ -147,8 +147,8 @@ void ZC_VBO::ResetVBOs() noexcept
 }
 
 //  VBOData
-ZC_VBO::VBOData::VBOData(const long& _size, char* const& _pData, char* const& _pDataHead,
-                        const long& _offset, VBOData* const& _pSamePrevious) noexcept
+ZC_VBO::VBOData::VBOData(long _size, char* _pData, char* _pDataHead,
+                        long _offset, VBOData* _pSamePrevious) noexcept
     : pData(_pData),
       size(_size),
       pDataHead(_pDataHead),

@@ -21,7 +21,7 @@ ZC_Shader::~ZC_Shader()
 	glDeleteProgram(id);
 }
 
-ZC_Shader* ZC_Shader::CreateShader(const std::string& name, ZC_ShaderCode shaderCode) noexcept
+ZC_Shader* ZC_Shader::CreateShader(const std::string& name, ZC_ShaderCode&& shaderCode) noexcept
 {
 	if (shaders.find(name) != shaders.end())
 	{
@@ -54,7 +54,7 @@ void ZC_Shader::Use() const noexcept
 	if (id != 0) glUseProgram(id);
 }
 
-void ZC_Shader::SetUniformMatrix4fv(const char* const& name, const float* const& pData) const noexcept
+void ZC_Shader::SetUniformMatrix4fv(const char* name, const float* pData) const noexcept
 {
 	GLint location = glGetUniformLocation(id, name);
 	glUniformMatrix4fv(location, 1, GL_FALSE, pData);
@@ -62,83 +62,62 @@ void ZC_Shader::SetUniformMatrix4fv(const char* const& name, const float* const&
 
 ZC_Shader::ZC_Shader(const ZC_ShaderCode& shaderCode) noexcept
 {
+	if (!shaderCode.vertexCode)
+	{
+		ZC_ErrorLogger::Err("ZC_ShaderCode::vertexCode = nullptr!", __FILE__, __LINE__);
+		return;
+	}
+	if (!shaderCode.fragmentCode)
+	{
+		ZC_ErrorLogger::Err("ZC_ShaderCode::fragmentCode = nullptr!", __FILE__, __LINE__);
+		return;
+	}
 	CreateShaderProgram(shaderCode);
 }
 
 void ZC_Shader::CreateShaderProgram(const ZC_ShaderCode& shaderCode) noexcept
 {
-	if (!shaderCode.vertexCode.pArray)
-	{
-		ZC_ErrorLogger::Err("ZC_ShaderCode::vertexCode = nullptr!", __FILE__, __LINE__);
-		return;
-	}
-	if (!shaderCode.fragmentCode.pArray)
-	{
-		ZC_ErrorLogger::Err("ZC_ShaderCode::fragmentCode = nullptr!", __FILE__, __LINE__);
-		return;
-	}
+	GLuint vertexID = CreateShader(shaderCode.vertexCode.Begin(), GL_VERTEX_SHADER);
+	if (vertexID == 0) return;
 
-	GLuint vertexID = 0;
-	if (!CreateShader(shaderCode.vertexCode.pArray, GL_VERTEX_SHADER, vertexID)) return;
-
-	GLuint fragmentID = 0;
-	if (!CreateShader(shaderCode.fragmentCode.pArray, GL_FRAGMENT_SHADER, fragmentID))
+	GLuint fragmentID = CreateShader(shaderCode.fragmentCode.Begin(), GL_FRAGMENT_SHADER);
+	if (fragmentID == 0)
 	{
 		glDeleteShader(vertexID);
 		return;
 	}
 
 	GLuint geometryID = 0;
-	if (shaderCode.geometryCode.pArray && !CreateShader(shaderCode.geometryCode.pArray, GL_GEOMETRY_SHADER, geometryID))
+	if (shaderCode.geometryCode)
 	{
-		glDeleteShader(vertexID);
-		glDeleteShader(fragmentID);
-		return;
+		geometryID = CreateShader(shaderCode.geometryCode.pArray, GL_GEOMETRY_SHADER);
+		if (geometryID == 0)
+		{
+			glDeleteShader(vertexID);
+			glDeleteShader(fragmentID);
+			return;
+		}
 	}
 
 	id = glCreateProgram();
 	glAttachShader(id, vertexID);
 	glAttachShader(id, fragmentID);
-	if (shaderCode.geometryCode.pArray) glAttachShader(id, geometryID);
+	if (geometryID != 0) glAttachShader(id, geometryID);
 
 	glLinkProgram(id);
 
 	glDeleteShader(vertexID);
 	glDeleteShader(fragmentID);
-	if (shaderCode.geometryCode.pArray) glDeleteShader(geometryID);
-
-	GLint success;
-	glGetProgramiv(id, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		GLchar infoLog[512];
-		glGetProgramInfoLog(id, 512, nullptr, infoLog);
-		ZC_ErrorLogger::Err("Link shader program failed: " + std::string(infoLog), __FILE__, __LINE__);
-		return;
-	}
-
-	ZC_ErrorLogger::Clear();
+	if (geometryID != 0) glDeleteShader(geometryID);
 }
 
-bool ZC_Shader::CreateShader(const char* const& shaderCode, const GLenum& shaderType, GLuint& shaderID) noexcept
+GLuint ZC_Shader::CreateShader(const char* shaderCode, GLenum shaderType) noexcept
 {
-	shaderID = glCreateShader(shaderType);
+	GLuint shaderID = glCreateShader(shaderType);
 	glShaderSource(shaderID, 1, &shaderCode, nullptr);
 	glCompileShader(shaderID);
-
-	GLint success;
-	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		GLchar infoLog[512];
-		glGetShaderInfoLog(shaderID, 512, nullptr, infoLog);
-		glDeleteShader(shaderID);
-		ZC_ErrorLogger::Err("Create shader failed: " + std::string(infoLog), __FILE__, __LINE__);
-		return false;
-	}
-	return true;
+	return ZC_ErrorLogger::WasError() ? 0 : shaderID;
 }
-
 #ifdef ZC_ANDROID
 void ZC_Shader::ResetShaders() noexcept
 {

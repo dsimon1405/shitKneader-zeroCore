@@ -27,11 +27,10 @@ public:
         */  
         Format(GLuint _attribindex, GLint _size, GLenum _type, GLboolean _normalized, GLuint _relativeoffset) noexcept;
 
-        bool operator == (const Format& format) const noexcept;
+        bool operator < (const Format& format) const noexcept;
     };
 
     ZC_VAOConfig() = default;
-    ~ZC_VAOConfig() = default;
 
     ZC_VAOConfig(const ZC_VAOConfig& vaoConfig) = default;
     ZC_VAOConfig& operator = (const ZC_VAOConfig& vaoConfig) = default;
@@ -39,7 +38,9 @@ public:
     ZC_VAOConfig(ZC_VAOConfig&& vaoConfig) noexcept;
     ZC_VAOConfig& operator = (ZC_VAOConfig&& vaoConfig) noexcept;
 
-    bool operator == (const ZC_VAOConfig& vaoConfig) const noexcept;
+    ~ZC_VAOConfig() = default;
+
+    bool operator < (const ZC_VAOConfig& vaoConfig) const noexcept;
 
     /*
     Add new format to configuration.
@@ -62,6 +63,8 @@ public:
 
 private:
     std::list<Format> formats;
+
+    static GLint GetMaxCount() noexcept;
 
     void Config(const GLuint& config) const noexcept;
     GLint Stride() const noexcept;

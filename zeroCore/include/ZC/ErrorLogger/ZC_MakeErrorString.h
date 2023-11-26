@@ -13,4 +13,4 @@ callingFileLine - line in the calling file (optional, required to log an error, 
 Return:
 A string created from the parameters. 
 */
-std::string ZC_MakeErrorString(const std::string& msg, const char* const& callingFilePath, const int& callingFileLine);
+std::string ZC_MakeErrorString(const std::string& msg, const char* callingFilePath, int callingFileLine);

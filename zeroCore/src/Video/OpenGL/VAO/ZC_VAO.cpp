@@ -1,7 +1,5 @@
 #include <ZC/Video/OpenGL/VAO/ZC_VAO.h>
 
-#include <ZC/ErrorLogger/ZC_ErrorLogger.h>
-
 ZC_VAO::ZC_VAO(ZC_VAO&& vao) noexcept
     : id(vao.id),
     config(vao.config),
@@ -28,30 +26,26 @@ ZC_VAO::~ZC_VAO()
 
 ZC_VAO* ZC_VAO::GetVAO(const ZC_VAOConfig& vaoConfig) noexcept
 {
-    for (auto& vaosPair : vaos)
-    {
-        if (vaosPair.first == vaoConfig) return &vaosPair.second;
-    }
+    auto vaosIter = vaos.find(vaoConfig);
+    if (vaosIter != vaos.end()) return &vaosIter->second;
 
     ZC_ErrorLogger::Clear();
     ZC_VAO vao = CreateVAO(vaoConfig);
     if (ZC_ErrorLogger::WasError()) return nullptr;
 
-    return &vaos.emplace_back(vaoConfig, std::move(vao)).second;
+    return &vaos.emplace(vaoConfig, std::move(vao)).first->second;
 }
 
 ZC_VAO* ZC_VAO::GetVAO(ZC_VAOConfig&& vaoConfig) noexcept
 {
-    for (auto& vaosPair : vaos)
-    {
-        if (vaosPair.first == vaoConfig) return &vaosPair.second;
-    }
+    auto vaosIter = vaos.find(vaoConfig);
+    if (vaosIter != vaos.end()) return &vaosIter->second;
 
     ZC_ErrorLogger::Clear();
     ZC_VAO vao = CreateVAO(vaoConfig);
     if (ZC_ErrorLogger::WasError()) return nullptr;
 
-    return &vaos.emplace_back(std::move(vaoConfig), std::move(vao)).second;
+    return &vaos.emplace(std::move(vaoConfig), std::move(vao)).first->second;
 }
 
 void ZC_VAO::UnbindVertexArray() noexcept
@@ -64,7 +58,7 @@ void ZC_VAO::BindVertexArray() const noexcept
     glBindVertexArray(id);
 }
 
-void ZC_VAO::DrawArrays(const ZC_VBO* const& vbo, const long& bufferOffset, const GLenum& mode, const int& count) const noexcept
+void ZC_VAO::DrawArrays(const ZC_VBO* vbo, long bufferOffset, GLenum mode, int count) const noexcept
 {
     BindVertexArray();
     vbo->BindVertexBuffer(config, bufferOffset, stride);
@@ -78,17 +72,8 @@ ZC_VAO::ZC_VAO(const GLuint& _config)
     glGenVertexArrays(1, &id);
 }
 
-bool ZC_VAO::ReserveVAOs(const GLint& count) noexcept
-{
-    vaos.reserve(count);
-    return true;
-}
-
 ZC_VAO ZC_VAO::CreateVAO(const ZC_VAOConfig& vaoConfig) noexcept
 {
-    static bool vaosReserveCount = ReserveVAOs(ZC_VAOConfig::MaxCount());
-    
-    static GLint configMaxCount = ZC_VAOConfig::MaxCount();
     GLuint config = vaos.size();
 
     ZC_VAO vao(config);
@@ -99,7 +84,7 @@ ZC_VAO ZC_VAO::CreateVAO(const ZC_VAOConfig& vaoConfig) noexcept
     if (ZC_ErrorLogger::WasError()) return vao;
 
     vao.stride = vaoConfig.Stride();
-
+    
     return vao; 
 }
 #ifdef ZC_ANDROID

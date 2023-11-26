@@ -3,7 +3,7 @@
 namespace ZC_VecArithmetic
 {
     template<typename TVec, typename TValue>
-    void PlusValue(TVec& vec, const short& size, const TValue& addable) noexcept
+    void PlusValue(TVec& vec, short size, TValue addable) noexcept
     {
         for (short i = 0; i < size; ++i)
         {
@@ -12,7 +12,7 @@ namespace ZC_VecArithmetic
     }
 
     template<typename TVec>
-    void PlusVec(TVec& vec1, const short& size, const TVec& addable) noexcept
+    void PlusVec(TVec& vec1, short size, const TVec& addable) noexcept
     {
         for (short i = 0; i < size; ++i)
         {
@@ -21,7 +21,7 @@ namespace ZC_VecArithmetic
     }
 
     template<typename TVec, typename TValue>
-    void MinusValue(TVec& vec, const short& size, const TValue& subtrahend) noexcept
+    void MinusValue(TVec& vec, short size, TValue subtrahend) noexcept
     {
         for (short i = 0; i < size; ++i)
         {
@@ -30,7 +30,7 @@ namespace ZC_VecArithmetic
     }
 
     template<typename TVec>
-    void MinusVec(TVec& vec1, const short& size, const TVec& subtrahend) noexcept
+    void MinusVec(TVec& vec1, short size, const TVec& subtrahend) noexcept
     {
         for (short i = 0; i < size; ++i)
         {
@@ -39,7 +39,7 @@ namespace ZC_VecArithmetic
     }
 
     template<typename TVec, typename TValue>
-    void MultiplyValue(TVec& vec, const short& size, const TValue& factor) noexcept
+    void MultiplyValue(TVec& vec, short size, TValue factor) noexcept
     {
         for (short i = 0; i < size; ++i)
         {

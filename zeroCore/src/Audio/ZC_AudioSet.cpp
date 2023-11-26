@@ -1,6 +1,6 @@
 #include <ZC/Audio/ZC_AudioSet.h>
 
-ZC_AudioSet::ZC_AudioSet(const Channels& _channels, const int& _frequency, const BitsPerSample& _bitsPerSample) noexcept
+ZC_AudioSet::ZC_AudioSet(Channels _channels, int _frequency, BitsPerSample _bitsPerSample) noexcept
     : channels(_channels),
     frequency(_frequency),
     bitsPerSample(_bitsPerSample)

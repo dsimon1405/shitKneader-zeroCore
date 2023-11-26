@@ -2,13 +2,13 @@
 
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
 
-ZC_AndroidNativeAppGlue_FileReader::ZC_AndroidNativeAppGlue_FileReader(const char* const& _path, const char* const& callingFilePath, const int& callingFileLine) noexcept
+ZC_AndroidNativeAppGlue_FileReader::ZC_AndroidNativeAppGlue_FileReader(const char* _path) noexcept
     : ZC_FileReader(_path)
 {
     file = AAssetManager_open(pAndroidApp->activity->assetManager, path, AASSET_MODE_BUFFER);
     if (!file)
     {
-        ZC_ErrorLogger::Err("Fail open file: " + std::string(path), callingFilePath, callingFileLine);
+        ZC_ErrorLogger::Err("Fail open file: " + std::string(path), __FILE__, __LINE__);
         return;
     }
     ZC_ErrorLogger::Clear();
@@ -23,33 +23,27 @@ ZC_AndroidNativeAppGlue_FileReader::~ZC_AndroidNativeAppGlue_FileReader() noexce
     }
 }
 
-size_t ZC_AndroidNativeAppGlue_FileReader::Read(char* pContainer, size_t size, const char* const& callingFilePath, const int& callingFileLine) noexcept
+size_t ZC_AndroidNativeAppGlue_FileReader::Read(char* pContainer, size_t count) noexcept
 {
-    if (!file)
+    if (!file || AAsset_getRemainingLength(file) == 0)
     {
         ZC_ErrorLogger::Clear();
         return 0;
     }
 
-    if (AAsset_getRemainingLength(file) == 0)
-    {
-        ZC_ErrorLogger::Clear();
-        return 0;
-    }
+    int readCount = AAsset_read(file, reinterpret_cast<void*>(pContainer), count);
 
-    int readCount = AAsset_read(file, reinterpret_cast<void*>(pContainer), size);
-
-    if (readCount == 0 && size != 0)
+    if (readCount == 0 && count != 0)
     {
-        ZC_ErrorLogger::Err("Fail read file: " + std::string(path), callingFilePath, callingFileLine);
+        ZC_ErrorLogger::Err("Fail read file: " + std::string(path), __FILE__, __LINE__);
         return 0;
     }
 
     ZC_ErrorLogger::Clear();
-    return size;
+    return count;
 }
 
-long ZC_AndroidNativeAppGlue_FileReader::Seek(long offset, const char* const& callingFilePath, const int& callingFileLine) noexcept
+long ZC_AndroidNativeAppGlue_FileReader::Seek(long offset) noexcept
 {
     if (!file)
     {
@@ -67,7 +61,7 @@ long ZC_AndroidNativeAppGlue_FileReader::Seek(long offset, const char* const& ca
     long seekResult = AAsset_seek(file, offset, SEEK_CUR);
     if (seekResult == -1)
     {
-        ZC_ErrorLogger::Err("Fail seek file: " + std::string(path), callingFilePath, callingFileLine);
+        ZC_ErrorLogger::Err("Fail seek file: " + std::string(path), __FILE__, __LINE__);
         return 0;
     }
 
@@ -84,7 +78,7 @@ void ZC_AndroidNativeAppGlue_FileReader::Close() noexcept
     }
 }
 
-bool ZC_AndroidNativeAppGlue_FileReader::Eof(const char* const& callingFilePath, const int& callingFileLine) noexcept
+bool ZC_AndroidNativeAppGlue_FileReader::Eof() noexcept
 {
     return file != nullptr && AAsset_getRemainingLength(file) == 0;
 }
@@ -94,7 +88,7 @@ size_t ZC_AndroidNativeAppGlue_FileReader::CurrentReadPosition() noexcept
     return file ? AAsset_getRemainingLength(file) : 0;
 }
 
-size_t ZC_AndroidNativeAppGlue_FileReader::Size(const char* const& callingFilePath, const int& callingFileLine) noexcept
+size_t ZC_AndroidNativeAppGlue_FileReader::Size() noexcept
 {
     return file ? AAsset_getLength(file) : 0;
 }

@@ -26,7 +26,7 @@ ZC_AudioStream::ZC_AudioStream(const ZC_AudioSet& _audioSet) noexcept
     audioSet = _audioSet;
 }
 
-void ZC_AudioStream::GetStreamData(void* pDataContainer, const int& bytesCount) noexcept
+void ZC_AudioStream::GetStreamData(void* pDataContainer, int bytesCount) noexcept
 {
     std::vector<ZC_StreamSound*> sounds;
     sGetpZC_StreamSound(sounds);

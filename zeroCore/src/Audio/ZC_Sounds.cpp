@@ -3,7 +3,7 @@
 #include "ZC_WAVHeader.h"
 #include <ZC/Tools/ZC_DynamicArray.h>
 
-bool ZC_Sounds::LoadWAV(const std::string& name, const char* const& path) noexcept
+bool ZC_Sounds::LoadWAV(const std::string& name, const char* path) noexcept
 {
     std::unique_lock<std::shared_mutex> soundsULock(soundsSMutex);
     auto soundsIter = sounds.find(name);
@@ -58,21 +58,21 @@ ZC_upSound ZC_Sounds::GetSound(const std::string& name) noexcept
     return ZC_uptrMake<ZC_Sound>(&soundsIter->second);
 }
 
-ZC_SoundData ZC_Sounds::ReadWAV(const char* const& path) noexcept
+ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
 {
-    ZC_upFileReader file = ZC_FileReader::MakeReader(path, __FILE__, __LINE__);
+    ZC_upFileReader file = ZC_FileReader::MakeReader(path);
     if (!file) return ZC_SoundData();
 
     WAVHeader header;
 
-    if (file->Seek(8, __FILE__, __LINE__) != 8)
+    if (file->Seek(8) != 8)
     {
         file->Close();
         return ZC_SoundData();
     }
 
     static size_t formatSize = sizeof(header.format);
-    if (file->Read(&header.format[0], formatSize, __FILE__, __LINE__) != formatSize)
+    if (file->Read(&header.format[0], formatSize) != formatSize)
     {
         file->Close();
         return ZC_SoundData();
@@ -86,47 +86,47 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* const& path) noexcept
         return ZC_SoundData();
     }
 
-    if (file->Seek(4, __FILE__, __LINE__) != 4)
+    if (file->Seek(4) != 4)
     {
         file->Close();
         return ZC_SoundData();
     }
 
     static size_t subchunk1SizeSize = sizeof(header.subchunk1Size);
-    if (file->Read(reinterpret_cast<char*>(&header.subchunk1Size), subchunk1SizeSize, __FILE__, __LINE__) != subchunk1SizeSize)
+    if (file->Read(reinterpret_cast<char*>(&header.subchunk1Size), subchunk1SizeSize) != subchunk1SizeSize)
     {
         file->Close();
         return ZC_SoundData();
     }
 
-    if (file->Seek(2, __FILE__, __LINE__) != 2)
+    if (file->Seek(2) != 2)
     {
         file->Close();
         return ZC_SoundData();
     }
 
     static size_t channelsSize = sizeof(header.channels);
-    if (file->Read(reinterpret_cast<char*>(&header.channels), channelsSize, __FILE__, __LINE__) != channelsSize)
+    if (file->Read(reinterpret_cast<char*>(&header.channels), channelsSize) != channelsSize)
     {
         file->Close();
         return ZC_SoundData();
     }
 
     static size_t frequencySize = sizeof(header.frequency);
-    if (file->Read(reinterpret_cast<char*>(&header.frequency), frequencySize, __FILE__, __LINE__) != frequencySize)
+    if (file->Read(reinterpret_cast<char*>(&header.frequency), frequencySize) != frequencySize)
     {
         file->Close();
         return ZC_SoundData();
     }
 
-    if (file->Seek(6, __FILE__, __LINE__) != 6)
+    if (file->Seek(6) != 6)
     {
         file->Close();
         return ZC_SoundData();
     }
 
     static size_t bitsPerSampleSize = sizeof(header.bitsPerSample);
-    if (file->Read(reinterpret_cast<char*>(&header.bitsPerSample), bitsPerSampleSize, __FILE__, __LINE__) != bitsPerSampleSize)
+    if (file->Read(reinterpret_cast<char*>(&header.bitsPerSample), bitsPerSampleSize) != bitsPerSampleSize)
     {
         file->Close();
         return ZC_SoundData();
@@ -134,7 +134,7 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* const& path) noexcept
 
     if (header.subchunk1Size != 16)
     {
-        if (file->Seek(header.subchunk1Size - 16, __FILE__, __LINE__) != header.subchunk1Size - 16)
+        if (file->Seek(header.subchunk1Size - 16) != header.subchunk1Size - 16)
         {
             file->Close();
             return ZC_SoundData();
@@ -142,14 +142,14 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* const& path) noexcept
     }
 
     static size_t subchunk2IdSize = sizeof(header.subchunk2Id);
-    if (file->Read(&header.subchunk2Id[0], subchunk2IdSize, __FILE__, __LINE__) != subchunk2IdSize)
+    if (file->Read(&header.subchunk2Id[0], subchunk2IdSize) != subchunk2IdSize)
     {
         file->Close();
         return ZC_SoundData();
     }
 
     static size_t subchunk2SizeSize = sizeof(header.subchunk2Size);
-    if (file->Read(reinterpret_cast<char*>(&header.subchunk2Size), subchunk2SizeSize, __FILE__, __LINE__) != subchunk2SizeSize)
+    if (file->Read(reinterpret_cast<char*>(&header.subchunk2Size), subchunk2SizeSize) != subchunk2SizeSize)
     {
         file->Close();
         return ZC_SoundData();
@@ -159,19 +159,19 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* const& path) noexcept
     //  if subchunk2Id != 'data', miss all till find 'data'
     while (!ConstCharEqual(dataString, header.subchunk2Id))
     {
-        if (file->Seek(header.subchunk2Size, __FILE__, __LINE__) != header.subchunk2Size)
+        if (file->Seek(header.subchunk2Size) != header.subchunk2Size)
         {
             file->Close();
             return ZC_SoundData();
         }
 
-        if (file->Read(&header.subchunk2Id[0], subchunk2IdSize, __FILE__, __LINE__) != subchunk2IdSize)
+        if (file->Read(&header.subchunk2Id[0], subchunk2IdSize) != subchunk2IdSize)
         {
             file->Close();
             return ZC_SoundData();
         }
 
-        if (file->Read(reinterpret_cast<char*>(&header.subchunk2Size), subchunk2SizeSize, __FILE__, __LINE__) != subchunk2SizeSize)
+        if (file->Read(reinterpret_cast<char*>(&header.subchunk2Size), subchunk2SizeSize) != subchunk2SizeSize)
         {
             file->Close();
             return ZC_SoundData();
@@ -203,7 +203,7 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* const& path) noexcept
     }
 
     ZC_DynamicArray<char> data(header.subchunk2Size);
-    if (file->Read(data.pArray, header.subchunk2Size, __FILE__, __LINE__) != header.subchunk2Size)
+    if (file->Read(data.pArray, header.subchunk2Size) != header.subchunk2Size)
     {
         file->Close();
         return ZC_SoundData();
@@ -220,7 +220,7 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* const& path) noexcept
     return ZC_SoundData(std::move(data), audioSet);
 }
 
-bool ZC_Sounds::ConstCharEqual(const char* const& first, char* const& second) noexcept
+bool ZC_Sounds::ConstCharEqual(const char* first, char* second) noexcept
 {
     for (size_t i = 0; ; ++i)
     {

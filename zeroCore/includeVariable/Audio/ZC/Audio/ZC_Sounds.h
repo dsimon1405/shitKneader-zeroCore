@@ -23,7 +23,7 @@ public:
     Return:
     On success true, otherwise false (ZC_ErrorLogger::ErrorMessage() - for more information).
     */
-    static bool LoadWAV(const std::string& name, const char* const& path) noexcept;
+    static bool LoadWAV(const std::string& name, const char* path) noexcept;
 
     /*
     Helps tp get loaded sound.
@@ -41,38 +41,41 @@ private:
     static inline std::shared_mutex soundsSMutex;
     static inline std::condition_variable_any soundsCVA;
 
-    static ZC_SoundData ReadWAV(const char* const& path) noexcept;
+    static ZC_SoundData ReadWAV(const char* path) noexcept;
 
     template<ZC_cBitsPerSample T>
-    static bool DeleteStartNullData(ZC_upFileReader& file, int32_t& size, const char* const& path) noexcept
-    {
-        T readData = 0;
-        static size_t readDataSizeof = sizeof(readData);
-        do
-        {
-            size -= readDataSizeof;
-            if (file->Read(reinterpret_cast<char*>(&readData), readDataSizeof, __FILE__, __LINE__) != readDataSizeof)
-            {
-                file->Close();
-                return false;
-            }
-            if (file->Eof())
-            {
-                ZC_ErrorLogger::Err("All data is 0 in the file: " + std::string(path), __FILE__, __LINE__);
-                file->Close();
-                return false;
-            }
-        
-        } while (readData == 0);
+    static bool DeleteStartNullData(ZC_upFileReader& file, int32_t& size, const char* path) noexcept;
 
-        size += readDataSizeof;
-        if (file->Seek(static_cast<int>(readDataSizeof) * -1, __FILE__, __LINE__) != readDataSizeof * -1)
+    static bool ConstCharEqual(const char* first, char* second) noexcept;
+};
+
+template<ZC_cBitsPerSample T>
+bool ZC_Sounds::DeleteStartNullData(ZC_upFileReader& file, int32_t& size, const char* path) noexcept
+{
+    T readData = 0;
+    static size_t readDataSizeof = sizeof(readData);
+    do
+    {
+        size -= readDataSizeof;
+        if (file->Read(reinterpret_cast<char*>(&readData), readDataSizeof) != readDataSizeof)
         {
             file->Close();
-        return false;
+            return false;
         }
-        return true;
-    }
+        if (file->Eof())
+        {
+            ZC_ErrorLogger::Err("All data is 0 in the file: " + std::string(path), __FILE__, __LINE__);
+            file->Close();
+            return false;
+        }
 
-    static bool ConstCharEqual(const char* const& first, char* const& second) noexcept;
-};
+    } while (readData == 0);
+
+    size += readDataSizeof;
+    if (file->Seek(static_cast<int>(readDataSizeof) * -1) != readDataSizeof * -1)
+    {
+        file->Close();
+        return false;
+    }
+    return true;
+}

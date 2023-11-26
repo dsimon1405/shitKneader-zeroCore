@@ -33,7 +33,7 @@ public:
     Return:
     On success pointer to ZC_Shader, otherwise nullptr.
     */
-	static ZC_Shader* CreateShader(const std::string& name, ZC_ShaderCode shaderCode) noexcept;
+	static ZC_Shader* CreateShader(const std::string& name, ZC_ShaderCode&& shaderCode) noexcept;
 
 	/*
     Help to get shader.
@@ -51,15 +51,16 @@ public:
 	*/
     void Use() const noexcept;
 
-	void SetUniformMatrix4fv(const char* const& name, const float* const& pData) const noexcept;
+	void SetUniformMatrix4fv(const char* name, const float* pData) const noexcept;
 	
 private:
 	GLuint id = 0;
 
 	ZC_Shader(const ZC_ShaderCode& shaderCode) noexcept;
 
+	static GLuint CreateShader(const char* shaderCode, GLenum shaderType) noexcept;
+
 	void CreateShaderProgram(const ZC_ShaderCode& shaderCode) noexcept;
-	static bool CreateShader(const char* const& shaderCode, const GLenum& shaderType, GLuint& shaderID) noexcept;
 #ifdef ZC_PC
 	static inline std::map<std::string, ZC_Shader> shaders;
 #elif defined ZC_ANDROID

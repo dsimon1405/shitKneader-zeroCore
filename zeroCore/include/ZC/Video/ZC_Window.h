@@ -47,12 +47,12 @@ public:
     g - green color.
     b - blue color.
     */
-    void SetClearColor(const float& r, const float& g, const float& b) noexcept;
+    void SetClearColor(float r, float g, float b) noexcept;
 
     /*
     Clear the window buffer.
     */
-    void Clear(const GLbitfield& mask = GL_COLOR_BUFFER_BIT) noexcept;
+    void Clear(GLbitfield mask = GL_COLOR_BUFFER_BIT) noexcept;
 
 protected:
     int width = 0,

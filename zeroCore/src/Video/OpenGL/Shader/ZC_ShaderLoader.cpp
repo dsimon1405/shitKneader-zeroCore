@@ -3,29 +3,29 @@
 #include <ZC/File/Read/ZC_FileReader.h>
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
 
-ZC_ShaderCode ZC_ShaderLoader::LoadShaderCode(const char* const& vertexPath, const char* const& fragmentPath, const char* const& geometryPath) noexcept
+ZC_ShaderCode ZC_ShaderLoader::LoadShaderCode(const char* vertexPath, const char* fragmentPath, const char* geometryPath) noexcept
 {
 
     ZC_DynamicArray<char> vertexCode = ReadShaderFile(vertexPath, ShaderType::Vertex);
-    if (!vertexCode.pArray) return {};
+    if (!vertexCode) return {};
 
     ZC_DynamicArray<char> fragmentCode = ReadShaderFile(fragmentPath, ShaderType::Fragment);
-    if (!fragmentCode.pArray) return {};
+    if (!fragmentCode) return {};
 
     ZC_DynamicArray<char> geometryCode;
     if (geometryPath)
     {
         geometryCode = ReadShaderFile(geometryPath, ShaderType::Geometry);
-        if (!geometryCode.pArray) return {};
+        if (!geometryCode) return {};
     }
 
     return { std::move(vertexCode), std::move(fragmentCode), std::move(geometryCode) };
 }
 
-ZC_DynamicArray<char> ZC_ShaderLoader::ReadShaderFile(const char* path, const ShaderType& shaderType) noexcept
+ZC_DynamicArray<char> ZC_ShaderLoader::ReadShaderFile(const char* path, ShaderType shaderType) noexcept
 {
-    ZC_upFileReader upFileReader = ZC_FileReader::MakeReader(path, __FILE__, __LINE__);
-    if (!upFileReader) return ZC_DynamicArray<char>();
+    ZC_upFileReader upFileReader = ZC_FileReader::MakeReader(path);
+    if (!upFileReader) return nullptr;
 
     unsigned int shaderStartSize = 0;
     switch (shaderType)
@@ -42,18 +42,18 @@ ZC_DynamicArray<char> ZC_ShaderLoader::ReadShaderFile(const char* path, const Sh
     }
 
     ZC_ErrorLogger::Clear();
-    size_t fileSize = upFileReader->Size(__FILE__, __LINE__);
+    size_t fileSize = upFileReader->Size();
     if (fileSize == 0)
     {
-        if (ZC_ErrorLogger::WasError()) return ZC_DynamicArray<char>();
+        if (ZC_ErrorLogger::WasError()) return nullptr;
 
-        ZC_ErrorLogger::Err("Empty fIle: " + std::string(path), __FILE__, __LINE__);
-        return ZC_DynamicArray<char>();
+        ZC_ErrorLogger::Err("Empty fIle: " + std::string(path));
+        return nullptr;
     }
 
     ZC_DynamicArray<char> fileData(shaderStartSize + fileSize + 1);
     fileData.pArray[fileSize + shaderStartSize] = '\0';
-    if (upFileReader->Read(fileData.pArray + shaderStartSize, fileSize, __FILE__, __LINE__) == 0) return ZC_DynamicArray<char>();
+    if (upFileReader->Read(fileData.pArray + shaderStartSize, fileSize) == 0) return nullptr;
 
     switch (shaderType)
     {
@@ -71,7 +71,7 @@ ZC_DynamicArray<char> ZC_ShaderLoader::ReadShaderFile(const char* path, const Sh
     return fileData;
 }
 
-void ZC_ShaderLoader::FillShaderStart(char*& shaderData, const std::string& shaderStart) noexcept
+void ZC_ShaderLoader::FillShaderStart(char* shaderData, const std::string& shaderStart) noexcept
 {
     for (size_t i = 0; i < shaderStart.size(); ++i)
     {

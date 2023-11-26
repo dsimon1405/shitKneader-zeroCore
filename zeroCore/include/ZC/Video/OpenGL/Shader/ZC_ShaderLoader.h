@@ -28,9 +28,9 @@ public:
     geometryPath - path to the geometry shader file.
 
     Return:
-    ZC_ShaderCode, if was error (use ZC_ErrorLogger::WasError() for check) ZC_ShaderCode will consider nullptr data (ZC_ErrorLogger::ErrorMessage() - for more information).
+    If success ZC_ShaderCode with code data, otherwise ZC_ShaderCode will consider nullptr data (use ZC_ErrorLogger::WasError() for check)(ZC_ErrorLogger::ErrorMessage() - for more information).
     */
-    static ZC_ShaderCode LoadShaderCode(const char* const& vertexPath, const char* const& fragmentPath, const char* const& geometryPath = nullptr) noexcept;
+    static ZC_ShaderCode LoadShaderCode(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr) noexcept;
 
     /*
     Read shader code from file.
@@ -40,9 +40,9 @@ public:
     shaderType - shader type to fill the shader header.
 
     Return:
-    If successful, a pointer to a character array on the heap - use delete[] to free memory, otherwise nullptr (ZC_ErrorLogger::ErrorMessage() - for more information).
+    If success struct dynamic array with code, otherwise empty struct (ZC_ErrorLogger::ErrorMessage() - for more information).
     */
-    static ZC_DynamicArray<char> ReadShaderFile(const char* path, const ShaderType& shaderType) noexcept;
+    static ZC_DynamicArray<char> ReadShaderFile(const char* path, ShaderType shaderType) noexcept;
 
 private:
 #ifdef ZC_PC
@@ -56,5 +56,5 @@ private:
 #endif
     static inline const std::string geometryStart = vertexStart;
 
-    static void FillShaderStart(char*& shaderData, const std::string& shaderStart) noexcept;
+    static void FillShaderStart(char* shaderData, const std::string& shaderStart) noexcept;
 };

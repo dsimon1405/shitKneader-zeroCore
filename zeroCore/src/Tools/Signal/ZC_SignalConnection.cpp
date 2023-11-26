@@ -1,14 +1,4 @@
 #include <ZC/Tools/Signal/ZC_SignalConnection.h>
-    
-ZC_SignalConnection::ZC_SignalConnection(ZC_SignalConnection&& con) noexcept
-    : state(con.state)
-{}
-
-ZC_SignalConnection& ZC_SignalConnection::operator=(ZC_SignalConnection&& con) noexcept
-{
-    state = con.state;
-    return *this;
-}
 
 ZC_SignalConnection::State ZC_SignalConnection::GetState() noexcept
 {

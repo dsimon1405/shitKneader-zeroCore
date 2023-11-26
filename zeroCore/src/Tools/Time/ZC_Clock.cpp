@@ -1,4 +1,4 @@
-#include <ZC/Tools/ZC_Clock.h>
+#include <ZC/Tools/Time/ZC_Clock.h>
 
 ZC_Clock::ZC_Clock() noexcept
     : start(Clock::now())

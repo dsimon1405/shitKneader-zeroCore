@@ -9,7 +9,7 @@
 
 #include <sstream>
 
-ZC_SDL_Window::ZC_SDL_Window(const char* const& name, const int& _width, const int& _height) noexcept
+ZC_SDL_Window::ZC_SDL_Window(const char* name, int _width, int _height) noexcept
 {
 	static bool sdlVideoInited = false;
 	if (!sdlVideoInited)
@@ -42,6 +42,101 @@ ZC_SDL_Window::ZC_SDL_Window(const char* const& name, const int& _width, const i
 		ZC_ErrorLogger::Err("SDL_GL_CreateContext() fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
 		return;
 	}
+
+	// ZC_OpenGLAssigneErrorCallback();
+	SDL_GetWindowSize(window, &width, &height);
+}
+
+ZC_SDL_Window::~ZC_SDL_Window() noexcept
+{
+    SDL_GL_DeleteContext(glContext);
+    SDL_DestroyWindow(window);
+}
+#include <ZC/Tools/Console/ZC_cout.h>
+bool ZC_SDL_Window::HandleEvents() noexcept
+{
+    static SDL_Event event;
+	int count = 0;
+    while (SDL_PollEvent(&event) != 0)
+    {
+        if (event.type == SDL_EVENT_QUIT)
+        {
+            return false;
+        }
+
+		if (event.type == SDL_EVENT_KEY_DOWN)
+		{
+		++count;
+			// event.motion
+			event.key.repeat;
+			
+			if (event.key.keysym.sym == SDLK_q)
+			{
+				ZC_cout("q down");
+			}
+			if (event.key.keysym.sym == SDLK_e)
+			{
+				ZC_cout("e");
+			}
+		}
+		if (event.type == SDL_EVENT_KEY_UP)
+		{
+			if (event.key.keysym.sym == SDLK_q)
+			{
+				ZC_cout("q up");
+			}
+		}
+    }
+				if (count > 0) ZC_cout(std::to_string(count));
+
+    return true;
+}
+
+void ZC_SDL_Window::SwapBuffer() noexcept
+{
+    SDL_GL_SwapWindow(window);
+}
+
+bool ZC_SDL_Window::SetOpenGLAttributes() noexcept
+{
+	// if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0)
+	// {
+	// 	ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
+	// 	return false;
+	// }
+	// if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, ZC_OPEN_GL_MAJOR_VERSION) != 0)
+	// {
+	// 	ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, ZC_OPEN_GL_MAJOR_VERSION) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
+	// 	return false;
+	// }
+	// if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, ZC_OPEN_GL_MINOR_VERSION) != 0)
+	// {
+	// 	ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, ZC_OPEN_GL_MINOR_VERSION) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
+	// 	return false;
+	// }
+	// if (SDL_GL_SetAttribute(SDL_GL_RED_SIZE, ZC_OPEN_GL_COLLOR_BUFFER_SIZE) != 0)
+	// {
+	// 	ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
+	// 	return false;
+	// }
+	// if (SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, ZC_OPEN_GL_COLLOR_BUFFER_SIZE) != 0)
+	// {
+	// 	ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
+	// 	return false;
+	// }
+	// if (SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, ZC_OPEN_GL_COLLOR_BUFFER_SIZE) != 0)
+	// {
+	// 	ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
+	// 	return false;
+	// }
+	// if (SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, ZC_OPEN_GL_DEPTH_BUFFER_SIZE) != 0)
+	// {
+	// 	ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
+	// 	return false;
+	// }
+
+	return true;
+}
 
 	// int red = 0;
     // int a999 = SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &red);	//	8
@@ -99,97 +194,3 @@ ZC_SDL_Window::ZC_SDL_Window(const char* const& name, const int& _width, const i
     // int a2 = SDL_GL_GetAttribute(SDL_GL_FLOATBUFFERS, &floatBuffers);
 	// int eglPlatform = 0;
     // int a1 = SDL_GL_GetAttribute(SDL_GL_EGL_PLATFORM, &eglPlatform);
-
-	ZC_OpenGLAssigneErrorCallback();
-	SDL_GetWindowSize(window, &width, &height);
-}
-
-ZC_SDL_Window::~ZC_SDL_Window() noexcept
-{
-    SDL_GL_DeleteContext(glContext);
-    SDL_DestroyWindow(window);
-}
-#include <ZC/Tools/Console/ZC_cout.h>
-bool ZC_SDL_Window::HandleEvents() noexcept
-{
-    static SDL_Event event;
-	int count = 0;
-    while (SDL_PollEvent(&event) != 0)
-    {
-        if (event.type == SDL_EVENT_QUIT)
-        {
-            return false;
-        }
-
-		if (event.type == SDL_EVENT_KEY_DOWN)
-		{
-		++count;
-			// event.motion
-			
-			if (event.key.keysym.sym == SDLK_q)
-			{
-				ZC_cout("q down");
-			}
-			if (event.key.keysym.sym == SDLK_e)
-			{
-				ZC_cout("e");
-			}
-		}
-		if (event.type == SDL_EVENT_KEY_UP)
-		{
-			if (event.key.keysym.sym == SDLK_q)
-			{
-				ZC_cout("q up");
-			}
-		}
-    }
-				if (count > 0) ZC_cout(std::to_string(count));
-
-    return true;
-}
-
-void ZC_SDL_Window::SwapBuffer() noexcept
-{
-    SDL_GL_SwapWindow(window);  
-}
-
-bool ZC_SDL_Window::SetOpenGLAttributes() noexcept
-{
-	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0)
-	{
-		ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
-		return false;
-	}
-	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, ZC_OPEN_GL_MAJOR_VERSION) != 0)
-	{
-		ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, ZC_OPEN_GL_MAJOR_VERSION) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
-		return false;
-	}
-	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, ZC_OPEN_GL_MINOR_VERSION) != 0)
-	{
-		ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, ZC_OPEN_GL_MINOR_VERSION) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
-		return false;
-	}
-	if (SDL_GL_SetAttribute(SDL_GL_RED_SIZE, ZC_OPEN_GL_COLLOR_BUFFER_SIZE) != 0)
-	{
-		ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
-		return false;
-	}
-	if (SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, ZC_OPEN_GL_COLLOR_BUFFER_SIZE) != 0)
-	{
-		ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
-		return false;
-	}
-	if (SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, ZC_OPEN_GL_COLLOR_BUFFER_SIZE) != 0)
-	{
-		ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
-		return false;
-	}
-	if (SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, ZC_OPEN_GL_DEPTH_BUFFER_SIZE) != 0)
-	{
-		ZC_ErrorLogger::Err("SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE) fail: " + std::string(SDL_GetError()), __FILE__, __LINE__);
-		return false;
-	}
-
-	return true;
-}

@@ -7,16 +7,16 @@
 class ZC_AndroidNativeAppGlue_FileReader : public ZC_FileReader, public ZC_android_app
 {
 public:
-    ZC_AndroidNativeAppGlue_FileReader(const char* const& _path, const char* const& callingFilePath = nullptr, const int& callingFileLine = 0) noexcept;
+    ZC_AndroidNativeAppGlue_FileReader(const char* _path) noexcept;
 
     ~ZC_AndroidNativeAppGlue_FileReader() noexcept override;
     
-    size_t Read(char* pContainer, size_t size, const char* const& callingFilePath = nullptr, const int& callingFileLine = 0) noexcept override;
-    long Seek(long offset, const char* const& callingFilePath = nullptr, const int& callingFileLine = 0) noexcept override;
+    size_t Read(char* pContainer, size_t count) noexcept override;
+    long Seek(long offset) noexcept override;
     void Close() noexcept override;
-    bool Eof(const char* const& callingFilePath = nullptr, const int& callingFileLine = 0) noexcept override;
+    bool Eof() noexcept override;
     size_t CurrentReadPosition() noexcept override;
-    size_t Size(const char* const& callingFilePath= nullptr, const int& callingFileLine = 0) noexcept override;
+    size_t Size() noexcept override;
 
 private:
     AAsset* file;

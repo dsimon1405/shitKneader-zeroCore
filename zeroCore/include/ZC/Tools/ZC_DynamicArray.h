@@ -7,8 +7,8 @@ struct ZC_DynamicArray
     T* pArray = nullptr;
     unsigned long size = 0;
 
-    ZC_DynamicArray(T* const& _pArray = nullptr, const unsigned long _size = 0) noexcept;
-    ZC_DynamicArray(const unsigned long& _size) noexcept;
+    ZC_DynamicArray(T* _pArray = nullptr, unsigned long _size = 0) noexcept;
+    ZC_DynamicArray(unsigned long _size) noexcept;
 
     ZC_DynamicArray(const ZC_DynamicArray&) = delete;
     ZC_DynamicArray& operator = (const ZC_DynamicArray&) = delete;
@@ -18,22 +18,22 @@ struct ZC_DynamicArray
 
     ~ZC_DynamicArray() noexcept;
 
-    T& operator [] (const unsigned long& index);
-    const T& operator [] (const unsigned long& index) const;
+    T& operator [] (unsigned long index);
+    const T& operator [] (unsigned long index) const;
 
     operator bool () const noexcept;
 
-    T* Begin() noexcept;
+    const T* Begin() const noexcept;
 };
 
 template<typename T>
-ZC_DynamicArray<T>::ZC_DynamicArray(T* const& _pArray, const unsigned long _size) noexcept
+ZC_DynamicArray<T>::ZC_DynamicArray(T* _pArray, unsigned long _size) noexcept
     : pArray(_pArray),
     size(_size)
 {}
 
 template<typename T>
-ZC_DynamicArray<T>::ZC_DynamicArray(const unsigned long& _size) noexcept
+ZC_DynamicArray<T>::ZC_DynamicArray(unsigned long _size) noexcept
         : size(_size),
           pArray(new T[_size])
 {}
@@ -66,19 +66,19 @@ ZC_DynamicArray<T>::~ZC_DynamicArray() noexcept
 }
 
 template<typename T>
-T& ZC_DynamicArray<T>::operator [] (const unsigned long& index)
+T& ZC_DynamicArray<T>::operator [] (unsigned long index)
 {
     return pArray[index];
 }
 
 template<typename T>
-const T& ZC_DynamicArray<T>::operator [] (const unsigned long& index) const
+const T& ZC_DynamicArray<T>::operator [] (unsigned long index) const
 {
     return const_cast<T&>(pArray[index]);
 }
 
 template<typename T>
-T* ZC_DynamicArray<T>::Begin() noexcept
+const T* ZC_DynamicArray<T>::Begin() const noexcept
 {
     return pArray;
 }

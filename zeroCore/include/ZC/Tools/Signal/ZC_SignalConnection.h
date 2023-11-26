@@ -1,8 +1,8 @@
 #pragma once
 
-/*
-Class for managing connection to the ZC_Signal.
-*/
+// #include "ZC_SignalConnector.h"
+
+//  Class for managing connection to the ZC_Signal.
 class ZC_SignalConnection
 {
 public:
@@ -12,18 +12,11 @@ public:
         Connected,
         //  The function will not be called.
         Disconnected,
-        //  Function removed from ZC_Signal.
+        //  Function removed.
         Terminated
     };
     
     ZC_SignalConnection() = default;
-
-    ZC_SignalConnection(const ZC_SignalConnection&) = delete;
-    ZC_SignalConnection& operator=(const ZC_SignalConnection&) = delete;
-    
-    ZC_SignalConnection(ZC_SignalConnection&& con) noexcept;
-    ZC_SignalConnection& operator=(ZC_SignalConnection&& con) noexcept;
-
     virtual ~ZC_SignalConnection() = default;
 
     /*

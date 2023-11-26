@@ -5,7 +5,7 @@ class ZC_uptr
 {
 public:
     ZC_uptr() = default;
-    ZC_uptr(T* const& _type) noexcept;
+    ZC_uptr(T* _type) noexcept;
 
     ZC_uptr(const ZC_uptr<T>&) = delete;
     ZC_uptr<T>& operator = (const ZC_uptr<T>&) = delete;
@@ -38,7 +38,7 @@ ZC_uptr<T> ZC_uptrMakeFromChild(TParams&&... params) noexcept
 }
 
 template<typename T>
-ZC_uptr<T>::ZC_uptr(T* const& _type) noexcept
+ZC_uptr<T>::ZC_uptr(T* _type) noexcept
     : pData(_type)
 {}
 

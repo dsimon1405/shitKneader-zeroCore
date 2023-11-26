@@ -20,7 +20,7 @@ public:
     callingFilePath - path to the file with the error.
     callingFileLine - error line number.
     */
-    static void Err(const std::string& msg = "", const char* const& callingFilePath = nullptr, const int& callingFileLine = 0);
+    static void Err(const std::string& msg = "", const char* callingFilePath = nullptr, int callingFileLine = 0);
 
     /*
     Tells if there was an error.

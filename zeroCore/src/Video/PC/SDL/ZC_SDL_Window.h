@@ -8,7 +8,7 @@
 class ZC_SDL_Window : public ZC_Window
 {
 public:
-    ZC_SDL_Window(const char* const& name = "", const int& width = 0, const int& height = 0) noexcept;
+    ZC_SDL_Window(const char* name = "", int width = 0, int height = 0) noexcept;
 
     ~ZC_SDL_Window() noexcept override;
 

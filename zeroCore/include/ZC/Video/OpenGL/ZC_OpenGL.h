@@ -6,7 +6,7 @@
 #include <GLES3/gl32.h>
 #define ZC_OPEN_GL_MAJOR_VERSION 3
 #define ZC_OPEN_GL_MINOR_VERSION 2
-#elif defined(ZC_PC)
+#elif defined ZC_PC
 #include <GL/glcorearb.h>
 #define ZC_OPEN_GL_MAJOR_VERSION 4
 #define ZC_OPEN_GL_MINOR_VERSION 6

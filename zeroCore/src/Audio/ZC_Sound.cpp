@@ -2,7 +2,7 @@
 
 #include <ZC/Audio/ZC_AudioStream.h>
 
-ZC_Sound::ZC_Sound(const ZC_SoundData* const& _soundData) noexcept
+ZC_Sound::ZC_Sound(const ZC_SoundData* _soundData) noexcept
     : ZC_StreamSound(_soundData)
 {
     conGetpZC_StreamSound = ZC_AudioStream::sGetpZC_StreamSound.Connect(ZC_Function<ZC_StreamSound*()>(&ZC_Sound::GetpZC_StreamSound, this));
@@ -67,7 +67,7 @@ typename ZC_StreamSound::SoundState ZC_Sound::GetState() noexcept
     return soundState;
 }
 
-void ZC_Sound::SetVolume(const unsigned short& _volume) noexcept
+void ZC_Sound::SetVolume(unsigned short _volume) noexcept
 {
     if (_volume <= 100)
     {

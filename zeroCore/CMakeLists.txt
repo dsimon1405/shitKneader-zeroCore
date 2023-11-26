@@ -236,7 +236,7 @@ set(ZC_SRC_FILES ${ZC_SRC_FILES}
     ${PROJECT_SOURCE_DIR}/src/Video/OpenGL/VAO/ZC_VAOConfig.cpp
     ${PROJECT_SOURCE_DIR}/src/Tools/Signal/ZC_SignalConnection.cpp
 	${PROJECT_SOURCE_DIR}/src/Tools/Exception/ZC_Exception.cpp
-    ${PROJECT_SOURCE_DIR}/src/Tools/ZC_Clock.cpp
+    ${PROJECT_SOURCE_DIR}/src/Tools/Time/ZC_Clock.cpp
 	${PROJECT_SOURCE_DIR}/src/ErrorLogger/ZC_MakeErrorString.cpp
 	${PROJECT_SOURCE_DIR}/src/File/Read/ZC_FileReader.cpp
 	${PROJECT_SOURCE_DIR}/src/ErrorLogger/ZC_ErrorLogger.cpp

@@ -11,7 +11,7 @@ using ZC_upSound = ZC_uptr<ZC_Sound>;
 class ZC_Sound : protected ZC_StreamSound
 {
 public:
-    ZC_Sound(const ZC_SoundData* const& _sound) noexcept;
+    ZC_Sound(const ZC_SoundData* _sound) noexcept;
 
     ~ZC_Sound() noexcept override;
     
@@ -41,7 +41,7 @@ public:
     Params:
     _volume - the volume value is in the range 0–100, otherwise it will be adjusted to the nearest limit
     */
-    void SetVolume(const unsigned short& _volume) noexcept;
+    void SetVolume(unsigned short _volume) noexcept;
 
     /*
     Helps to get volume of the sound.
