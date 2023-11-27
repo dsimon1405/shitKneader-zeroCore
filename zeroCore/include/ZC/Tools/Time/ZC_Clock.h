@@ -42,7 +42,7 @@ public:
 
     ~ZC_Clock() = default;
 
-    //  Starts counting down time.
+    //  Starts/restarts counting down time.
     void Start() noexcept;
 
     //  Calculate the duration since the previous Start or Stop call. Starts counting down time.

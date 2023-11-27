@@ -65,6 +65,8 @@ bool ZC_SDL_LoadOpenGLFunctions()
     if (!pglDeleteBuffers) { ZC_ErrorLogger::Err("glDeleteBuffers SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     pglBindBuffer = (PFNGLBINDBUFFERPROC)SDL_GL_GetProcAddress("glBindBuffer");
     if (!pglBindBuffer) { ZC_ErrorLogger::Err("glBindBuffer SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
+    pglBufferData = (PFNGLBUFFERDATAPROC)SDL_GL_GetProcAddress("glBufferData");
+    if (!pglBufferData) { ZC_ErrorLogger::Err("glBufferData SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     pglBufferSubData = (PFNGLBUFFERSUBDATAPROC)SDL_GL_GetProcAddress("glBufferSubData");
     if (!pglBufferSubData) { ZC_ErrorLogger::Err("glBufferSubData SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     //  vbo
@@ -77,8 +79,6 @@ bool ZC_SDL_LoadOpenGLFunctions()
     if (!pglDeleteVertexArrays) { ZC_ErrorLogger::Err("glDeleteVertexArrays SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     pglBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)SDL_GL_GetProcAddress("glBindVertexArray");
     if (!pglBindVertexArray) { ZC_ErrorLogger::Err("glBindVertexArray SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
-    pglBufferData = (PFNGLBUFFERDATAPROC)SDL_GL_GetProcAddress("glBufferData");
-    if (!pglBufferData) { ZC_ErrorLogger::Err("glBufferData SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     pglEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)SDL_GL_GetProcAddress("glEnableVertexAttribArray");
     if (!pglEnableVertexAttribArray) { ZC_ErrorLogger::Err("glEnableVertexAttribArray SDL_GL_GetProcAddress faild!", __FILE__, __LINE__); return false;}
     pglDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)SDL_GL_GetProcAddress("glDisableVertexAttribArray");
@@ -147,6 +147,7 @@ PFNGLUNIFORMMATRIX4FVPROC pglUniformMatrix4fv = nullptr;
 PFNGLGENBUFFERSPROC pglGenBuffers = nullptr;
 PFNGLDELETEBUFFERSPROC pglDeleteBuffers = nullptr;
 PFNGLBINDBUFFERPROC pglBindBuffer = nullptr;
+PFNGLBUFFERDATAPROC pglBufferData = nullptr;
 PFNGLBUFFERSUBDATAPROC pglBufferSubData = nullptr;
 
 //  vbo
@@ -156,7 +157,6 @@ PFNGLBINDVERTEXBUFFERPROC pglBindVertexBuffer = nullptr;
 PFNGLGENVERTEXARRAYSPROC pglGenVertexArrays = nullptr;
 PFNGLDELETEVERTEXARRAYSPROC pglDeleteVertexArrays = nullptr;
 PFNGLBINDVERTEXARRAYPROC pglBindVertexArray = nullptr;
-PFNGLBUFFERDATAPROC pglBufferData = nullptr;
 PFNGLENABLEVERTEXATTRIBARRAYPROC pglEnableVertexAttribArray = nullptr;
 PFNGLDISABLEVERTEXATTRIBARRAYPROC pglDisableVertexAttribArray = nullptr;
 PFNGLVERTEXATTRIBPOINTERPROC pglVertexAttribPointer = nullptr;

@@ -34,6 +34,10 @@ set(ZC_SRC_FILES ${ZC_SRC_FILES}
 #========================= add lib
 add_library(${PROJECT_NAME} ${ZC_LIB_TYPE} ${ZC_SRC_FILES})
 
+#find_package(OpenGL REQUIRED)
+#set(${ZC_INCLUDE_DIRS} ${ZC_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS})
+#set(${ZC_LINK_LIBS} ${ZC_LINK_LIBS} ${OPENGL_LIBRARIES})
+
 #========================= include
 target_include_directories(${PROJECT_NAME} ${ZC_INCLUDE_DIRS})
 

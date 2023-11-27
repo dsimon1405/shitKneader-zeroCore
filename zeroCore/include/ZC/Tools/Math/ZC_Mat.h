@@ -24,7 +24,7 @@ namespace ZC_Mat
     Perspective matrix.
     */
     template<ZC_cVecTypes TValue>
-    ZC_Mat4<TValue> Perspective(TValue fovy, TValue aspect, TValue near, TValue far) noexcept
+    ZC_Mat4<TValue> Perspective(TValue fovy, TValue aspect, TValue nearPlane, TValue farPlane) noexcept
     {
         ZC_Mat4<TValue> result;
 
@@ -33,15 +33,15 @@ namespace ZC_Mat
         result[0][0] = static_cast<TValue>(1) / (aspect * tanHalfFovy);
         result[1][1] = static_cast<TValue>(1) / tanHalfFovy;
 
-        TValue farMinusNear = far - near;
+        TValue farMinusNear = farPlane - nearPlane;
 #ifdef ZC_LEFT_COORDINATE_SYSTEM
-        result[2][2] = (far + near) / farMinusNear;
+        result[2][2] = (farPlane + nearPlane) / farMinusNear;
         result[2][3] = static_cast<TValue>(1);
 #elif defined ZC_RIGHT_COORDINATE_SYSTEM
-        result[2][2] = - (far + near) / farMinusNear;
+        result[2][2] = - (farPlane + nearPlane) / farMinusNear;
         result[2][3] = - static_cast<TValue>(1);
 #endif
-        result[3][2] = - (static_cast<TValue>(2) * far * near) / farMinusNear;
+        result[3][2] = - (static_cast<TValue>(2) * farPlane * nearPlane) / farMinusNear;
         return result;
     }
 

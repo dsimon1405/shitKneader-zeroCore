@@ -12,7 +12,7 @@ public:
     ~ZC_SDL_AudioStream() noexcept override;
 
 private:
-    SDL_AudioStream* audioStream;
+    SDL_AudioStream* audioStream = nullptr;
     
-    static void SDLCALL MyAudioCallback(void *userdata, SDL_AudioStream *stream, int approx_amount);
+    static void SDLCALL AudioCallback(void *userdata, SDL_AudioStream *stream, int approx_amount);
 };

@@ -20,7 +20,7 @@ option(ZC_COPY_ASSETS_SRC_TO_BUILD "ON - copy assets from ZC_SRC_ASSETS_PATH to 
 
 message(STATUS "========================= ZERO CORE START ========================")
 
-set(ZC_MY_DEBUG ON)
+set(ZC_MY_DEBUG OFF)
 
 #========================= c++ standard
 set(CMAKE_CXX_STANDARD 20)
@@ -147,6 +147,8 @@ if(ZC_SDL_VIDEO)
 	#	add lib
 	if(ZC_MY_DEBUG)
 		set(ZC_LINK_LIBS ${ZC_LINK_LIBS} PRIVATE ${PROJECT_SOURCE_DIR}/external/sdl3Libs/libSDL3.so)
+	#	set(ZC_INCLUDE_DIRS PUBLIC ${PROJECT_SOURCE_DIR}/external/sdl3/include)
+	#	set(ZC_LINK_LIBS ${ZC_LINK_LIBS} PUBLIC ${PROJECT_BINARY_DIR}/external/sdl3/Debug/SDL3-static.lib)
 	else()
 		set(SDL_STATIC ON)
 		set(SDL_SHARED OFF)

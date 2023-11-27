@@ -3,6 +3,7 @@
 #include "ZC_Vec3.h"
 
 #include <math.h>
+#include <C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt\corecrt_math_defines.h>
 
 namespace ZC_Vec
 {

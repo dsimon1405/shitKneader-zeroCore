@@ -16,8 +16,8 @@ public:
     void SwapBuffer() noexcept override;
 
 private:
-    SDL_Window* window;
-    SDL_GLContext glContext;
+    SDL_Window* window = nullptr;
+    SDL_GLContext glContext = nullptr;
 
     bool SetOpenGLAttributes() noexcept;
 };

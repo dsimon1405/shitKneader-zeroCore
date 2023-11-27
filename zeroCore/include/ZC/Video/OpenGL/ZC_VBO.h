@@ -68,7 +68,7 @@ public:
 	On success true, otherwise false (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
 	*/
 	template<ZC_cOpenGLType TOpenGL>
-	bool BufferData(ZC_DynamicArray<TOpenGL> data, GLenum _usage) noexcept;
+	bool BufferData(ZC_DynamicArray<TOpenGL>&& data, GLenum _usage) noexcept;
 
 	/*
 	Save new data in vbo.
@@ -81,7 +81,7 @@ public:
 	On success true, otherwise false (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
 	*/
 	template<ZC_cOpenGLType TOpenGL>
-	bool BufferSubData(long offset, ZC_DynamicArray<TOpenGL> data) noexcept;
+	bool BufferSubData(long offset, ZC_DynamicArray<TOpenGL>&& data) noexcept;
 
 private:
 	GLuint id = 0;
@@ -92,6 +92,8 @@ private:
 	static void UnbindBuffer() noexcept;
 	
 	void BindBuffer() const noexcept;
+	bool BufferData(void* pData, size_t bytesSize, GLenum _usage) noexcept;
+	bool BufferSubData(long offset, void* pData, size_t bytesSize) noexcept;
 
 #ifdef ZC_ANDROID
 	friend class ZC_AndroidNativeAppGlue_Window;
@@ -130,34 +132,20 @@ private:
 };
 
 template<ZC_cOpenGLType TOpenGL>
-bool ZC_VBO::BufferData(ZC_DynamicArray<TOpenGL> data, GLenum _usage) noexcept
+bool ZC_VBO::BufferData(ZC_DynamicArray<TOpenGL>&& data, GLenum _usage) noexcept
 {
-	BindBuffer();
-	ZC_ErrorLogger::Clear();
-	size_t dataBytesSize = data.size * sizeof(TOpenGL);
-	glBufferData(GL_ARRAY_BUFFER, dataBytesSize, static_cast<void*>(data.pArray), _usage);
-	UnbindBuffer();
-	if (ZC_ErrorLogger::WasError()) return false;
+	if (!BufferData(static_cast<void*>(data.pArray), data.size * sizeof(TOpenGL), _usage)) return false;
 #ifdef ZC_ANDROID
-	usage = _usage;
-	ClearvboDatas();
-	vboDatas.emplace_back(dataBytesSize, reinterpret_cast<char*>(data.pArray), reinterpret_cast<char*>(data.pArray));
 	data.pArray = nullptr;
 #endif
 	return true;
 }
 
 template<ZC_cOpenGLType TOpenGL>
-bool ZC_VBO::BufferSubData(long offset, ZC_DynamicArray<TOpenGL> data) noexcept
+bool ZC_VBO::BufferSubData(long offset, ZC_DynamicArray<TOpenGL>&& data) noexcept
 {
-	BindBuffer();
-	ZC_ErrorLogger::Clear();
-	size_t bytesSize = data.size * sizeof(TOpenGL);
-	glBufferSubData(GL_ARRAY_BUFFER, offset, bytesSize, static_cast<void*>(data.pArray));
-	UnbindBuffer();
-	if (ZC_ErrorLogger::WasError()) return false;
+	if (!BufferSubData(offset, static_cast<void*>(data.pArray), data.size * sizeof(TOpenGL))) return false;
 #ifdef ZC_ANDROID
-	AddVBOData(offset, bytesSize, reinterpret_cast<char*>(data.pArray));
 	data.pArray = nullptr;
 #endif
 	return true;

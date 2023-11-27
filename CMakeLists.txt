@@ -4,8 +4,8 @@ project(shitKneader)
 #========================= options
 
 #   only one could be ON
-option(SK_PC "Build executable file for PC" OFF)
-option(SK_ANDROID "Build APK file in Android Studio" ON)
+option(SK_PC "Build executable file for PC" ON)
+option(SK_ANDROID "Build APK file in Android Studio" OFF)
 
 option(SK_DEBUG "ON - External libraries will be build shared" ON)
 

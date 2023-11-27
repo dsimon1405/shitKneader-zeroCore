@@ -63,8 +63,8 @@ private:
     template <ZC_cBitsPerSample T>
     static void FillData(void* pDataContainer, int bytesCount, std::vector<ZC_StreamSound*>& sounds) noexcept;
 
-    template<typename T>
-    static T Avg(T* datas, size_t size) noexcept;
+    //template<typename T>
+    //static T Avg(T* datas, size_t size) noexcept;
 };
 
 template <ZC_cBitsPerSample T>
@@ -72,29 +72,38 @@ void ZC_AudioStream::FillData(void* pDataContainer, int bytesCount, std::vector<
 {
     T* pData = static_cast<T*>(pDataContainer);
     int pDataSize = bytesCount / static_cast<int>(sizeof(T));
+    if (stateAudioStream == ZC_AudioStream::State::Passive)
+    {
+        std::fill(pData, pData + pDataSize, 0);
+        return;
+    }
     for (int pDataIndex = 0; pDataIndex < pDataSize; ++pDataIndex)
     {
-        T datas[sounds.size()];
-        size_t datasIndex = 0;
+        if (sounds.size() == 0)
+        {
+            std::fill(pData + pDataIndex, pData + (pDataSize - pDataIndex), 0);
+            return;
+        }
+        T divisor = sounds.size() == 1 ? static_cast<T>(2) : static_cast<T>(sounds.size());
+        T result = 0;
         for (auto soundsIter = sounds.begin(); soundsIter != sounds.end();)
         {
             T data = 0;
             soundsIter = (*soundsIter)->Pop(data) ? ++soundsIter : sounds.erase(soundsIter);
-            if (data != 0) datas[datasIndex++] = data;
+            result += data / divisor;
         }
-
-        pData[pDataIndex] = stateAudioStream == ZC_AudioStream::State::Active ? Avg(&datas[0], datasIndex) : 0;
+        pData[pDataIndex] = result;
     }
 }
 
-template<typename T>
-T ZC_AudioStream::Avg(T* datas, size_t size) noexcept
-{
-    T result = 0;
-    T divisor = static_cast<T>(size);
-    for (T i = 0; i < size; ++i)
-    {
-        result += datas[i] / divisor;
-    }
-    return size < 2 ? result / 2 : result;
-}
+//template<typename T>
+//T ZC_AudioStream::Avg(T* datas, size_t size) noexcept
+//{
+//    T result = 0;
+//    T divisor = static_cast<T>(size);
+//    for (T i = 0; i < size; ++i)
+//    {
+//        result += datas[i] / divisor;
+//    }
+//    return size < 2 ? result / 2 : result;
+//}

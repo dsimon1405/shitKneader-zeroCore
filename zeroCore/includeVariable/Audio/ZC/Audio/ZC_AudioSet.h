@@ -20,11 +20,11 @@ struct ZC_AudioSet
     };
 
     //  Number of channels in the audio recording for the audio stream.
-    Channels channels;
+    Channels channels = Channels::Mono;
     //  The number of bytes that should be played per second.
     int frequency = 0;
     //  The number of bytes in one audio sample for an audio stream.
-    BitsPerSample bitsPerSample;
+    BitsPerSample bitsPerSample = BitsPerSample::S16;
 
     //  Create default audio set.
     ZC_AudioSet() = default;

@@ -7,11 +7,12 @@
 #define ZC_OPEN_GL_MAJOR_VERSION 3
 #define ZC_OPEN_GL_MINOR_VERSION 2
 #elif defined ZC_PC
-#include <GL/glcorearb.h>
+#include <ZC/Video/OpenGL/GL/glcorearb.h>
 #define ZC_OPEN_GL_MAJOR_VERSION 4
 #define ZC_OPEN_GL_MINOR_VERSION 6
 
 //  clear
+
 extern PFNGLCLEARPROC pglClear;
 #define glClear pglClear
 
@@ -19,6 +20,7 @@ extern PFNGLCLEARCOLORPROC pglClearColor;
 #define glClearColor pglClearColor
 
 //  get
+
 extern PFNGLGETSTRINGPROC pglGetString;
 #define glGetString pglGetString
 
@@ -26,10 +28,12 @@ extern PFNGLGETINTEGERVPROC pglGetIntegerv;
 #define glGetIntegerv pglGetIntegerv
 
 //  enable
+
 extern PFNGLENABLEPROC pglEnable;
 #define glEnable pglEnable
 
 //  debug
+
 extern PFNGLDEBUGMESSAGECALLBACKPROC pglDebugMessageCallback;
 #define glDebugMessageCallback pglDebugMessageCallback
 
@@ -37,6 +41,7 @@ extern PFNGLDEBUGMESSAGECONTROLPROC pglDebugMessageControl;
 #define glDebugMessageControl pglDebugMessageControl
 
 //  shader
+
 extern PFNGLCREATEPROGRAMPROC pglCreateProgram;
 #define glCreateProgram pglCreateProgram
 
@@ -83,6 +88,7 @@ extern PFNGLUNIFORMMATRIX4FVPROC pglUniformMatrix4fv;
 #define glUniformMatrix4fv pglUniformMatrix4fv
 
 //  buffer
+
 extern PFNGLGENBUFFERSPROC pglGenBuffers;
 #define glGenBuffers pglGenBuffers
 
@@ -96,10 +102,12 @@ extern PFNGLBUFFERSUBDATAPROC pglBufferSubData;
 #define glBufferSubData pglBufferSubData
 
 //  vbo
+
 extern PFNGLBINDVERTEXBUFFERPROC pglBindVertexBuffer; 
 #define glBindVertexBuffer pglBindVertexBuffer
 
 //  vao
+
 extern PFNGLGENVERTEXARRAYSPROC pglGenVertexArrays;
 #define glGenVertexArrays pglGenVertexArrays
 

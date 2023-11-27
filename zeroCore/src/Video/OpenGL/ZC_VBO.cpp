@@ -35,6 +35,35 @@ void ZC_VBO::BindBuffer() const noexcept
 {
     glBindBuffer(GL_ARRAY_BUFFER, id);
 }
+
+bool ZC_VBO::BufferData(void* pData, size_t bytesSize, GLenum _usage) noexcept
+{
+    BindBuffer();
+    ZC_ErrorLogger::Clear();
+    glBufferData(GL_ARRAY_BUFFER, bytesSize, const_cast<const void*>(pData), _usage);
+    UnbindBuffer();
+    if (ZC_ErrorLogger::WasError()) return false;
+#ifdef ZC_ANDROID
+    usage = _usage;
+    ClearvboDatas();
+    char* pDataChar = reinterpret_cast<char*>(pData);
+    vboDatas.emplace_back(dataBytesSize, pDataChar, pDataChar);
+#endif
+    return true;
+}
+
+bool ZC_VBO::BufferSubData(long offset, void* pData, size_t bytesSize) noexcept
+{
+    BindBuffer();
+    ZC_ErrorLogger::Clear();
+    glBufferSubData(GL_ARRAY_BUFFER, offset, bytesSize, const_cast<const void*>(pData));
+    UnbindBuffer();
+    if (ZC_ErrorLogger::WasError()) return false;
+#ifdef ZC_ANDROID
+    AddVBOData(offset, bytesSize, reinterpret_cast<char*>(data.pArray));
+#endif
+    return true;
+}
 #ifdef ZC_PC
 ZC_VBO::ZC_VBO(ZC_VBO&& vbo) noexcept
     : id(vbo.id)
