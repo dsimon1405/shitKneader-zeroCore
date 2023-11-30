@@ -7,18 +7,22 @@
 class ZC_PC_FileReader : public ZC_FileReader
 {
 public:
-    ZC_PC_FileReader(const char* _path) noexcept;
+    ZC_PC_FileReader(const char* _path);
 
-    ~ZC_PC_FileReader() noexcept override;
+    ~ZC_PC_FileReader() override;
     
-    size_t Read(char* pContainer, size_t count) noexcept override;
-    long Seek(long offset) noexcept override;
-    void Close() noexcept override;
-    bool Eof() noexcept override;
-    size_t CurrentReadPosition() noexcept override;
-    size_t Size() noexcept override;
+    long Read(char* pContainer, long count) override;
+    long Seek(long offset) override;
+    void Close() override;
+    bool Eof() override;
+    long CurrentReadPosition() override;
+    long Size() const override;
+    long RemainingLength() override;
 
 private:
     std::ifstream file;
     const size_t size;
+
+    bool OpenCheck() const;
+    long CalculateSize();
 };

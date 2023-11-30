@@ -56,8 +56,6 @@ public:
     ZC_Function(ZC_Function<TReturn(TParams...)>&& pFunc) noexcept;
     ZC_Function<TReturn(TParams...)>& operator = (ZC_Function<TReturn(TParams...)>&& func) noexcept;
 
-    // ~ZC_Function() noexcept;
-
     /*
     Call function(method). If function is nullptr throw exception.
 
@@ -68,6 +66,8 @@ public:
     TReturn type object.
     */
     TReturn operator () (TParams... params) const;
+
+    auto operator <=> (const ZC_Function<TReturn(TParams...)>& func) const = default;
 
 private:
     ZC_uptr<ZC_IFunctionHolder<TReturn(TParams...)>> pFuncHolder;

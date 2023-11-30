@@ -53,7 +53,7 @@ template<ZC_cBitsPerSample T>
 bool ZC_Sounds::DeleteStartNullData(ZC_upFileReader& file, int32_t& size, const char* path) noexcept
 {
     T readData = 0;
-    static size_t readDataSizeof = sizeof(readData);
+    static constexpr long readDataSizeof = sizeof(readData);
     do
     {
         size -= readDataSizeof;
@@ -72,7 +72,7 @@ bool ZC_Sounds::DeleteStartNullData(ZC_upFileReader& file, int32_t& size, const 
     } while (readData == 0);
 
     size += readDataSizeof;
-    if (file->Seek(static_cast<int>(readDataSizeof) * -1) != readDataSizeof * -1)
+    if (file->Seek(-readDataSizeof) != static_cast<long>(-readDataSizeof))
     {
         file->Close();
         return false;

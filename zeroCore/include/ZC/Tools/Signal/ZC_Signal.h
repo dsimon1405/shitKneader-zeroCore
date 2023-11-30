@@ -15,7 +15,7 @@ class ZC_Signal<TReturn(TParams...)> : public ZC_SignalConnector<TReturn(TParams
 {
 public:
     //  Creates a ZC_Signal with the function signature <TReturn(TParams...)>.
-    ZC_Signal();
+    ZC_Signal() = default;
 
     ZC_Signal(const ZC_Signal<TReturn(TParams...)>&) = delete;
     ZC_Signal<TReturn(TParams...)>& operator = (const ZC_Signal<TReturn(TParams...)>&) = delete;
@@ -45,11 +45,6 @@ public:
     //  Create Connector to the signal. Usefull for hide signal in private zone.
     ZC_SignalConnector<TReturn(TParams...)>* GetConnector() noexcept;
 };
-
-template<typename TReturn, ZC_cNotRValueRef... TParams>
-ZC_Signal<TReturn(TParams...)>::ZC_Signal()
-    : ZC_SignalConnector<TReturn(TParams...)>()
-{}
 
 template<typename TReturn, ZC_cNotRValueRef... TParams>
 ZC_Signal<TReturn(TParams...)>::ZC_Signal(ZC_Signal<TReturn(TParams...)>&& sig) noexcept

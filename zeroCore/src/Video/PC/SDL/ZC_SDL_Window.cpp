@@ -23,8 +23,8 @@ ZC_SDL_Window::ZC_SDL_Window(const char* name, int _width, int _height) noexcept
 	if (!SetOpenGLAttributes()) return;
 
     window = _width <= 0 && _height <= 0 ?
-		window = SDL_CreateWindow(name, 0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN)
-		: window = SDL_CreateWindowWithPosition(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _width, _height, SDL_WINDOW_OPENGL);
+		SDL_CreateWindow(name, 0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN)
+		: SDL_CreateWindowWithPosition(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _width, _height, SDL_WINDOW_OPENGL);
     
 	if (!window)
 	{
@@ -39,7 +39,7 @@ ZC_SDL_Window::ZC_SDL_Window(const char* name, int _width, int _height) noexcept
 		return;
 	}
 
-    if (!ZC_SDL_LoadOpenGLFunctions()) return;	//	???
+    if (!ZC_SDL_LoadOpenGLFunctions()) return;
 
 	ZC_OpenGLAssigneErrorCallback();
 	SDL_GetWindowSize(window, &width, &height);
@@ -61,31 +61,52 @@ bool ZC_SDL_Window::HandleEvents() noexcept
         {
             return false;
         }
-
+		
+		if (event.type == SDL_EVENT_MOUSE_WHEEL)
+		{
+			// count += event.wheel.y;
+			auto scroledX = event.wheel.x;
+			auto x = event.wheel.mouseX;
+			auto scroledY = event.wheel.y;
+			auto y = event.wheel.mouseY;
+					int a = 3;
+		}
+		if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+		{
+			if(event.button.button == SDL_BUTTON_LEFT)
+			{
+				
+				int a = 3;
+			}
+			if(event.button.button == SDL_BUTTON_X1)
+			{
+				int a = 3;
+			}
+		}
 		if (event.type == SDL_EVENT_KEY_DOWN)
 		{
-		++count;
-			// event.motion
-			event.key.repeat;
 			
-			if (event.key.keysym.sym == SDLK_q)
-			{
-				ZC_cout("q down");
-			}
 			if (event.key.keysym.sym == SDLK_e)
 			{
-				ZC_cout("e");
+				ZC_cout("e " + std::to_string(count));
+				int a = 3;
+			}
+			if (event.key.keysym.scancode == SDL_SCANCODE_LCTRL)
+			{
+				int time = event.key.timestamp;
+				int a = 3;
+				// ZC_cout("q down");
 			}
 		}
 		if (event.type == SDL_EVENT_KEY_UP)
 		{
 			if (event.key.keysym.sym == SDLK_q)
 			{
-				ZC_cout("q up");
+				// ZC_cout("q up");
 			}
 		}
     }
-				if (count > 0) ZC_cout(std::to_string(count));
+				if (count != 0) ZC_cout("scroll y " + std::to_string(count));
 
     return true;
 }

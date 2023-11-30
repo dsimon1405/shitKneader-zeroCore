@@ -16,7 +16,7 @@ public:
     
     ~ZC_FunctionHolder() override = default;
     
-    TReturn operator()(TParams&&... params) const noexcept override;
+    TReturn operator()(TParams&&... params) const override;
 
 private:
     TReturn(*pFunc)(TParams...);
@@ -33,14 +33,14 @@ public:
 
     ~ZC_FunctionHolder() override = default;
     
-    TReturn operator()(TParams&&... params) const noexcept override;
+    TReturn operator()(TParams&&... params) const override;
 
 private:
     TClass* pClass;
     TReturn(TClass::*pFunc)(TParams...);
 };
 
-//  start  template <typename TReturn, typename... TParams> ZC_FunctionHolder<TReturn(TParams...)>
+//  start   template<typename TReturn, typename... TParams> ZC_FunctionHolder<TReturn(TParams...)>
 
 template<typename TReturn, typename... TParams>
 ZC_FunctionHolder<TReturn(TParams...)>::ZC_FunctionHolder(TReturn(*_pFunc)(TParams...)) noexcept
@@ -48,11 +48,11 @@ ZC_FunctionHolder<TReturn(TParams...)>::ZC_FunctionHolder(TReturn(*_pFunc)(TPara
 {}
 
 template<typename TReturn, typename... TParams>
-TReturn ZC_FunctionHolder<TReturn(TParams...)>::operator()(TParams&&... params) const noexcept
+TReturn ZC_FunctionHolder<TReturn(TParams...)>::operator()(TParams&&... params) const
 {
     return (*pFunc)(std::forward<TParams>(params)...);
 }
-//  end  template <typename TReturn, typename... TParams> ZC_FunctionHolder<TReturn(TParams...)>
+//  end   template <typename TReturn, typename... TParams> ZC_FunctionHolder<TReturn(TParams...)>
 
 //  start   template<typename TReturn, typename... TParams, typename TClass> class ZC_FunctionHolder<TReturn(TParams...), TClass>
 
@@ -75,7 +75,7 @@ ZC_FunctionHolder<TReturn(TParams...), TClass>::ZC_FunctionHolder(TReturn(TClass
 {}
 
 template<typename TReturn, typename... TParams, typename TClass>
-TReturn ZC_FunctionHolder<TReturn(TParams...), TClass>::operator()(TParams&&... params) const noexcept
+TReturn ZC_FunctionHolder<TReturn(TParams...), TClass>::operator()(TParams&&... params) const
 {
     return (pClass->*pFunc)(std::forward<TParams>(params)...);
 }

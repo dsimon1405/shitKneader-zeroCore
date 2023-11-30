@@ -1,45 +1,19 @@
-#========================= src files
-#   SDL3
-    #   video
-if(ZC_SDL_VIDEO)
-    #	include
-    set(ZC_INCLUDE_DIRS ${ZC_INCLUDE_DIRS}
-        PRIVATE ${PROJECT_SOURCE_DIR}/external/sdl3/include)
-
-    #   src
-    set(ZC_SRC_FILES ${ZC_SRC_FILES}
-        ${PROJECT_SOURCE_DIR}/src/Video/PC/SDL/ZC_SDL_Window.cpp
-        ${PROJECT_SOURCE_DIR}/src/Video/OpenGL/PC/SDL/ZC_SDL_LoadOpenGLFunctions.cpp)
-endif()
-
-#   audio
-if(ZC_AUDIO)
-    if(ZC_SDL_AUDIO)
-        set(ZC_SRC_FILES ${ZC_SRC_FILES}
-            ${PROJECT_SOURCE_DIR}/src/Audio/PC/SDL/ZC_SDL_AudioStream.cpp)
-    endif()
-endif()
-
-#========================= includeVariable
-set(ZC_INCLUDE_DIRS ${ZC_INCLUDE_DIRS} PUBLIC ${PROJECT_SOURCE_DIR}/includeVariable/PC)
-
-#========================= src files
+#========================= sources
 set(ZC_SRC_FILES ${ZC_SRC_FILES}
-        ${PROJECT_SOURCE_DIR}/src/Tools/Console/PC/ZC_cout.cpp
-        ${PROJECT_SOURCE_DIR}/src/File/Read/PC/ZC_PC_FileReader.cpp
-        ${PROJECT_SOURCE_DIR}/src/File/Read/PC/ZC_MakeAbsolutePath.cpp
-        ${PROJECT_SOURCE_DIR}/src/main/PC/ZC_PC_main.cpp
-        )
+	${PROJECT_SOURCE_DIR}/src/Tools/Console/PC/ZC_cout.cpp
+	${PROJECT_SOURCE_DIR}/src/File/Read/PC/ZC_PC_FileReader.cpp
+	$<$<BOOL:${ZC_SDL_VIDEO}>:
+		${PROJECT_SOURCE_DIR}/src/Video/PC/SDL/ZC_SDL_Window.cpp
+		${PROJECT_SOURCE_DIR}/src/Video/OpenGL/PC/SDL/ZC_SDL_LoadOpenGLFunctions.cpp>
+    $<$<BOOL:${ZC_AUDIO}>:
+        $<$<BOOL:${ZC_SDL_AUDIO}>:
+		    ${PROJECT_SOURCE_DIR}/src/Audio/PC/SDL/ZC_SDL_AudioStream.cpp>>
+    PARENT_SCOPE)
 
-#========================= add lib
-add_library(${PROJECT_NAME} ${ZC_LIB_TYPE} ${ZC_SRC_FILES})
+set(ZC_INCLUDE_DIRS ${ZC_INCLUDE_DIRS}
+    PRIVATE $<$<BOOL:${ZC_SDL_VIDEO}>:${PROJECT_SOURCE_DIR}/external/sdl3/include>
+    PARENT_SCOPE)
 
-#find_package(OpenGL REQUIRED)
-#set(${ZC_INCLUDE_DIRS} ${ZC_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS})
-#set(${ZC_LINK_LIBS} ${ZC_LINK_LIBS} ${OPENGL_LIBRARIES})
-
-#========================= include
-target_include_directories(${PROJECT_NAME} ${ZC_INCLUDE_DIRS})
-
-#========================= link
-target_link_libraries(${PROJECT_NAME} ${ZC_LINK_LIBS})
+set(ZC_LINK_LIBS ${ZC_LINK_LIBS}
+    PRIVATE $<$<BOOL:${ZC_SDL_VIDEO}>:$<IF:${ZC_MY_DEBUG},${PROJECT_SOURCE_DIR}/external/sdl3Libs/libSDL3.so,SDL3::SDL3>>
+    PARENT_SCOPE)

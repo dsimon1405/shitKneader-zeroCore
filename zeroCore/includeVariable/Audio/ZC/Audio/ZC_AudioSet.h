@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ZC_string.h>
+#include <ZC/Tools/ZC_string.h>
 
 //  Struct - set of audio parameters for an audio stream.
 struct ZC_AudioSet

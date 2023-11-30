@@ -3,7 +3,7 @@
 namespace ZC_MatArithmetic
 {
     template<typename TMat, typename TValue>
-    void MultiplyValue(TMat& mat, short size, TValue factor)
+    void MultiplyValue(TMat& mat, short size, TValue factor) noexcept
     {
         for (short i = 0; i < size; ++i)
         {
@@ -12,7 +12,7 @@ namespace ZC_MatArithmetic
     }
 
     template<typename TMat, typename TVec>
-    void MultiplyVec(const TMat& mat, short size, const TVec& factor, TVec& result)
+    void MultiplyVec(const TMat& mat, short size, const TVec& factor, TVec& result) noexcept
     {
         for (short i = 0; i < size; ++i)
         {
@@ -24,7 +24,7 @@ namespace ZC_MatArithmetic
     }
 
     template<typename TMat>
-    void MultiplyMat(TMat& mat, short size, const TMat& factor)
+    void MultiplyMat(TMat& mat, short size, const TMat& factor) noexcept
     {
         TMat temp;
         for (short i = 0; i < size; ++i)

@@ -34,8 +34,8 @@ ZC_DynamicArray<T>::ZC_DynamicArray(T* _pArray, unsigned long _size) noexcept
 
 template<typename T>
 ZC_DynamicArray<T>::ZC_DynamicArray(unsigned long _size) noexcept
-        : size(_size),
-          pArray(new T[_size])
+        : pArray(new T[_size]),
+        size(_size)
 {}
 
 template<typename T>

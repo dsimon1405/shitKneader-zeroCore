@@ -47,7 +47,7 @@ bool ZC_VBO::BufferData(void* pData, size_t bytesSize, GLenum _usage) noexcept
     usage = _usage;
     ClearvboDatas();
     char* pDataChar = reinterpret_cast<char*>(pData);
-    vboDatas.emplace_back(dataBytesSize, pDataChar, pDataChar);
+    vboDatas.emplace_back(bytesSize, pDataChar, pDataChar);
 #endif
     return true;
 }
@@ -60,7 +60,7 @@ bool ZC_VBO::BufferSubData(long offset, void* pData, size_t bytesSize) noexcept
     UnbindBuffer();
     if (ZC_ErrorLogger::WasError()) return false;
 #ifdef ZC_ANDROID
-    AddVBOData(offset, bytesSize, reinterpret_cast<char*>(data.pArray));
+    AddVBOData(offset, bytesSize, reinterpret_cast<char*>(pData));
 #endif
     return true;
 }
@@ -178,10 +178,10 @@ void ZC_VBO::ResetVBOs() noexcept
 //  VBOData
 ZC_VBO::VBOData::VBOData(long _size, char* _pData, char* _pDataHead,
                         long _offset, VBOData* _pSamePrevious) noexcept
-    : pData(_pData),
+    : offset(_offset),
+      pData(_pData),
       size(_size),
       pDataHead(_pDataHead),
-      offset(_offset),
       pSamePrevious(_pSamePrevious)
 {}
 

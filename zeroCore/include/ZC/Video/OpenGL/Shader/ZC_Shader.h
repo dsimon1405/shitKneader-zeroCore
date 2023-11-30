@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ZC_string.h>
+#include <ZC/Tools/ZC_string.h>
 #include <ZC/Video/OpenGL/ZC_OpenGL.h>
 #include "ZC_ShaderCode.h"
 #ifdef ZC_ANDROID

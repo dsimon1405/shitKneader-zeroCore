@@ -9,18 +9,18 @@ struct ZC_FPS
     short fps = 1000000 / 60;
     ZC_Clock clock;
 
-    void Actualize() noexcept;
-    void SetFPS(float _fps) noexcept;
+    void Actualize();
+    void SetFPS(double _fps);
 };
 
-void ZC_FPS::Actualize() noexcept
+void ZC_FPS::Actualize()
 {
     std::this_thread::sleep_for(ZC_Nanoseconds(clock.Stop<ZC_Nanoseconds>() - fps));
     clock.Start();
 }
 
-void ZC_FPS::SetFPS(float _fps) noexcept
+void ZC_FPS::SetFPS(double _fps)
 {
     //  наносекунды 1 / 1 000 000
-    fps = 1000000 / fps;
+    fps = 1000000.0 / fps;
 }

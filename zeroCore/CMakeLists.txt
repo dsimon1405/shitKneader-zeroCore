@@ -6,21 +6,17 @@ project(zeroCore)
 option(ZC_PC "ON - build for PC version" ON)
 option(ZC_ANDROID "ON - build for Android version" OFF)
 
+#	set the relative path from the launch file to your resources (this is necessary for the same behavior of PC/Android file systems)
+#	exapmle: your resources directory in build folder (.../build/allResurcesDirName) make next => set(ZC_ASSETS_PATH allResurcesDirName)
+set(ZC_ASSETS_PATH ${ZC_ASSETS_PATH})
+
 option(ZC_AUDIO "ON - audio support" ON)
 
 option(ZC_STATIC "ON - build static library, else build shared" ON)
 
-option(ZC_DEBUG "ON - error will throw exception, else will logg error message" OFF)
-
-#	ZC_SRC_ASSETS_PATH - set path to source assets directory in your CMakeLists.txt (exemple: set(ZC_SRC_ASSETS_PATH ".../assets"))
-set(ZC_SRC_ASSETS_PATH ${ZC_SRC_ASSETS_PATH})
-#	set ZC_BUILD_ASSETS_PATH - path to build assets directory (For PC development, this path will be considered absolute to assets)
-set(ZC_BUILD_ASSETS_PATH ${ZC_BUILD_ASSETS_PATH})
-option(ZC_COPY_ASSETS_SRC_TO_BUILD "ON - copy assets from ZC_SRC_ASSETS_PATH to ZC_BUILD_ASSETS_PATH" OFF)
-
 message(STATUS "========================= ZERO CORE START ========================")
 
-set(ZC_MY_DEBUG OFF)
+set(ZC_MY_DEBUG 1)
 
 #========================= c++ standard
 set(CMAKE_CXX_STANDARD 20)
@@ -32,29 +28,40 @@ if(ZC_PC AND WIN32)
 endif()
 
 #========================= set configuration
-if(ZC_ANDROID)
-	#	disable other platforms options
-	set(ZC_PC OFF)
-	
-	#	set video/audio API
-	set(ZC_ANDROID_NATIVE_APP_GLUE ON)
-	if(ZC_AUDIO)
-		set(ZC_OBOE ON)
-	else()
-		set(ZC_OBOE OFF)
-	endif()
-else()
-	#	if no ON options, make ON PC configuration
-	set(ZC_PC ON)
+if((ZC_PC AND ZC_ANDROID) OR (NOT ZC_PC AND NOT ZC_ANDROID))
+	message(FATAL_ERROR "Options ZC_PC and ZC_ANDROID can't have the same values.")
+endif()
 
-	#	set video/audio API
+#	all bool used values set off
+	#	video
+set(ZC_SDL_VIDEO OFF)
+set(ZC_ANDROID_NATIVE_APP_GLUE ON)
+	#	audio
+set(ZC_OBOE OFF)
+set(ZC_SDL_AUDIO OFF)
+
+if(ZC_PC)
+	#	video
 	set(ZC_SDL_VIDEO ON)
+	#	audio
 	if(ZC_AUDIO)
 		set(ZC_SDL_AUDIO ON)
-	else()
-		set(ZC_SDL_AUDIO OFF)
+	endif()
+elseif(ZC_ANDROID)
+	#	video
+	set(ZC_ANDROID_NATIVE_APP_GLUE ON)
+	#	audio
+	if(ZC_AUDIO)
+		set(ZC_OBOE ON)
 	endif()
 endif()
+
+#	fatatl error equal function
+function(ZC_F_FATAL_EQUAL data1 data2 errorMessage)
+	if(NOT ${data1} EQUAL ${data2})
+		message(FATAL_ERROR ${errorMessage})
+	endif()
+endfunction()
 
 #========================= git submodules
 if(ZC_SDL_VIDEO OR ZC_OBOE)
@@ -72,9 +79,7 @@ if(ZC_GIT_SUBMODULES)
 			execute_process(COMMAND ${GIT_EXECUTABLE} init
 		                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		                    RESULT_VARIABLE ZC_GIT_INIT_RESULT)
-		    if(NOT ZC_GIT_INIT_RESULT EQUAL "0")
-				message(FATAL_ERROR "git init => failed with: ${GIT_SUBMOD_RESULT}")
-		    endif()
+			ZC_F_FATAL_EQUAL(${ZC_GIT_INIT_RESULT} 0 "git init => failed with: ${ZC_GIT_INIT_RESULT}")
 		endif()
 
 		#	git submodule add
@@ -85,9 +90,7 @@ if(ZC_GIT_SUBMODULES)
 				execute_process(COMMAND ${GIT_EXECUTABLE} submodule add ${link} external/${name}
 			                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			                    RESULT_VARIABLE ZC_GIT_SUBMODULE_ADD_RESULT)
-			    if(NOT ZC_GIT_SUBMODULE_ADD_RESULT EQUAL "0")
-					message(FATAL_ERROR "git submodule add ${link} external/${name} => failed with: ${ZC_GIT_SUBMODULE_ADD_RESULT}")
-			    endif()
+				ZC_F_FATAL_EQUAL(${ZC_GIT_SUBMODULE_ADD_RESULT} 0 "git submodule add ${link} external/${name} => failed with: ${ZC_GIT_SUBMODULE_ADD_RESULT}")
 			endif()
 			#	existing check
 			if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/${name}/.git")
@@ -111,9 +114,7 @@ if(ZC_GIT_SUBMODULES)
 		    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
 		                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		                    RESULT_VARIABLE ZC_GIT_SUBMOD_RESULT)
-		    if(NOT ZC_GIT_SUBMOD_RESULT EQUAL "0")
-		        message(FATAL_ERROR "git submodule update --init --recursive => failed with: ${GIT_SUBMOD_RESULT}")
-		    endif()
+			ZC_F_FATAL_EQUAL(${ZC_GIT_SUBMOD_RESULT} 0 "git submodule update --init --recursive => failed with: ${ZC_GIT_SUBMOD_RESULT}")
 		endif()
 	else()
 		message(FATAL_ERROR "Could not find_package(Git QUIET)!")
@@ -133,54 +134,33 @@ if(ZC_GIT_SUBMODULES)
 	endif()
 endif()
 
-#========================= include dirs
-set(ZC_INCLUDE_DIRS
-	PUBLIC ${PROJECT_SOURCE_DIR}/include
-	PUBLIC ${PROJECT_BINARY_DIR}/config
-	)
-
 #========================= external libs
-set(ZC_LINK_LIBS)
-
-#	sdl3
-if(ZC_SDL_VIDEO)
-	#	add lib
-	if(ZC_MY_DEBUG)
-		set(ZC_LINK_LIBS ${ZC_LINK_LIBS} PRIVATE ${PROJECT_SOURCE_DIR}/external/sdl3Libs/libSDL3.so)
-	#	set(ZC_INCLUDE_DIRS PUBLIC ${PROJECT_SOURCE_DIR}/external/sdl3/include)
-	#	set(ZC_LINK_LIBS ${ZC_LINK_LIBS} PUBLIC ${PROJECT_BINARY_DIR}/external/sdl3/Debug/SDL3-static.lib)
-	else()
-		set(SDL_STATIC ON)
-		set(SDL_SHARED OFF)
+if(ZC_PC)
+	#	sdl3
+	if(ZC_SDL_VIDEO AND NOT ZC_MY_DEBUG)
 		set(SDL_TEST_LIBRARY OFF)
+		if(ZC_STATIC)
+			set(SDL_STATIC ON)
+			set(SDL_SHARED OFF)
+		endif()
 		add_subdirectory(${PROJECT_SOURCE_DIR}/external/sdl3)
-
-		set(ZC_LINK_LIBS ${ZC_LINK_LIBS} PRIVATE SDL3::SDL3)
 	endif()
 endif()
 
-#	android_native_app_glue
-if(ZC_ANDROID_NATIVE_APP_GLUE)
-	#   set link flag for calling CMakeLists.txt
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate" PARENT_SCOPE)
-endif()
+if(ZC_ANDROID)
+	#	android_native_app_glue
+	if(ZC_ANDROID_NATIVE_APP_GLUE)
+		#   set link flag for calling CMakeLists.txt
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate" PARENT_SCOPE)
+	endif()
 
-#	oboe
-if(ZC_OBOE)
-	add_subdirectory(${PROJECT_SOURCE_DIR}/external/oboe)
+	#	oboe
+	if(ZC_OBOE)
+		add_subdirectory(${PROJECT_SOURCE_DIR}/external/oboe)
+	endif()
 endif()
 
 #========================= ZERO CORE =========================
-
-#========================= copy assets
-if(ZC_COPY_ASSETS_SRC_TO_BUILD)
-	message(STATUS "Copy: ${ZC_SRC_ASSETS_PATH} => ${ZC_BUILD_ASSETS_PATH}")
-	execute_process(COMMAND cp -R ${ZC_SRC_ASSETS_PATH} ${ZC_BUILD_ASSETS_PATH}
-				RESULT_VARIABLE ZC_COPY_ASSETS_RESULT)
-	if(NOT ZC_COPY_ASSETS_RESULT EQUAL "0")
-		message(FATAL_ERROR "cp -R ${ZC_SRC_ASSETS_PATH} ${ZC_BUILD_ASSETS_PATH} => failed with: ${GIT_SUBMOD_RESULT}")
-	endif()
-endif()
 
 #========================= make config file
 add_subdirectory(config)
@@ -192,41 +172,35 @@ else()
 	set(ZC_LIB_TYPE SHARED)
 endif()
 
-#========================= src files
-set(ZC_SRC_FILES)
-
-#	ErrorLogger
-if(ZC_DEBUG)
-	set(ZC_SRC_FILES ${ZC_SRC_FILES}
-		${PROJECT_SOURCE_DIR}/src/ErrorLogger/Exception/ZC_ErrorLogger.cpp)
-else()
-	set(ZC_SRC_FILES ${ZC_SRC_FILES}
-		${PROJECT_SOURCE_DIR}/src/ErrorLogger/Message/ZC_ErrorLogger.cpp)
-endif()
-
-#	audio
-if(ZC_AUDIO)
-	set(ZC_INCLUDE_DIRS ${ZC_INCLUDE_DIRS}
-		PUBLIC ${PROJECT_SOURCE_DIR}/includeVariable/Audio)
-    set(ZC_SRC_FILES ${ZC_SRC_FILES}
-        ${PROJECT_SOURCE_DIR}/src/Audio/ZC_Audio.cpp
-        ${PROJECT_SOURCE_DIR}/src/Audio/ZC_AudioSet.cpp
-        ${PROJECT_SOURCE_DIR}/src/Audio/ZC_AudioStream.cpp
-        ${PROJECT_SOURCE_DIR}/src/Audio/ZC_Sound.cpp
-        ${PROJECT_SOURCE_DIR}/src/Audio/ZC_SoundData.cpp
-        ${PROJECT_SOURCE_DIR}/src/Audio/ZC_Sounds.cpp
-        ${PROJECT_SOURCE_DIR}/src/Audio/ZC_StreamSound.cpp
-    )
-endif()
-
 # #	sqlite
 # #set(ZC_SRC_FILES ${ZC_SRC_FILES} ${PROJECT_SOURCE_DIR}/external/sqlite/src/sqlite3.c)
 # add_library(sqlite SHARED ${PROJECT_SOURCE_DIR}/external/sqlite/src/sqlite3.c)
 # set(ZC_INCLUDE_DIRS ${ZC_INCLUDE_DIRS} PUBLIC ${PROJECT_SOURCE_DIR}/external/sqlite/include)
 # set(ZC_LINK_LIBS ${ZC_LINK_LIBS} PUBLIC sqlite)
 
-#	total
+#========================= sources
+set(ZC_SRC_FILES)
+set(ZC_INCLUDE_DIRS)
+set(ZC_LINK_LIBS)
+
+if(ZC_PC)
+	add_subdirectory(PC)
+elseif(ZC_ANDROID)
+	add_subdirectory(Android)
+endif()
+
 set(ZC_SRC_FILES ${ZC_SRC_FILES}
+	$<IF:$<CONFIG:Debug>,
+		${PROJECT_SOURCE_DIR}/src/ErrorLogger/Exception/ZC_ErrorLogger.cpp,
+		${PROJECT_SOURCE_DIR}/src/ErrorLogger/Message/ZC_ErrorLogger.cpp>
+	$<$<BOOL:${ZC_AUDIO}>:
+		${PROJECT_SOURCE_DIR}/src/Audio/ZC_Audio.cpp
+		${PROJECT_SOURCE_DIR}/src/Audio/ZC_AudioSet.cpp
+		${PROJECT_SOURCE_DIR}/src/Audio/ZC_AudioStream.cpp
+		${PROJECT_SOURCE_DIR}/src/Audio/ZC_Sound.cpp
+		${PROJECT_SOURCE_DIR}/src/Audio/ZC_SoundData.cpp
+		${PROJECT_SOURCE_DIR}/src/Audio/ZC_Sounds.cpp
+		${PROJECT_SOURCE_DIR}/src/Audio/ZC_StreamSound.cpp>
     ${PROJECT_SOURCE_DIR}/src/Video/ZC_Video.cpp
     ${PROJECT_SOURCE_DIR}/src/Video/ZC_Window.cpp
     ${PROJECT_SOURCE_DIR}/src/Video/OpenGL/ZC_OpenGLConfig.cpp
@@ -244,23 +218,34 @@ set(ZC_SRC_FILES ${ZC_SRC_FILES}
 	${PROJECT_SOURCE_DIR}/src/ErrorLogger/ZC_ErrorLogger.cpp
     )
 
-set(ZC_INCLUDE_DIRS ${ZC_INCLUDE_DIRS} PUBLIC ${PROJECT_SOURCE_DIR}/external/glm/glm)
+add_library(${PROJECT_NAME} ${ZC_LIB_TYPE} ${ZC_SRC_FILES})
 
-#========================= add lib
-if(ZC_PC)
-	add_subdirectory(PC)
-else(ZC_ANDROID)
-	add_subdirectory(Android)
-endif()
+#========================= include dirs
+set(ZC_INCLUDE_DIRS ${ZC_INCLUDE_DIRS}
+	PUBLIC ${PROJECT_SOURCE_DIR}/include
+	PRIVATE ${PROJECT_SOURCE_DIR}/src
+	PUBLIC ${PROJECT_BINARY_DIR}/config
+	PUBLIC $<$<BOOL:${ZC_AUDIO}>:${PROJECT_SOURCE_DIR}/includeVariable/Audio>
+	PUBLIC ${PROJECT_SOURCE_DIR}/external/glm/glm	#	delete me
+	)
 
+target_include_directories(${PROJECT_NAME} ${ZC_INCLUDE_DIRS})
+
+#========================= link libs
+set(ZC_LINK_LIBS ${ZC_LINK_LIBS}
+	)
+
+target_link_libraries(${PROJECT_NAME} ${ZC_LINK_LIBS})
+
+#========================= compiler params
+target_compile_options(${PROJECT_NAME}
+	PRIVATE	-Wall
+			$<$<CONFIG:Release>:-O3>
+	)
 
 message(STATUS "======================== ZERO CORE CONFIG ========================\n")
 message(STATUS "ZC_PC: ${ZC_PC}")
 message(STATUS "ZC_ANDROID: ${ZC_ANDROID}\n")
 message(STATUS "ZC_STATIC: ${ZC_STATIC}\n")
 message(STATUS "ZC_AUDIO: ${ZC_AUDIO}\n")
-message(STATUS "ZC_DEBUG: ${ZC_DEBUG}\n")
-message(STATUS "ZC_SRC_ASSETS_PATH: ${ZC_SRC_ASSETS_PATH}")
-message(STATUS "ZC_BUILD_ASSETS_PATH: ${ZC_BUILD_ASSETS_PATH}")
-message(STATUS "ZC_COPY_ASSETS_SRC_TO_BUILD: ${ZC_COPY_ASSETS_SRC_TO_BUILD}\n")
 message(STATUS "========================= ZERO CORE END ==========================")

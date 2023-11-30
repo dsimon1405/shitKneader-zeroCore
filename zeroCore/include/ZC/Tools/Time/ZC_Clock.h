@@ -47,22 +47,21 @@ public:
 
     //  Calculate the duration since the previous Start or Stop call. Starts counting down time.
     template<ZC_cTimeMeasure TTimeMeasue>
-    long Stop() noexcept;
+    long Stop();
 
     //  Calculate the duration since the previous Start or Stop call.
     template<ZC_cTimeMeasure TTimeMeasue>
-    long Time() noexcept;
+    long Time();
 
 private:
     typedef typename std::chrono::high_resolution_clock Clock;
-//    typedef typename std::chrono::duration<double, std::ratio<1>> Second;
     typedef typename std::chrono::time_point<Clock> TimePoint;
 
     TimePoint start;
 };
 
 template<ZC_cTimeMeasure TTimeMeasue>
-long ZC_Clock::Stop() noexcept
+long ZC_Clock::Stop()
 {
     TimePoint now = Clock::now();
     auto result = std::chrono::duration_cast<TTimeMeasue>(now - start).count();
@@ -71,7 +70,7 @@ long ZC_Clock::Stop() noexcept
 }
 
 template<ZC_cTimeMeasure TTimeMeasue>
-long ZC_Clock::Time() noexcept
+long ZC_Clock::Time()
 {
     return std::chrono::duration_cast<TTimeMeasue>(Clock::now() - start).count();
 }

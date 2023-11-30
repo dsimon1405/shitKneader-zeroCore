@@ -1,11 +1,12 @@
 #pragma once
 
+#include <compare>
+
 template<typename T>
 class ZC_uptr
 {
 public:
-    ZC_uptr() = default;
-    ZC_uptr(T* _type) noexcept;
+    ZC_uptr(T* _type = nullptr) noexcept;
 
     ZC_uptr(const ZC_uptr<T>&) = delete;
     ZC_uptr<T>& operator = (const ZC_uptr<T>&) = delete;
@@ -15,11 +16,14 @@ public:
 
     ~ZC_uptr() noexcept;
 
-    T* operator -> () const noexcept;
+    T* operator -> () noexcept;
+    const T* operator -> () const noexcept;
+    
     operator bool () const noexcept;
-    bool operator < (const ZC_uptr<T>& uptr) const noexcept;
+    auto operator <=> (const ZC_uptr<T>& uptr) const = default;
 
-    T* Get() const noexcept;
+    T* Get() noexcept;
+    const T* Get() const noexcept;
 
 private:
     T* pData = nullptr;
@@ -52,9 +56,12 @@ ZC_uptr<T>::ZC_uptr(ZC_uptr<T>&& uptr) noexcept
 template<typename T>
 ZC_uptr<T>& ZC_uptr<T>::operator = (ZC_uptr<T>&& uptr) noexcept
 {
-    delete pData;
-    pData = uptr.pData;
-    uptr.pData = nullptr;
+    if(this != &uptr)
+    {
+        if(pData) delete pData;
+        pData = uptr.pData;
+        uptr.pData = nullptr;
+    }
     return *this;
 }
 
@@ -65,9 +72,15 @@ ZC_uptr<T>::~ZC_uptr() noexcept
 }
 
 template<typename T>
-T* ZC_uptr<T>::operator -> () const noexcept
+T* ZC_uptr<T>::operator -> () noexcept
 {
     return pData;
+}
+
+template<typename T>
+const T* ZC_uptr<T>::operator -> () const noexcept
+{
+    return const_cast<const T*>(pData);
 }
 
 template<typename T>
@@ -77,13 +90,13 @@ ZC_uptr<T>::operator bool () const noexcept
 }
 
 template<typename T>
-bool ZC_uptr<T>::operator < (const ZC_uptr<T>& uptr) const noexcept
+T* ZC_uptr<T>::Get() noexcept
 {
-    return this < &uptr;
+    return pData;
 }
 
 template<typename T>
-T* ZC_uptr<T>::Get() const noexcept
+const T* ZC_uptr<T>::Get() const noexcept
 {
-    return pData;
+    return static_cast<const T*>(pData);
 }

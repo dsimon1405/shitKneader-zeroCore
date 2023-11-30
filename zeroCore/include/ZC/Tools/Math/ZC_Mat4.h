@@ -21,7 +21,6 @@ in method
 template<ZC_cVecTypes TValue = float>
 struct ZC_Mat4
 {
-
     ZC_Mat4(TValue value = 0) noexcept;
 
     ZC_Vec4<TValue>& operator [] (int index);
@@ -54,7 +53,7 @@ struct ZC_Mat4
     Return:
     Rotation matrix.
     */
-    ZC_Mat4<TValue>& Rotate(TValue angle, const ZC_Vec3<TValue>& axiss) noexcept;
+    ZC_Mat4<TValue>& Rotate(TValue angle, const ZC_Vec3<TValue>& axiss);
 
     /*
     Transform the matrix for vector translation.
@@ -145,7 +144,7 @@ ZC_Mat4<TValue>& ZC_Mat4<TValue>::Scale(const ZC_Vec3<TValue>& scale) noexcept
 }
 
 template<ZC_cVecTypes TValue>
-ZC_Mat4<TValue>& ZC_Mat4<TValue>::Rotate(TValue angle, const ZC_Vec3<TValue>& axiss) noexcept
+ZC_Mat4<TValue>& ZC_Mat4<TValue>::Rotate(TValue angle, const ZC_Vec3<TValue>& axiss)
 {
     const TValue radAngle = ZC_Vec::Radians(angle);
     const TValue c = cos(radAngle);

@@ -1,62 +1,57 @@
 #include "ZC_PC_FileReader.h"
 
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
-#include "ZC_MakeAbsolutePath.h"
+#include <ZC_Config.h>
 
-ZC_PC_FileReader::ZC_PC_FileReader(const char* _path) noexcept
-    : ZC_FileReader(ZC_MakeAbsolutePath(_path)),
+#include <filesystem>
+
+ZC_PC_FileReader::ZC_PC_FileReader(const char* _path)
+    : ZC_FileReader(std::filesystem::current_path().append(ZC_ASSETS_PATH).append(_path)),
     file(path, std::ios::binary),
-    size(Size())
+    size(CalculateSize())
+{}
+
+ZC_PC_FileReader::~ZC_PC_FileReader()
 {
-    if (!file.is_open())
-    {
-        ZC_ErrorLogger::Err("Fail open file: " + std::string(path), __FILE__, __LINE__);
-        file.close();
-        return;
-    }
-    ZC_ErrorLogger::Clear();
+    file.close();
 }
 
-ZC_PC_FileReader::~ZC_PC_FileReader() noexcept
+long ZC_PC_FileReader::Read(char* pContainer, long count)
 {
-    Close();
-}
-
-size_t ZC_PC_FileReader::Read(char* pContainer, size_t count) noexcept
-{
-    if (!file.is_open())
+    if (!OpenCheck()) return 0;
+    if (count <= 0)
     {
-        ZC_ErrorLogger::Clear();
-        return 0;
+        ZC_ErrorLogger::Err("Try to read " + std::to_string(count) + " < 1 bytes from file: " + std::string(path), __FILE__, __LINE__);
+        return -1;
     }
-
-    size_t remainingSize = size - CurrentReadPosition();
-    count = count > remainingSize ? remainingSize : count;
-
-    file.read(pContainer, count);
     
+    long remainingSize = size - file.tellg();
+    if (remainingSize == 0)
+    {
+        ZC_ErrorLogger::Err("End of file reached: " + std::string(path), __FILE__, __LINE__);
+        return -1;
+    }
+
+    count = count > remainingSize ? remainingSize : count;
+    file.read(pContainer, count);
     if (file.fail())
     {
         ZC_ErrorLogger::Err("Fail read file: " + std::string(path), __FILE__, __LINE__);
-        return 0;
+        return -1;
     }
     
     ZC_ErrorLogger::Clear();
     return count;
 }
 
-long ZC_PC_FileReader::Seek(long offset) noexcept
+long ZC_PC_FileReader::Seek(long offset)
 {
-    if (!file.is_open())
-    {
-        ZC_ErrorLogger::Clear();
-        return 0;
-    }
+    if (!OpenCheck()) return 0;
 
-    size_t remainingLength = size - CurrentReadPosition();
-    if ((offset > 0 && offset > remainingLength) || (offset < 0 && offset * -1 > size - remainingLength))
+    long remainingLength = size - file.tellg();
+    if ((offset > 0 && offset > remainingLength) || (offset < 0 && -offset > static_cast<long>(size) - remainingLength))
     {
-        ZC_ErrorLogger::Clear();
+        ZC_ErrorLogger::Err("offset greater than length to file boundary: " + std::string(path), __FILE__, __LINE__);
         return 0;
     }
     
@@ -71,46 +66,65 @@ long ZC_PC_FileReader::Seek(long offset) noexcept
     return offset;
 }
 
-void ZC_PC_FileReader::Close() noexcept
+void ZC_PC_FileReader::Close()
 {
     file.close();
 }
 
-bool ZC_PC_FileReader::Eof() noexcept
+bool ZC_PC_FileReader::Eof()
 {
-    return size - CurrentReadPosition() == 0;
+    if (!OpenCheck()) return true;
+    return size - file.tellg() == 0;
 }
 
-size_t ZC_PC_FileReader::CurrentReadPosition() noexcept
+long ZC_PC_FileReader::CurrentReadPosition()
 {
-    if (!file.is_open()) return 0;
+    if (!OpenCheck()) return -1;
     return file.tellg();
 }
 
-size_t ZC_PC_FileReader::Size() noexcept
+long ZC_PC_FileReader::Size() const
+{
+    if (!OpenCheck()) return -1;
+    return size;
+}
+
+long ZC_PC_FileReader::RemainingLength()
+{
+    if (!OpenCheck()) return -1;
+    return size - file.tellg();
+}
+
+bool ZC_PC_FileReader::OpenCheck() const
 {
     if (!file.is_open())
     {
-        ZC_ErrorLogger::Clear();
-        return 0;
+        ZC_ErrorLogger::Err("The file is not open: " + std::string(path), __FILE__, __LINE__);
+        return false;
     }
+    return true;
+}
 
-    size_t currentPosition = file.tellg();
+long ZC_PC_FileReader::CalculateSize()
+{
+    ZC_ErrorLogger::Clear();
+    if (!OpenCheck()) return -1;
+
+    long currentPosition = file.tellg();
     file.seekg(0, file.end);
     if (file.fail())
     {
         ZC_ErrorLogger::Err("Fail seek file: " + std::string(path), __FILE__, __LINE__);
-        return 0;
+        return -1;
     }
 
-    size_t fullLength = file.tellg();
+    long fullLength = file.tellg();
     file.seekg(currentPosition, file.beg);
     if (file.fail())
     {
         ZC_ErrorLogger::Err("Fail seek file: " + std::string(path), __FILE__, __LINE__);
-        return 0;
+        return -1;
     }
 
-    ZC_ErrorLogger::Clear();
     return fullLength;
 }

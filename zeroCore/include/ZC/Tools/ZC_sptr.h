@@ -1,5 +1,7 @@
 #pragma once
 
+#include <compare>
+
 template<typename T>
 class ZC_sptr
 {
@@ -14,12 +16,14 @@ public:
 
     ~ZC_sptr() noexcept;
 
-    bool operator == (const ZC_sptr<T>& sptr) const noexcept;
-    T* operator -> () const noexcept;
-    operator bool () const noexcept;
-    bool operator < (const ZC_sptr<T>& uptr) const noexcept;
+    T* operator -> () noexcept;
+    const T* operator -> () const noexcept;
 
-    T* Get() const noexcept;
+    operator bool () const noexcept;
+    auto operator <=> (const ZC_sptr<T>& uptr) const noexcept;
+
+    T* Get() noexcept;
+    const T* Get() const noexcept;
 
     template<typename TParant>
     ZC_sptr<TParant> DynamicCast() const noexcept;
@@ -33,7 +37,7 @@ private:
 };
 
 template<typename T, typename... TParams>
-ZC_sptr<T> ZC_sptrMake(TParams&&... params)
+ZC_sptr<T> ZC_sptrMake(TParams&&... params) noexcept
 {
     return ZC_sptr<T>(new T(std::forward<TParams>(params)...));
 }
@@ -59,16 +63,12 @@ ZC_sptr<T>::ZC_sptr(const ZC_sptr<T>& sptr) noexcept
 template<typename T>
 ZC_sptr<T>& ZC_sptr<T>::operator = (const ZC_sptr<T>& sptr) noexcept
 {
-    if (*this == sptr)
-    {
-        pUseCount = sptr.pUseCount;
-    }
-    else
+    if (*this != sptr)
     {
         Delete();
         pUseCount = &++*sptr.pUseCount;
+        pData = sptr.pData;
     }
-    pData = sptr.pData;
     return *this;
 }
 
@@ -84,12 +84,7 @@ ZC_sptr<T>::ZC_sptr(ZC_sptr<T>&& sptr) noexcept
 template<typename T>
 ZC_sptr<T>& ZC_sptr<T>::operator = (ZC_sptr<T>&& sptr) noexcept
 {
-    if (*this == sptr)
-    {
-        pData = sptr.pData;
-        pUseCount = sptr.pUseCount;
-    }
-    else
+    if (this != &sptr)
     {
         Delete();
         pData = sptr.pData;
@@ -108,15 +103,15 @@ ZC_sptr<T>::~ZC_sptr() noexcept
 }
 
 template<typename T>
-bool ZC_sptr<T>::operator == (const ZC_sptr<T>& sptr) const noexcept
+T* ZC_sptr<T>::operator -> () noexcept
 {
-    return pData == sptr.pData;
+    return pData;
 }
 
 template<typename T>
-T* ZC_sptr<T>::operator -> () const noexcept
+const T* ZC_sptr<T>::operator -> () const noexcept
 {
-    return pData;
+    return static_cast<const T*>(pData);
 }
 
 template<typename T>
@@ -126,15 +121,21 @@ ZC_sptr<T>::operator bool () const noexcept
 }
 
 template<typename T>
-bool ZC_sptr<T>::operator < (const ZC_sptr<T>& uptr) const noexcept
+auto ZC_sptr<T>::operator <=> (const ZC_sptr<T>& uptr) const noexcept
 {
-    return pData < uptr.pData;
+    return pData <=> uptr.pData;
 }
 
 template<typename T>
-T* ZC_sptr<T>::Get() const noexcept
+T* ZC_sptr<T>::Get() noexcept
 {
     return pData;
+}
+
+template<typename T>
+const T* ZC_sptr<T>::Get() const noexcept
+{
+    return static_cast<const T*>(pData);
 }
 
 template<typename T>
@@ -142,7 +143,7 @@ template<typename TParant>
 ZC_sptr<TParant> ZC_sptr<T>::DynamicCast() const noexcept
 {
     ZC_sptr<TParant> result;
-    if (pData)
+    if (!pData)
     {
         result.pData = dynamic_cast<TParant*>(pData);
         result.pUseCount = &++*pUseCount;

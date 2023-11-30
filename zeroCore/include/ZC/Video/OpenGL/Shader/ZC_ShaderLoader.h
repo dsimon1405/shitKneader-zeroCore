@@ -3,7 +3,7 @@
 #include "ZC_ShaderCode.h"
 #include <ZC/Video/OpenGL/ZC_OpenGL.h>
 #include <ZC/Tools/ZC_DynamicArray.h>
-#include <ZC_string.h>
+#include <ZC/Tools/ZC_string.h>
 
 //  Class for load shader code from files.
 class ZC_ShaderLoader

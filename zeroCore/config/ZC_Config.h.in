@@ -4,8 +4,6 @@
 #define ${ZC_VIDEO_TYPE}
 #define ${ZC_AUDIO_TYPE}
 
-#define ${ZC_DEBUG_TYPE}
-
-#define ZC_SRC_ASSETS_PATH "${ZC_SRC_ASSETS_PATH}"
-#define ZC_BUILD_ASSETS_PATH "${ZC_BUILD_ASSETS_PATH}"
-
+#ifdef ZC_PC
+#define ZC_ASSETS_PATH "${ZC_ASSETS_PATH}"
+#endif

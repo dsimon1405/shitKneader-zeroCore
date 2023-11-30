@@ -1,6 +1,5 @@
 #include "ZC_OpenGLConfig.h"
 
-#ifdef ZC_DEBUG
 #include <ZC/Video/OpenGL/ZC_OpenGL.h>
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
 
@@ -51,14 +50,11 @@ void ZC_OpenGLErrorCallback(GLenum source, GLenum type, unsigned int id, GLenum 
 
     ZC_ErrorLogger::Err(stream.str(), __FILE__, __LINE__);
 }
-#endif
 
 void ZC_OpenGLAssigneErrorCallback() noexcept
 {
-#ifdef ZC_DEBUG
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(ZC_OpenGLErrorCallback, nullptr);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-#endif
 }

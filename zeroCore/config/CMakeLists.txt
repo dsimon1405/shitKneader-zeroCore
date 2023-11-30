@@ -23,21 +23,10 @@ else()
     set(ZC_AUDIO_TYPE ZC_AUDIO_NONE)
 endif()
 
+#========================= assets
 if(ZC_PC)
-    set(ZC_SRC_ASSETS_PATH ${ZC_SRC_ASSETS_PATH})
-    set(ZC_BUILD_ASSETS_PATH ${ZC_BUILD_ASSETS_PATH})
-elseif(ZC_ANDROID)
-    set(ZC_SRC_ASSETS_PATH)
-    set(ZC_BUILD_ASSETS_PATH)
+    set(ZC_ASSETS_PATH ${ZC_ASSETS_PATH})
 endif()
-
-#========================= debug
-if(ZC_DEBUG)
-    set(ZC_DEBUG_TYPE ZC_DEBUG)
-else()
-    set(ZC_DEBUG_TYPE ZC_RELEASE)
-endif()
-
 
 # #========================= make config file
 configure_file(ZC_Config.h.in ${PROJECT_BINARY_DIR}/config/ZC_Config.h)

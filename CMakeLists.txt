@@ -7,8 +7,6 @@ project(shitKneader)
 option(SK_PC "Build executable file for PC" ON)
 option(SK_ANDROID "Build APK file in Android Studio" OFF)
 
-option(SK_DEBUG "ON - External libraries will be build shared" ON)
-
 message(STATUS "======================= SHIT KNEADER START =======================")
 
 #========================= options control
@@ -22,41 +20,32 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(SK_PC AND WIN32 AND SK_DEBUG)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-endif()
-
-#========================= zeroCore
-set(ZC_AUDIO ON)
-
-if(SK_DEBUG)
-    set(ZC_STATIC OFF)
-    set(ZC_DEBUG ON)
-else()
-    set(ZC_STATIC ON)
-    set(ZC_DEBUG OFF)
-endif()
-
-set(ZC_SRC_ASSETS_PATH "${PROJECT_SOURCE_DIR}/assets")
-set(ZC_COPY_ASSETS_SRC_TO_BUILD ON)
-
-if(SK_PC)
-    set(ZC_PC ON)
-    set(ZC_ANDROID OFF)
-    set(ZC_BUILD_ASSETS_PATH "${PROJECT_BINARY_DIR}")
-elseif(SK_ANDROID)
-    set(ZC_PC OFF)
-    set(ZC_ANDROID ON)
-    set(ZC_BUILD_ASSETS_PATH "/home/dmitry/AndroidStudioProjects/SK/app/src/main")
-endif()
-
 #========================= external libs
 set(SK_LINK_LIBS)
+
+set(SK_ASSETS_DIRECTORY_NAME assets)
+#========================= zeroCore
+if(SK_ANDROID)
+    set(ZC_PC OFF)
+    set(ZC_ANDROID ON)
+endif()
+
+set(ZC_ASSETS_PATH ${SK_ASSETS_DIRECTORY_NAME})
+
+set(ZC_AUDIO ON)
+
+# set(ZC_STATIC ON)
+set(ZC_STATIC OFF)
 
 add_subdirectory(zeroCore)
 set(SK_LINK_LIBS ${SK_LINK_LIBS} PUBLIC zeroCore)
 
 #========================= SHIT KNEADER =========================
+
+#   dll 
+if(SK_PC AND WIN32 AND NOT ZC_STATIC)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+endif()
 
 #========================= files
 set(SK_SRC_FILES
@@ -67,16 +56,29 @@ set(SK_SRC_FILES
 if(SK_PC)
     add_executable(${PROJECT_NAME} ${SK_SRC_FILES})
 elseif(SK_ANDROID)
-    # set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     add_library(${PROJECT_NAME} SHARED ${SK_SRC_FILES})
 endif()
 
 #========================= link libs
 target_link_libraries(${PROJECT_NAME} ${SK_LINK_LIBS})
 
+#========================= compiler params
+target_compile_options(${PROJECT_NAME}
+    PRIVATE	-Wall
+            $<$<CONFIG:Release>:-O3>)
+
+#========================= copy assets
+set(SK_ASSETS_DESTINATION_PATH 
+    $<$<BOOL:${SK_PC}>:${PROJECT_BINARY_DIR}/${SK_ASSETS_DIRECTORY_NAME}>
+    $<$<BOOL:${SK_ANDROID}>:/home/dmitry/AndroidStudioProjects/SK/app/src/main/${SK_ASSETS_DIRECTORY_NAME}>)
+
+add_custom_target(SK_COPY_ASSETS ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/${SK_ASSETS_DIRECTORY_NAME} ${SK_ASSETS_DESTINATION_PATH}
+    COMMENT "Copy assets: ${PROJECT_SOURCE_DIR}/${SK_ASSETS_DIRECTORY_NAME} => ${SK_ASSETS_DESTINATION_PATH}")
+add_dependencies(${PROJECT_NAME} SK_COPY_ASSETS)
+
 
 message(STATUS "====================== SHIT KNEADER CONFIG =======================\n")
 message(STATUS "SK_PC: ${SK_PC}")
 message(STATUS "SK_ANDROID: ${SK_ANDROID}\n")
-message(STATUS "SK_DEBUG: ${SK_DEBUG}\n")
 message(STATUS "======================== SHIT KNEADER END ========================")

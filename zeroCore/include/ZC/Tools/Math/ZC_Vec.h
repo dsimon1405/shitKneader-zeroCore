@@ -3,7 +3,7 @@
 #include "ZC_Vec3.h"
 
 #include <math.h>
-#include <C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt\corecrt_math_defines.h>
+// #include <C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt\corecrt_math_defines.h>   //  win PI
 
 namespace ZC_Vec
 {
@@ -17,7 +17,7 @@ namespace ZC_Vec
     Normalized vector;
     */
     template<ZC_cVecTypes TValue>
-    ZC_Vec3<TValue> Normalize(const ZC_Vec3<TValue>& vec) noexcept
+    ZC_Vec3<TValue> Normalize(const ZC_Vec3<TValue>& vec)
     {
         TValue squareLegSum = 0;
         for (short i = 0; i < 3; ++i)
@@ -69,8 +69,8 @@ namespace ZC_Vec
     template<ZC_cVecTypes TValue>
     TValue Radians(TValue angle) noexcept
     {
-        static const TValue radiansCoef = static_cast<TValue>(M_PI / 180.0);
-        return angle * radiansCoef;
+        static const double radiansCoef = M_PI / 180.0;
+        return angle * static_cast<TValue>(radiansCoef);
     }
 
     /*

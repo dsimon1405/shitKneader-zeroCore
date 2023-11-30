@@ -71,14 +71,14 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
         return ZC_SoundData();
     }
 
-    static size_t formatSize = sizeof(header.format);
+    static constexpr long formatSize = sizeof(header.format);
     if (file->Read(&header.format[0], formatSize) != formatSize)
     {
         file->Close();
         return ZC_SoundData();
     }
 
-    static const char* WAVEString = "WAVE";
+    static constexpr const char* WAVEString = "WAVE";
     if (!ConstCharEqual(WAVEString, header.format))
     {
         ZC_ErrorLogger::Err("File format != 'WAVE': " + std::string(path), __FILE__, __LINE__);
@@ -92,7 +92,7 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
         return ZC_SoundData();
     }
 
-    static size_t subchunk1SizeSize = sizeof(header.subchunk1Size);
+    static constexpr long subchunk1SizeSize = sizeof(header.subchunk1Size);
     if (file->Read(reinterpret_cast<char*>(&header.subchunk1Size), subchunk1SizeSize) != subchunk1SizeSize)
     {
         file->Close();
@@ -105,14 +105,14 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
         return ZC_SoundData();
     }
 
-    static size_t channelsSize = sizeof(header.channels);
+    static constexpr long channelsSize = sizeof(header.channels);
     if (file->Read(reinterpret_cast<char*>(&header.channels), channelsSize) != channelsSize)
     {
         file->Close();
         return ZC_SoundData();
     }
 
-    static size_t frequencySize = sizeof(header.frequency);
+    static constexpr long frequencySize = sizeof(header.frequency);
     if (file->Read(reinterpret_cast<char*>(&header.frequency), frequencySize) != frequencySize)
     {
         file->Close();
@@ -125,7 +125,7 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
         return ZC_SoundData();
     }
 
-    static size_t bitsPerSampleSize = sizeof(header.bitsPerSample);
+    static constexpr long bitsPerSampleSize = sizeof(header.bitsPerSample);
     if (file->Read(reinterpret_cast<char*>(&header.bitsPerSample), bitsPerSampleSize) != bitsPerSampleSize)
     {
         file->Close();
@@ -134,21 +134,21 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
 
     if (header.subchunk1Size != 16)
     {
-        if (file->Seek(header.subchunk1Size - 16) != header.subchunk1Size - 16)
+        if (file->Seek(header.subchunk1Size - 16) != static_cast<long>(header.subchunk1Size - 16))
         {
             file->Close();
             return ZC_SoundData();
         }
     }
 
-    static size_t subchunk2IdSize = sizeof(header.subchunk2Id);
+    static constexpr long subchunk2IdSize = sizeof(header.subchunk2Id);
     if (file->Read(&header.subchunk2Id[0], subchunk2IdSize) != subchunk2IdSize)
     {
         file->Close();
         return ZC_SoundData();
     }
 
-    static size_t subchunk2SizeSize = sizeof(header.subchunk2Size);
+    static constexpr long subchunk2SizeSize = sizeof(header.subchunk2Size);
     if (file->Read(reinterpret_cast<char*>(&header.subchunk2Size), subchunk2SizeSize) != subchunk2SizeSize)
     {
         file->Close();
@@ -159,7 +159,7 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
     //  if subchunk2Id != 'data', miss all till find 'data'
     while (!ConstCharEqual(dataString, header.subchunk2Id))
     {
-        if (file->Seek(header.subchunk2Size) != header.subchunk2Size)
+        if (file->Seek(header.subchunk2Size) != static_cast<long>(header.subchunk2Size))
         {
             file->Close();
             return ZC_SoundData();
@@ -203,7 +203,7 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
     }
 
     ZC_DynamicArray<char> data(header.subchunk2Size);
-    if (file->Read(data.pArray, header.subchunk2Size) != header.subchunk2Size)
+    if (file->Read(data.pArray, header.subchunk2Size) != static_cast<long>(header.subchunk2Size))
     {
         file->Close();
         return ZC_SoundData();
@@ -213,7 +213,7 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
     if (!file->Eof())
     {
         ZC_ErrorLogger::Err("Read " + std::to_string(header.subchunk2Size)
-            + " bytes, until the end of the file " + std::to_string(file->Size() - file->CurrentReadPosition())
+            + " bytes, until the end of the file " + std::to_string(file->RemainingLength())
             + " bytes in the file: " + std::string(path), __FILE__, __LINE__);
     }
 

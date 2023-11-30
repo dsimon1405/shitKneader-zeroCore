@@ -18,3 +18,7 @@
         }
     #endif
 #endif
+
+ZC_FileReader::ZC_FileReader(std::string&& _path) noexcept
+    : path(std::move(_path))
+{}

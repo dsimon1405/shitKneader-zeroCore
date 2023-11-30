@@ -2,19 +2,14 @@
 
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
 
-ZC_AndroidNativeAppGlue_FileReader::ZC_AndroidNativeAppGlue_FileReader(const char* _path) noexcept
-    : ZC_FileReader(_path)
+ZC_AndroidNativeAppGlue_FileReader::ZC_AndroidNativeAppGlue_FileReader(const char* _path)
+    : ZC_FileReader(_path),
+    file(AAssetManager_open(pAndroidApp->activity->assetManager, _path, AASSET_MODE_BUFFER))
 {
-    file = AAssetManager_open(pAndroidApp->activity->assetManager, path, AASSET_MODE_BUFFER);
-    if (!file)
-    {
-        ZC_ErrorLogger::Err("Fail open file: " + std::string(path), __FILE__, __LINE__);
-        return;
-    }
-    ZC_ErrorLogger::Clear();
+    OpenCheck();
 }
 
-ZC_AndroidNativeAppGlue_FileReader::~ZC_AndroidNativeAppGlue_FileReader() noexcept
+ZC_AndroidNativeAppGlue_FileReader::~ZC_AndroidNativeAppGlue_FileReader()
 {
     if (file)
     {
@@ -23,38 +18,39 @@ ZC_AndroidNativeAppGlue_FileReader::~ZC_AndroidNativeAppGlue_FileReader() noexce
     }
 }
 
-size_t ZC_AndroidNativeAppGlue_FileReader::Read(char* pContainer, size_t count) noexcept
+long ZC_AndroidNativeAppGlue_FileReader::Read(char* pContainer, long count)
 {
-    if (!file || AAsset_getRemainingLength(file) == 0)
+    if (!OpenCheck()) return 0;
+    if (count <= -1)
     {
-        ZC_ErrorLogger::Clear();
-        return 0;
+        ZC_ErrorLogger::Err("Try to read " + std::to_string(count) + " < 1 bytes from file: " + std::string(path), __FILE__, __LINE__);
+        return -1;
+    }
+    if (AAsset_getRemainingLength(file) == 0)
+    {
+        ZC_ErrorLogger::Err("End of file reached: " + std::string(path), __FILE__, __LINE__);
+        return -1;
     }
 
     int readCount = AAsset_read(file, reinterpret_cast<void*>(pContainer), count);
-
     if (readCount == 0 && count != 0)
     {
         ZC_ErrorLogger::Err("Fail read file: " + std::string(path), __FILE__, __LINE__);
-        return 0;
+        return -1;
     }
 
     ZC_ErrorLogger::Clear();
     return count;
 }
 
-long ZC_AndroidNativeAppGlue_FileReader::Seek(long offset) noexcept
+long ZC_AndroidNativeAppGlue_FileReader::Seek(long offset)
 {
-    if (!file)
-    {
-        ZC_ErrorLogger::Clear();
-        return 0;
-    }
+    if (!OpenCheck()) return 0;
 
     long remainingLength = AAsset_getRemainingLength(file);
     if ((offset > 0 && offset > remainingLength) || (offset < 0 && offset * -1 > AAsset_getLength(file) - remainingLength))
     {
-        ZC_ErrorLogger::Clear();
+        ZC_ErrorLogger::Err("offset greater than length to file boundary: " + std::string(path), __FILE__, __LINE__);
         return 0;
     }
 
@@ -69,7 +65,7 @@ long ZC_AndroidNativeAppGlue_FileReader::Seek(long offset) noexcept
     return offset;
 }
 
-void ZC_AndroidNativeAppGlue_FileReader::Close() noexcept
+void ZC_AndroidNativeAppGlue_FileReader::Close()
 {
     if (file)
     {
@@ -78,17 +74,36 @@ void ZC_AndroidNativeAppGlue_FileReader::Close() noexcept
     }
 }
 
-bool ZC_AndroidNativeAppGlue_FileReader::Eof() noexcept
+bool ZC_AndroidNativeAppGlue_FileReader::Eof()
 {
-    return file != nullptr && AAsset_getRemainingLength(file) == 0;
+    if (!OpenCheck()) return true;
+    return AAsset_getRemainingLength(file) == 0;
 }
 
-size_t ZC_AndroidNativeAppGlue_FileReader::CurrentReadPosition() noexcept
+long ZC_AndroidNativeAppGlue_FileReader::CurrentReadPosition()
+ {
+     if (!OpenCheck()) return -1;
+     return AAsset_getLength(file) - AAsset_getRemainingLength(file);
+ }
+
+long ZC_AndroidNativeAppGlue_FileReader::Size() const
 {
-    return file ? AAsset_getRemainingLength(file) : 0;
+    if (!OpenCheck()) return -1;
+    return AAsset_getLength(file);
 }
 
-size_t ZC_AndroidNativeAppGlue_FileReader::Size() noexcept
+long ZC_AndroidNativeAppGlue_FileReader::RemainingLength()
 {
-    return file ? AAsset_getLength(file) : 0;
+    if (!OpenCheck()) return -1;
+    return AAsset_getRemainingLength(file);
+}
+
+bool ZC_AndroidNativeAppGlue_FileReader::OpenCheck() const
+{
+    if (!file)
+    {
+        ZC_ErrorLogger::Err("The file is not open: " + std::string(path), __FILE__, __LINE__);
+        return false;
+    }
+    return true;
 }
