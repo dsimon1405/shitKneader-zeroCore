@@ -1,7 +1,7 @@
 #include <ZC/Audio/ZC_Audio.h>
 
 #include <ZC_Config.h>
-#include "../Tools/ZC_uptrCreateWithErrorCheck.h"
+#include <Tools/ZC_uptrCreateWithErrorCheck.h>
 
 #if defined(ZC_SDL_AUDIO)
     #include "PC/SDL/ZC_SDL_AudioStream.h"

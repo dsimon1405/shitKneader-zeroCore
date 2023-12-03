@@ -11,6 +11,8 @@
 #include <ZC/Audio/ZC_Audio.h>
 #include <ZC/Audio/ZC_Sounds.h>
 
+#include <SK_AssetsPaths.h>
+
 #include <ZC/Tools/Math/ZC_Mat.h>
  #include <ZC/Tools/Console/ZC_cout.h>
 class A
@@ -59,8 +61,8 @@ public:
    ~B() override{ZC_cout("B dtr");}
 };
 
-#include <matrix.hpp>
-#include <gtc/matrix_transform.hpp>
+// #include <matrix.hpp>
+// #include <gtc/matrix_transform.hpp>
 
 template<typename T>
 void FillMat(T& mat)
@@ -75,52 +77,25 @@ void FillMat(T& mat)
   }
 }
 
-bool EqualMat(const ZC_Mat4<float>& mat1, const glm::mat4 mat2)
-{
-  for (int i = 0; i < 4; i++)
-  {
-      for (int j = 0; j < 4; j++)
-      {
-          if (mat1[i][j] != mat2[i][j]) return false;
-      }
-  }
-  return true;
-}
-
-template<typename T>
-struct Q
-{
-  constexpr Q( T& _q) : q(_q){}
-  constexpr T Foo1(int a) const
-  {
-    a = 0;
-      int b = 1;
-    return a + b;
-  }
-  T q;
-};
-
-constexpr auto Foo(const int a) noexcept
-{
-  Q q(a);
-   int b = q.Foo1(q.q);
-   return a + b;
-}
+// bool EqualMat(const ZC_Mat4<float>& mat1, const glm::mat4 mat2)
+// {
+//   for (int i = 0; i < 4; i++)
+//   {
+//       for (int j = 0; j < 4; j++)
+//       {
+//           if (mat1[i][j] != mat2[i][j]) return false;
+//       }
+//   }
+//   return true;
+// }
 
 int ZC_main()
 {
-  const int a = 3;
-  assert(a == 1 && "error");  //  debug release
-  constexpr bool w = noexcept(Foo(a));
-  auto q = Foo(a);
-  auto q1 = Foo(a);
-  auto q2 = Foo(a);
-  auto q3 = Foo(a);
     ZC_upWindow window = ZC_Video::MakeWindow("lolka", 640, 480);
-
-     ZC_Sounds::LoadWAV("lp", "sounds/lp.wav");
+    
+     ZC_Sounds::LoadWAV("lp", SK_Path_sounds_lp);
      ZC_upSound lp = ZC_Sounds::GetSound("lp");
-     ZC_Sounds::LoadWAV("Airplanes", "sounds/Airplanes.wav");
+     ZC_Sounds::LoadWAV("Airplanes", SK_Path_sounds_Airplanes);
      ZC_upSound airplanes = ZC_Sounds::GetSound("Airplanes");
      ZC_Audio::OpenAudioStream(ZC_AudioSet(ZC_AudioSet::Channels::Stereo, 44100, ZC_AudioSet::BitsPerSample::S16));
      lp->Play();
@@ -143,7 +118,7 @@ int ZC_main()
      vbo->BufferData(sizeof(GLfloat) * vertices.size, GL_STATIC_DRAW);
      vbo->BufferSubData(sizeof(float) * 0, std::move(vertices));
 
-     ZC_Shader* shader = ZC_Shader::CreateShader("test", ZC_ShaderLoader::LoadShaderCode("shaders/test.vs", "shaders/test.fs"));
+     ZC_Shader* shader = ZC_Shader::CreateShader("test", ZC_ShaderLoader::LoadShaderCode(SK_Path_shaders_testVS, SK_Path_shaders_testFS));
 
      auto view = ZC_Mat::LookAt(ZC_Vec3(0.f,-50.f,0.f),{0.f,0.f,0.f},{0.f,0.f,1.f});
      auto perspective = ZC_Mat::Perspective(45.0f, static_cast<float>(window->GetWidth() / window->GetHeight()), 0.1f, 100.0f);
@@ -186,5 +161,6 @@ int ZC_main()
           c.Start();
         }
      }
+    ZC_Audio::CloseAudioStream();
      return 0;
 }

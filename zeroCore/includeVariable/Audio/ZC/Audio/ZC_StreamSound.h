@@ -32,7 +32,7 @@ protected:
     SoundState soundState = SoundState::Stop;
     const ZC_SoundData* soundData;
     unsigned long soundDataIndex = 0;
-    double volume = 1.0;
+    float volume = 1.f;
     ZC_SignalConnection* conGetpZC_StreamSound;
     std::mutex soundStateMutex;
 
@@ -50,7 +50,7 @@ bool ZC_StreamSound::Pop(T& value) noexcept
         return false;
     }
 
-    value = soundData->GetValue<T>(soundDataIndex++) * volume;
+    value = static_cast<T>(static_cast<float>(soundData->GetValue<T>(soundDataIndex++)) * volume);
     if (soundDataIndex >= soundDataSize)
     {
         soundDataIndex = 0;

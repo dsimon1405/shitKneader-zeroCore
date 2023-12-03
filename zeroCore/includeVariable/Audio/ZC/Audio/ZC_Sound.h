@@ -41,7 +41,7 @@ public:
     Params:
     _volume - the volume value is in the range 0–100, otherwise it will be adjusted to the nearest limit
     */
-    void SetVolume(unsigned short _volume) noexcept;
+    void SetVolume(float _volume) noexcept;
 
     /*
     Helps to get volume of the sound.

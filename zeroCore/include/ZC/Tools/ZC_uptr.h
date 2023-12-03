@@ -86,7 +86,7 @@ const T* ZC_uptr<T>::operator -> () const noexcept
 template<typename T>
 ZC_uptr<T>::operator bool () const noexcept
 {
-    return pData;
+    return pData != nullptr;
 }
 
 template<typename T>

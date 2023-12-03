@@ -21,7 +21,7 @@ public:
 
 private:
     std::ifstream file;
-    const size_t size;
+    const long size;
 
     bool OpenCheck() const;
     long CalculateSize();

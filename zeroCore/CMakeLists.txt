@@ -16,10 +16,10 @@ option(ZC_STATIC "ON - build static library, else build shared" ON)
 
 message(STATUS "========================= ZERO CORE START ========================")
 
-set(ZC_MY_DEBUG 1)
+set(ZC_MY_DEBUG 0)
 
 #========================= c++ standard
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #	for windows build dll + lib for linking
@@ -54,6 +54,13 @@ elseif(ZC_ANDROID)
 	if(ZC_AUDIO)
 		set(ZC_OBOE ON)
 	endif()
+endif()
+
+#========================= lib type
+if(ZC_STATIC)
+	set(ZC_LIB_TYPE STATIC)
+else()
+	set(ZC_LIB_TYPE SHARED)
 endif()
 
 #	fatatl error equal function
@@ -139,10 +146,8 @@ if(ZC_PC)
 	#	sdl3
 	if(ZC_SDL_VIDEO AND NOT ZC_MY_DEBUG)
 		set(SDL_TEST_LIBRARY OFF)
-		if(ZC_STATIC)
-			set(SDL_STATIC ON)
-			set(SDL_SHARED OFF)
-		endif()
+		set(SDL_STATIC ON)
+		set(SDL_SHARED OFF)
 		add_subdirectory(${PROJECT_SOURCE_DIR}/external/sdl3)
 	endif()
 endif()
@@ -164,13 +169,6 @@ endif()
 
 #========================= make config file
 add_subdirectory(config)
-
-#========================= lib type
-if(ZC_STATIC)
-	set(ZC_LIB_TYPE STATIC)
-else()
-	set(ZC_LIB_TYPE SHARED)
-endif()
 
 # #	sqlite
 # #set(ZC_SRC_FILES ${ZC_SRC_FILES} ${PROJECT_SOURCE_DIR}/external/sqlite/src/sqlite3.c)
@@ -232,14 +230,13 @@ set(ZC_INCLUDE_DIRS ${ZC_INCLUDE_DIRS}
 target_include_directories(${PROJECT_NAME} ${ZC_INCLUDE_DIRS})
 
 #========================= link libs
-set(ZC_LINK_LIBS ${ZC_LINK_LIBS}
-	)
+set(ZC_LINK_LIBS ${ZC_LINK_LIBS})
 
 target_link_libraries(${PROJECT_NAME} ${ZC_LINK_LIBS})
 
 #========================= compiler params
 target_compile_options(${PROJECT_NAME}
-	PRIVATE	-Wall
+	PRIVATE	-W3
 			$<$<CONFIG:Release>:-O3>
 	)
 

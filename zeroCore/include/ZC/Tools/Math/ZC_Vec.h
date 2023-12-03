@@ -2,8 +2,10 @@
 
 #include "ZC_Vec3.h"
 
-#include <math.h>
-// #include <C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt\corecrt_math_defines.h>   //  win PI
+#include <cmath>
+
+#define ZC_PI       3.14159265358979323846   // pi
+#define ZC_PI_RAD_COEF (ZC_PI / 180.0)
 
 namespace ZC_Vec
 {
@@ -69,8 +71,7 @@ namespace ZC_Vec
     template<ZC_cVecTypes TValue>
     TValue Radians(TValue angle) noexcept
     {
-        static const double radiansCoef = M_PI / 180.0;
-        return angle * static_cast<TValue>(radiansCoef);
+        return angle * static_cast<TValue>(ZC_PI_RAD_COEF);
     }
 
     /*

@@ -64,7 +64,7 @@ template<ZC_cTimeMeasure TTimeMeasue>
 long ZC_Clock::Stop()
 {
     TimePoint now = Clock::now();
-    auto result = std::chrono::duration_cast<TTimeMeasue>(now - start).count();
+    long result = static_cast<long>(std::chrono::duration_cast<TTimeMeasue>(now - start).count());
     start = std::move(now);
     return result;
 }
@@ -72,5 +72,5 @@ long ZC_Clock::Stop()
 template<ZC_cTimeMeasure TTimeMeasue>
 long ZC_Clock::Time()
 {
-    return std::chrono::duration_cast<TTimeMeasue>(Clock::now() - start).count();
+    return static_cast<long>(std::chrono::duration_cast<TTimeMeasue>(Clock::now() - start).count());
 }

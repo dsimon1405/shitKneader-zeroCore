@@ -41,7 +41,7 @@ ZC_DynamicArray<T>::ZC_DynamicArray(unsigned long _size) noexcept
 template<typename T>
 ZC_DynamicArray<T>::ZC_DynamicArray(ZC_DynamicArray&& charArray) noexcept
         : pArray(charArray.pArray),
-          size(charArray.size)
+        size(charArray.size)
 {
     charArray.pArray = nullptr;
 }
@@ -86,5 +86,5 @@ const T* ZC_DynamicArray<T>::Begin() const noexcept
 template<typename T>
 ZC_DynamicArray<T>::operator bool () const noexcept
 {
-    return pArray;
+    return pArray != nullptr;
 }

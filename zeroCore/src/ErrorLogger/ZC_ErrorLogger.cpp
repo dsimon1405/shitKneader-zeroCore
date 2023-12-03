@@ -1,9 +1,9 @@
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
 
-bool ZC_ErrorLogger::WasError() noexcept
-{
-    return !errorMessage.empty();
-}
+// constexpr bool ZC_ErrorLogger::WasError() noexcept
+// {
+//     return !errorMessage.empty();
+// }
 
 const char* ZC_ErrorLogger::ErrorMessage() noexcept
 {

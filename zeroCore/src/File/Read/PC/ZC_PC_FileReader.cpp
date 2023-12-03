@@ -6,7 +6,7 @@
 #include <filesystem>
 
 ZC_PC_FileReader::ZC_PC_FileReader(const char* _path)
-    : ZC_FileReader(std::filesystem::current_path().append(ZC_ASSETS_PATH).append(_path)),
+    : ZC_FileReader(std::filesystem::current_path().append(ZC_ASSETS_PATH).append(_path).string()),
     file(path, std::ios::binary),
     size(CalculateSize())
 {}

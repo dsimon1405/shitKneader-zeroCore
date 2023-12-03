@@ -74,7 +74,7 @@ ZC_VAO::ZC_VAO(const GLuint& _config)
 
 ZC_VAO ZC_VAO::CreateVAO(const ZC_VAOConfig& vaoConfig) noexcept
 {
-    GLuint config = vaos.size();
+    GLuint config = static_cast<GLuint>(vaos.size());
 
     ZC_VAO vao(config);
     vao.BindVertexArray();

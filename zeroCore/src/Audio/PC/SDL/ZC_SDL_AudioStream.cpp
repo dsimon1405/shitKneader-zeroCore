@@ -75,9 +75,8 @@ void SDLCALL ZC_SDL_AudioStream::AudioCallback(void* userdata, SDL_AudioStream *
             + std::string(SDL_GetError()), __FILE__, __LINE__);
         return;
     }
-
 #if _WIN32
-    ZC_DynamicArray<char> dynamicData(approx_amount);   //  попробовать consexpr Foo(int approx_amount){return approx_amount;}
+    ZC_DynamicArray<char> dynamicData(static_cast<unsigned long>(approx_amount));   //  попробовать consexpr Foo(int approx_amount){return approx_amount;}
     char* pData = dynamicData.pArray;
 #else
     char pData[approx_amount];

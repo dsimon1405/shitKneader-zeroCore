@@ -186,9 +186,9 @@ ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
     }
 
     ZC_AudioSet audioSet(
-    audioSet.channels = header.channels == 1 ? ZC_AudioSet::Channels::Mono : ZC_AudioSet::Channels::Stereo,
-    audioSet.frequency = header.frequency,
-    audioSet.bitsPerSample = header.bitsPerSample == 16 ? ZC_AudioSet::BitsPerSample::S16 : ZC_AudioSet::BitsPerSample::S32);
+        header.channels == 1 ? ZC_AudioSet::Channels::Mono : ZC_AudioSet::Channels::Stereo,
+        header.frequency,
+        header.bitsPerSample == 16 ? ZC_AudioSet::BitsPerSample::S16 : ZC_AudioSet::BitsPerSample::S32);
 
     switch (audioSet.bitsPerSample)
     {

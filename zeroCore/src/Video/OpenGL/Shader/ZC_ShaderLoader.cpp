@@ -19,7 +19,7 @@ ZC_ShaderCode ZC_ShaderLoader::LoadShaderCode(const char* vertexPath, const char
         if (!geometryCode) return {};
     }
 
-    return { std::move(vertexCode), std::move(fragmentCode), std::move(geometryCode) };
+    return ZC_ShaderCode(std::move(vertexCode), std::move(fragmentCode), std::move(geometryCode));
 }
 
 ZC_DynamicArray<char> ZC_ShaderLoader::ReadShaderFile(const char* path, ShaderType shaderType) noexcept
@@ -27,7 +27,7 @@ ZC_DynamicArray<char> ZC_ShaderLoader::ReadShaderFile(const char* path, ShaderTy
     ZC_upFileReader upFileReader = ZC_FileReader::MakeReader(path);
     if (!upFileReader) return nullptr;
 
-    unsigned int shaderStartSize = 0;
+    size_t shaderStartSize = 0;
     switch (shaderType)
     {
         case ShaderType::Vertex:
@@ -53,7 +53,7 @@ ZC_DynamicArray<char> ZC_ShaderLoader::ReadShaderFile(const char* path, ShaderTy
 
     ZC_DynamicArray<char> fileData(shaderStartSize + fileSize + 1);
     fileData.pArray[fileSize + shaderStartSize] = '\0';
-    if (upFileReader->Read(fileData.pArray + shaderStartSize, fileSize) == 0) return nullptr;
+    if (upFileReader->Read(fileData.pArray + shaderStartSize, static_cast<long>(fileSize)) == 0) return nullptr;
 
     switch (shaderType)
     {

@@ -1,0 +1,11 @@
+#pragma once
+
+//  sounds
+
+#define SK_Path_sounds_lp "${SK_Path_sounds_lp}"
+#define SK_Path_sounds_Airplanes "${SK_Path_sounds_Airplanes}"
+
+//  shaders
+
+#define SK_Path_shaders_testVS "${SK_Path_shaders_testVS}"
+#define SK_Path_shaders_testFS "${SK_Path_shaders_testFS}"

@@ -67,12 +67,9 @@ typename ZC_StreamSound::SoundState ZC_Sound::GetState() noexcept
     return soundState;
 }
 
-void ZC_Sound::SetVolume(unsigned short _volume) noexcept
+void ZC_Sound::SetVolume(float _volume) noexcept
 {
-    if (_volume <= 100)
-    {
-        volume = _volume / 100.0f;
-    }
+    if (_volume >= 0 && _volume <= 100.f) volume = _volume / 100.f;
 }
 
 short ZC_Sound::GetVolume() const noexcept
