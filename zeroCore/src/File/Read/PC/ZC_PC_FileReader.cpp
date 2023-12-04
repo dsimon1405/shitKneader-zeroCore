@@ -25,7 +25,7 @@ long ZC_PC_FileReader::Read(char* pContainer, long count)
         return -1;
     }
     
-    long remainingSize = size - file.tellg();
+    long remainingSize = size - static_cast<long>(file.tellg());
     if (remainingSize == 0)
     {
         ZC_ErrorLogger::Err("End of file reached: " + std::string(path), __FILE__, __LINE__);
@@ -48,7 +48,7 @@ long ZC_PC_FileReader::Seek(long offset)
 {
     if (!OpenCheck()) return 0;
 
-    long remainingLength = size - file.tellg();
+    long remainingLength = size - static_cast<long>(file.tellg());
     if ((offset > 0 && offset > remainingLength) || (offset < 0 && -offset > static_cast<long>(size) - remainingLength))
     {
         ZC_ErrorLogger::Err("offset greater than length to file boundary: " + std::string(path), __FILE__, __LINE__);
@@ -80,7 +80,7 @@ bool ZC_PC_FileReader::Eof()
 long ZC_PC_FileReader::CurrentReadPosition()
 {
     if (!OpenCheck()) return -1;
-    return file.tellg();
+    return static_cast<long>(file.tellg());
 }
 
 long ZC_PC_FileReader::Size() const
@@ -92,7 +92,7 @@ long ZC_PC_FileReader::Size() const
 long ZC_PC_FileReader::RemainingLength()
 {
     if (!OpenCheck()) return -1;
-    return size - file.tellg();
+    return size - static_cast<long>(file.tellg());
 }
 
 bool ZC_PC_FileReader::OpenCheck() const
@@ -110,7 +110,7 @@ long ZC_PC_FileReader::CalculateSize()
     ZC_ErrorLogger::Clear();
     if (!OpenCheck()) return -1;
 
-    long currentPosition = file.tellg();
+    long currentPosition = static_cast<long>(file.tellg());
     file.seekg(0, file.end);
     if (file.fail())
     {
@@ -118,7 +118,7 @@ long ZC_PC_FileReader::CalculateSize()
         return -1;
     }
 
-    long fullLength = file.tellg();
+    long fullLength = static_cast<long>(file.tellg());
     file.seekg(currentPosition, file.beg);
     if (file.fail())
     {

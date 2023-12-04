@@ -118,9 +118,9 @@ constexpr S<T> Foo(S<T> s1, S<T> s2)
 //  579,1 кБ (579 144 байта)
 int ZC_main()
 {
-  ZC_Vec3 v1(1.f,2.f,3.f);
-  ZC_Vec3 v2(1.1f,2.1f,3.1f);
-  v1 *= 2.f;
+  constexpr ZC_Vec3 v1(1.f,2.f,3.f);
+  constexpr ZC_Vec3 v2(1.1f,2.1f,3.1f);
+  constexpr auto v3 = v1 + v2;
 
     ZC_upWindow window = ZC_Video::MakeWindow("lolka", 640, 480);
     
