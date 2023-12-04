@@ -15,7 +15,7 @@ struct ZC_FPS
 
 void ZC_FPS::Actualize()
 {
-    std::this_thread::sleep_for(ZC_Nanoseconds(clock.Stop<ZC_Nanoseconds>() - fps));
+    std::this_thread::sleep_for(ZC_Nanoseconds(clock.Restart<ZC_Nanoseconds>() - fps));
     clock.Start();
 }
 

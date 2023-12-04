@@ -14,9 +14,9 @@ struct ZC_DynamicArray
     ZC_DynamicArray& operator = (const ZC_DynamicArray&) = delete;
 
     ZC_DynamicArray(ZC_DynamicArray&& charArray) noexcept;;
-    ZC_DynamicArray& operator = (ZC_DynamicArray&& charArray) noexcept;
+    ZC_DynamicArray& operator = (ZC_DynamicArray&& charArray);
 
-    ~ZC_DynamicArray() noexcept;
+    ~ZC_DynamicArray();
 
     T& operator [] (unsigned long index);
     const T& operator [] (unsigned long index) const;
@@ -47,7 +47,7 @@ ZC_DynamicArray<T>::ZC_DynamicArray(ZC_DynamicArray&& charArray) noexcept
 }
 
 template<typename T>
-ZC_DynamicArray<T>& ZC_DynamicArray<T>::operator = (ZC_DynamicArray&& charArray) noexcept
+ZC_DynamicArray<T>& ZC_DynamicArray<T>::operator = (ZC_DynamicArray&& charArray)
 {
     delete[] pArray;
     pArray = charArray.pArray;
@@ -59,7 +59,7 @@ ZC_DynamicArray<T>& ZC_DynamicArray<T>::operator = (ZC_DynamicArray&& charArray)
 }
 
 template<typename T>
-ZC_DynamicArray<T>::~ZC_DynamicArray() noexcept
+ZC_DynamicArray<T>::~ZC_DynamicArray()
 {
     delete[] pArray;
     pArray = nullptr;

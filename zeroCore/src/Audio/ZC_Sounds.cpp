@@ -3,7 +3,7 @@
 #include "ZC_WAVHeader.h"
 #include <ZC/Tools/ZC_DynamicArray.h>
 
-bool ZC_Sounds::LoadWAV(const std::string& name, const char* path) noexcept
+bool ZC_Sounds::LoadWAV(const std::string& name, const char* path)
 {
     std::unique_lock<std::shared_mutex> soundsULock(soundsSMutex);
     auto soundsIter = sounds.find(name);
@@ -41,7 +41,7 @@ bool ZC_Sounds::LoadWAV(const std::string& name, const char* path) noexcept
     return true;
 }
 
-ZC_upSound ZC_Sounds::GetSound(const std::string& name) noexcept
+ZC_upSound ZC_Sounds::GetSound(const std::string& name)
 {
     std::shared_lock<std::shared_mutex> soundsSLock(soundsSMutex);
     std::map<std::string, ZC_SoundData>::iterator soundsIter;
@@ -58,7 +58,7 @@ ZC_upSound ZC_Sounds::GetSound(const std::string& name) noexcept
     return ZC_uptrMake<ZC_Sound>(&soundsIter->second);
 }
 
-ZC_SoundData ZC_Sounds::ReadWAV(const char* path) noexcept
+ZC_SoundData ZC_Sounds::ReadWAV(const char* path)
 {
     ZC_upFileReader file = ZC_FileReader::MakeReader(path);
     if (!file) return ZC_SoundData();

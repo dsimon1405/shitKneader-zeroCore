@@ -22,12 +22,12 @@ public:
     Return:
     If there was an event that required closing the window, false, otherwise true.
     */
-    virtual bool HandleEvents() noexcept = 0;
+    virtual bool HandleEvents() = 0;
 
     /*
     Changes the current buffer to a buffer with a prepared sketch
     */
-    virtual void SwapBuffer() noexcept = 0;
+    virtual void SwapBuffer() = 0;
     
     /*
     Returns the width of the window.
@@ -47,12 +47,12 @@ public:
     g - green color.
     b - blue color.
     */
-    void SetClearColor(float r, float g, float b) noexcept;
+    void SetClearColor(float r, float g, float b);
 
     /*
     Clear the window buffer.
     */
-    void Clear(GLbitfield mask = GL_COLOR_BUFFER_BIT) noexcept;
+    void Clear(GLbitfield mask = GL_COLOR_BUFFER_BIT);
 
 protected:
     int width = 0,

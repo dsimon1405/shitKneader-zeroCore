@@ -28,9 +28,9 @@ public:
 	ZC_VBO& operator = (const ZC_VBO&) = delete;
 
 	ZC_VBO(ZC_VBO&& vbo) noexcept;
-	ZC_VBO& operator = (ZC_VBO&& vbo) noexcept;
+	ZC_VBO& operator = (ZC_VBO&& vbo);
 
-	virtual ~ZC_VBO() noexcept;
+	virtual ~ZC_VBO();
 
 	/*
 	Create a vertex array buffer to store data in graphics memory.
@@ -38,12 +38,12 @@ public:
 	Return:
 	On success pointer to ZC_VBO, otherwise nullptr (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
 	*/
-	static ZC_VBO* CreateVBO() noexcept;
+	static ZC_VBO* CreateVBO();
 
 	/*
 	Maybe baby
 	*/
-	void BindVertexBuffer(GLuint vaoConfig, long offset, int stride) const noexcept;
+	void BindVertexBuffer(GLuint vaoConfig, long offset, int stride) const;
 
 	/*
 	Reserve place in vbo.
@@ -55,7 +55,7 @@ public:
 	Return:
 	On success true, otherwise false (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
 	*/
-    bool BufferData(long size, GLenum _usage = GL_STATIC_DRAW) noexcept;
+    bool BufferData(long size, GLenum _usage = GL_STATIC_DRAW);
 
 	/*
 	Saves data to a buffer.
@@ -68,7 +68,7 @@ public:
 	On success true, otherwise false (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
 	*/
 	template<ZC_cOpenGLType TOpenGL>
-	bool BufferData(ZC_DynamicArray<TOpenGL>&& data, GLenum _usage) noexcept;
+	bool BufferData(ZC_DynamicArray<TOpenGL>&& data, GLenum _usage);
 
 	/*
 	Save new data in vbo.
@@ -81,19 +81,19 @@ public:
 	On success true, otherwise false (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
 	*/
 	template<ZC_cOpenGLType TOpenGL>
-	bool BufferSubData(long offset, ZC_DynamicArray<TOpenGL>&& data) noexcept;
+	bool BufferSubData(long offset, ZC_DynamicArray<TOpenGL>&& data);
 
 private:
 	GLuint id = 0;
     static inline std::list<ZC_VBO> vbos;
 
-	ZC_VBO() noexcept;
+	ZC_VBO();
 
-	static void UnbindBuffer() noexcept;
+	static void UnbindBuffer();
 	
-	void BindBuffer() const noexcept;
-	bool BufferData(void* pData, size_t bytesSize, GLenum _usage) noexcept;
-	bool BufferSubData(long offset, void* pData, size_t bytesSize) noexcept;
+	void BindBuffer() const;
+	bool BufferData(void* pData, size_t bytesSize, GLenum _usage);
+	bool BufferSubData(long offset, void* pData, size_t bytesSize);
 
 #ifdef ZC_ANDROID
 	friend class ZC_AndroidNativeAppGlue_Window;
@@ -124,15 +124,15 @@ private:
 	std::list<VBOData> vboDatas;
 	GLenum usage = 0;
 
-	static void ResetVBOs() noexcept;
+	static void ResetVBOs();
 
 	void ClearvboDatas() noexcept;
-    void AddVBOData(long offset, long size, char* pData) noexcept;
+    void AddVBOData(long offset, long size, char* pData);
 #endif
 };
 
 template<ZC_cOpenGLType TOpenGL>
-bool ZC_VBO::BufferData(ZC_DynamicArray<TOpenGL>&& data, GLenum _usage) noexcept
+bool ZC_VBO::BufferData(ZC_DynamicArray<TOpenGL>&& data, GLenum _usage)
 {
 	if (!BufferData(static_cast<void*>(data.pArray), data.size * sizeof(TOpenGL), _usage)) return false;
 #ifdef ZC_ANDROID
@@ -142,7 +142,7 @@ bool ZC_VBO::BufferData(ZC_DynamicArray<TOpenGL>&& data, GLenum _usage) noexcept
 }
 
 template<ZC_cOpenGLType TOpenGL>
-bool ZC_VBO::BufferSubData(long offset, ZC_DynamicArray<TOpenGL>&& data) noexcept
+bool ZC_VBO::BufferSubData(long offset, ZC_DynamicArray<TOpenGL>&& data)
 {
 	if (!BufferSubData(offset, static_cast<void*>(data.pArray), data.size * sizeof(TOpenGL))) return false;
 #ifdef ZC_ANDROID

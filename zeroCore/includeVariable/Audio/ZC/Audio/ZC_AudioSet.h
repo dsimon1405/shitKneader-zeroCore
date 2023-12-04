@@ -58,5 +58,5 @@ struct ZC_AudioSet
     Return:
     Strign representation of ZC_AudioSet.
     */
-    std::string ToString() const noexcept;
+    std::string ToString() const;
 };

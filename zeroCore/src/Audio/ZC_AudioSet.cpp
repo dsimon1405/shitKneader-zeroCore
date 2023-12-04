@@ -18,7 +18,7 @@ bool ZC_AudioSet::operator == (const ZC_AudioSet& audioSet) const noexcept
         bitsPerSample == audioSet.bitsPerSample;
 }
 
-std::string ZC_AudioSet::ToString() const noexcept
+std::string ZC_AudioSet::ToString() const
 {
     return std::string("channels = " + std::to_string(channels)
     + "\nfrequency = " + std::to_string(channels)

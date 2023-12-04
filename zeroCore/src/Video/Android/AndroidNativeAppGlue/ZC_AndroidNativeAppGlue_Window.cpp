@@ -10,7 +10,7 @@
 //#include <ZC/Audio/ZC_AudioStream.h>
 #include <ZC/Audio/ZC_Audio.h>
 
-ZC_AndroidNativeAppGlue_Window::ZC_AndroidNativeAppGlue_Window(const char* name, int width, int height) noexcept
+ZC_AndroidNativeAppGlue_Window::ZC_AndroidNativeAppGlue_Window(const char* name, int width, int height)
 {
     if (!pAndroidApp)
     {
@@ -29,7 +29,7 @@ ZC_AndroidNativeAppGlue_Window::ZC_AndroidNativeAppGlue_Window(const char* name,
     }
 }
 
-bool ZC_AndroidNativeAppGlue_Window::HandleEvents() noexcept
+bool ZC_AndroidNativeAppGlue_Window::HandleEvents()
 {
     static int events;
     static struct android_poll_source* pSource;
@@ -57,7 +57,7 @@ bool ZC_AndroidNativeAppGlue_Window::HandleEvents() noexcept
     return true;
 }
 
-void ZC_AndroidNativeAppGlue_Window::SwapBuffer() noexcept
+void ZC_AndroidNativeAppGlue_Window::SwapBuffer()
 {
 //    currentFrame++;
     eglSwapBuffers(display, surface);
@@ -235,7 +235,7 @@ void ZC_AndroidNativeAppGlue_Window::HandleCMD(struct android_app* app, int cmd)
     }
 }
 
-bool ZC_AndroidNativeAppGlue_Window::InitGraphicOpenGL(ANativeWindow* pWindow) noexcept
+bool ZC_AndroidNativeAppGlue_Window::InitGraphicOpenGL(ANativeWindow* pWindow)
 {
     const EGLint attribs[] = {EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
                               EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
@@ -377,7 +377,7 @@ bool ZC_AndroidNativeAppGlue_Window::InitGraphicOpenGL(ANativeWindow* pWindow) n
     return true;
 }
 
-void ZC_AndroidNativeAppGlue_Window::CloseGraphicOpenGL() noexcept
+void ZC_AndroidNativeAppGlue_Window::CloseGraphicOpenGL()
 {
     if (display != EGL_NO_DISPLAY)
     {

@@ -19,7 +19,7 @@ public:
 	ZC_Shader& operator = (const ZC_Shader&) = delete;
 	
 	ZC_Shader(ZC_Shader&& shader) noexcept;
-	ZC_Shader& operator = (ZC_Shader&& shader) noexcept;
+	ZC_Shader& operator = (ZC_Shader&& shader);
 
     ~ZC_Shader();
 
@@ -33,7 +33,7 @@ public:
     Return:
     On success pointer to ZC_Shader, otherwise nullptr.
     */
-	static ZC_Shader* CreateShader(const std::string& name, ZC_ShaderCode&& shaderCode) noexcept;
+	static ZC_Shader* CreateShader(const std::string& name, ZC_ShaderCode&& shaderCode);
 
 	/*
     Help to get shader.
@@ -44,23 +44,23 @@ public:
     Return:
     If shader exists pointer to ZC_Shader, otherwise nullptr.
     */
-	static ZC_Shader* GetShader(const std::string& name) noexcept;
+	static ZC_Shader* GetShader(const std::string& name);
 
 	/*
 	Activate shader program.
 	*/
-    void Use() const noexcept;
+    void Use() const;
 
-	void SetUniformMatrix4fv(const char* name, const float* pData) const noexcept;
+	void SetUniformMatrix4fv(const char* name, const float* pData) const;
 	
 private:
 	GLuint id = 0;
 
-	ZC_Shader(const ZC_ShaderCode& shaderCode) noexcept;
+	ZC_Shader(const ZC_ShaderCode& shaderCode);
 
-	static GLuint CreateShader(const char* shaderCode, GLenum shaderType) noexcept;
+	static GLuint CreateShader(const char* shaderCode, GLenum shaderType);
 
-	void CreateShaderProgram(const ZC_ShaderCode& shaderCode) noexcept;
+	void CreateShaderProgram(const ZC_ShaderCode& shaderCode);
 #ifdef ZC_PC
 	static inline std::map<std::string, ZC_Shader> shaders;
 #elif defined ZC_ANDROID
@@ -68,6 +68,6 @@ private:
 
 	static inline std::map<std::string, std::pair<ZC_Shader, ZC_ShaderCode>> shaders;
 
-	static void ResetShaders() noexcept;
+	static void ResetShaders();
 #endif
 };

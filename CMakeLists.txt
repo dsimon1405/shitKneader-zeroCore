@@ -37,8 +37,8 @@ set(ZC_ASSETS_PATH ${SK_ASSETS_DIRECTORY_NAME})
 
 set(ZC_AUDIO ON)
 
-set(ZC_STATIC ON)
-# set(ZC_STATIC OFF)
+# set(ZC_STATIC ON)
+set(ZC_STATIC OFF)
 
 add_subdirectory(zeroCore)
 set(SK_LINK_LIBS ${SK_LINK_LIBS} PUBLIC zeroCore)
@@ -66,7 +66,7 @@ target_link_libraries(${PROJECT_NAME} ${SK_LINK_LIBS})
 
 #========================= compiler params
 target_compile_options(${PROJECT_NAME}
-    PRIVATE	-W3
+    PRIVATE	$<IF:$<BOOL:${WIN32}>,-W3,-Wall>
             $<$<CONFIG:Release>:-O3>)
 
 #========================= copy assets

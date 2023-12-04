@@ -11,21 +11,21 @@ using ZC_upSound = ZC_uptr<ZC_Sound>;
 class ZC_Sound : protected ZC_StreamSound
 {
 public:
-    ZC_Sound(const ZC_SoundData* _sound) noexcept;
+    ZC_Sound(const ZC_SoundData* _sound);
 
     ~ZC_Sound() noexcept override;
     
     //  Begins transferring audio data to an existing audio stream.
-    void Play() noexcept;
+    void Play();
 
     //  Begins or continues to transmit audio data in an infinitely repeating state to an existing audio stream/
-    void PlayLoop() noexcept;
+    void PlayLoop();
 
     //  Stops transmission of data to the audio stream, maintaining the current transmission position.
-    void Pause() noexcept;
+    void Pause();
 
     //  Stops data transmission to the audio stream, returning the gear position to the start.
-    void Stop() noexcept;
+    void Stop();
 
     /*
     Sounds state.
@@ -33,7 +33,7 @@ public:
     Return:
     Current sound state.
     */
-    typename ZC_StreamSound::SoundState GetState() noexcept;
+    typename ZC_StreamSound::SoundState GetState();
 
     /*
     Set volume of the sound.
@@ -57,7 +57,7 @@ public:
     Return:
     Unique pointer with the same sound data.
     */
-    ZC_upSound GetSameSound() const noexcept;
+    ZC_upSound GetSameSound() const;
 
 private:
     ZC_StreamSound* GetpZC_StreamSound() noexcept;

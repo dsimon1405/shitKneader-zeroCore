@@ -20,7 +20,7 @@ public:
     const T* operator -> () const noexcept;
     
     operator bool () const noexcept;
-    auto operator <=> (const ZC_uptr<T>& uptr) const = default;
+    auto operator <=> (const ZC_uptr<T>& uptr) const noexcept = default;
 
     T* Get() noexcept;
     const T* Get() const noexcept;

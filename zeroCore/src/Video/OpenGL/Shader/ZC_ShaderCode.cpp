@@ -2,7 +2,7 @@
 
 #include <utility>
 
-ZC_ShaderCode::ZC_ShaderCode(ZC_DynamicArray<char> _vertexCode, ZC_DynamicArray<char> _fragmentCode, ZC_DynamicArray<char> _geometryCode) noexcept
+ZC_ShaderCode::ZC_ShaderCode(ZC_DynamicArray<char>&& _vertexCode, ZC_DynamicArray<char>&& _fragmentCode, ZC_DynamicArray<char>&& _geometryCode) noexcept
         : vertexCode(std::move(_vertexCode)),
           fragmentCode(std::move(_fragmentCode)),
           geometryCode(std::move(_geometryCode))

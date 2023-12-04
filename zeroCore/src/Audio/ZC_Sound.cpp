@@ -2,7 +2,7 @@
 
 #include <ZC/Audio/ZC_AudioStream.h>
 
-ZC_Sound::ZC_Sound(const ZC_SoundData* _soundData) noexcept
+ZC_Sound::ZC_Sound(const ZC_SoundData* _soundData)
     : ZC_StreamSound(_soundData)
 {
     conGetpZC_StreamSound = ZC_AudioStream::sGetpZC_StreamSound.Connect(ZC_Function<ZC_StreamSound*()>(&ZC_Sound::GetpZC_StreamSound, this));
@@ -14,7 +14,7 @@ ZC_Sound::~ZC_Sound() noexcept
     conGetpZC_StreamSound->Terminate();
 }
 
-void ZC_Sound::Play() noexcept
+void ZC_Sound::Play()
 {
     if (ZC_AudioStream::GetState() != ZC_AudioStream::State::Null && soundData->GetAudioSet() == ZC_AudioStream::GetAudioSet())
     {
@@ -27,7 +27,7 @@ void ZC_Sound::Play() noexcept
     }
 }
 
-void ZC_Sound::PlayLoop() noexcept
+void ZC_Sound::PlayLoop()
 {
     if (ZC_AudioStream::GetState() != ZC_AudioStream::State::Null && soundData->GetAudioSet() == ZC_AudioStream::GetAudioSet())
     {
@@ -40,7 +40,7 @@ void ZC_Sound::PlayLoop() noexcept
     }
 }
 
-void ZC_Sound::Pause() noexcept
+void ZC_Sound::Pause()
 {
     std::lock_guard<std::mutex> lock(soundStateMutex);
     if (soundState == ZC_StreamSound::SoundState::Play || soundState == ZC_StreamSound::SoundState::PlayLoop)
@@ -50,7 +50,7 @@ void ZC_Sound::Pause() noexcept
     }
 }
 
-void ZC_Sound::Stop() noexcept
+void ZC_Sound::Stop()
 {
     std::lock_guard<std::mutex> lock(soundStateMutex);
     if (soundState != ZC_StreamSound::SoundState::Stop)
@@ -61,7 +61,7 @@ void ZC_Sound::Stop() noexcept
     }
 }
 
-typename ZC_StreamSound::SoundState ZC_Sound::GetState() noexcept
+typename ZC_StreamSound::SoundState ZC_Sound::GetState()
 {
     std::lock_guard<std::mutex> lock(soundStateMutex);
     return soundState;
@@ -82,7 +82,7 @@ ZC_StreamSound* ZC_Sound::GetpZC_StreamSound() noexcept
     return dynamic_cast<ZC_StreamSound*>(this);
 }
 
-ZC_upSound ZC_Sound::GetSameSound() const noexcept
+ZC_upSound ZC_Sound::GetSameSound() const
 {
     return ZC_uptrMake<ZC_Sound>(soundData);
 }

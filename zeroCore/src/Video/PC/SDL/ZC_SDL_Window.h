@@ -8,16 +8,16 @@
 class ZC_SDL_Window : public ZC_Window
 {
 public:
-    ZC_SDL_Window(const char* name = "", int width = 0, int height = 0) noexcept;
+    ZC_SDL_Window(const char* name = "", int width = 0, int height = 0);
 
-    ~ZC_SDL_Window() noexcept override;
+    ~ZC_SDL_Window() override;
 
-    bool HandleEvents() noexcept override;
-    void SwapBuffer() noexcept override;
+    bool HandleEvents() override;
+    void SwapBuffer() override;
 
 private:
     SDL_Window* window = nullptr;
     SDL_GLContext glContext = nullptr;
 
-    bool SetOpenGLAttributes() noexcept;
+    bool SetOpenGLAttributes();
 };

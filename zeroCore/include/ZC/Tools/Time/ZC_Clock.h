@@ -47,7 +47,7 @@ public:
 
     //  Calculate the duration since the previous Start or Stop call. Starts counting down time.
     template<ZC_cTimeMeasure TTimeMeasue>
-    long Stop();
+    long Restart();
 
     //  Calculate the duration since the previous Start or Stop call.
     template<ZC_cTimeMeasure TTimeMeasue>
@@ -61,7 +61,7 @@ private:
 };
 
 template<ZC_cTimeMeasure TTimeMeasue>
-long ZC_Clock::Stop()
+long ZC_Clock::Restart()
 {
     TimePoint now = Clock::now();
     long result = static_cast<long>(std::chrono::duration_cast<TTimeMeasue>(now - start).count());

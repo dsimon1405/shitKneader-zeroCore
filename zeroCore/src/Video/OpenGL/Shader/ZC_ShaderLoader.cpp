@@ -3,7 +3,7 @@
 #include <ZC/File/Read/ZC_FileReader.h>
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
 
-ZC_ShaderCode ZC_ShaderLoader::LoadShaderCode(const char* vertexPath, const char* fragmentPath, const char* geometryPath) noexcept
+ZC_ShaderCode ZC_ShaderLoader::LoadShaderCode(const char* vertexPath, const char* fragmentPath, const char* geometryPath)
 {
 
     ZC_DynamicArray<char> vertexCode = ReadShaderFile(vertexPath, ShaderType::Vertex);
@@ -22,7 +22,7 @@ ZC_ShaderCode ZC_ShaderLoader::LoadShaderCode(const char* vertexPath, const char
     return ZC_ShaderCode(std::move(vertexCode), std::move(fragmentCode), std::move(geometryCode));
 }
 
-ZC_DynamicArray<char> ZC_ShaderLoader::ReadShaderFile(const char* path, ShaderType shaderType) noexcept
+ZC_DynamicArray<char> ZC_ShaderLoader::ReadShaderFile(const char* path, ShaderType shaderType)
 {
     ZC_upFileReader upFileReader = ZC_FileReader::MakeReader(path);
     if (!upFileReader) return nullptr;

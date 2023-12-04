@@ -8,7 +8,7 @@ ZC_VAO::ZC_VAO(ZC_VAO&& vao) noexcept
     vao.id = 0;
 }
 
-ZC_VAO& ZC_VAO::operator = (ZC_VAO&& vao) noexcept
+ZC_VAO& ZC_VAO::operator = (ZC_VAO&& vao)
 {
     if (id != 0) glDeleteVertexArrays(1, &id);
     id = vao.id;
@@ -24,7 +24,7 @@ ZC_VAO::~ZC_VAO()
     glDeleteVertexArrays(1, &id);
 }
 
-ZC_VAO* ZC_VAO::GetVAO(const ZC_VAOConfig& vaoConfig) noexcept
+ZC_VAO* ZC_VAO::GetVAO(const ZC_VAOConfig& vaoConfig)
 {
     auto vaosIter = vaos.find(vaoConfig);
     if (vaosIter != vaos.end()) return &vaosIter->second;
@@ -36,7 +36,7 @@ ZC_VAO* ZC_VAO::GetVAO(const ZC_VAOConfig& vaoConfig) noexcept
     return &vaos.emplace(vaoConfig, std::move(vao)).first->second;
 }
 
-ZC_VAO* ZC_VAO::GetVAO(ZC_VAOConfig&& vaoConfig) noexcept
+ZC_VAO* ZC_VAO::GetVAO(ZC_VAOConfig&& vaoConfig)
 {
     auto vaosIter = vaos.find(vaoConfig);
     if (vaosIter != vaos.end()) return &vaosIter->second;
@@ -48,17 +48,17 @@ ZC_VAO* ZC_VAO::GetVAO(ZC_VAOConfig&& vaoConfig) noexcept
     return &vaos.emplace(std::move(vaoConfig), std::move(vao)).first->second;
 }
 
-void ZC_VAO::UnbindVertexArray() noexcept
+void ZC_VAO::UnbindVertexArray()
 {
     glBindVertexArray(0);
 }
 
-void ZC_VAO::BindVertexArray() const noexcept
+void ZC_VAO::BindVertexArray() const
 {
     glBindVertexArray(id);
 }
 
-void ZC_VAO::DrawArrays(const ZC_VBO* vbo, long bufferOffset, GLenum mode, int count) const noexcept
+void ZC_VAO::DrawArrays(const ZC_VBO* vbo, long bufferOffset, GLenum mode, int count) const
 {
     BindVertexArray();
     vbo->BindVertexBuffer(config, bufferOffset, stride);
@@ -72,7 +72,7 @@ ZC_VAO::ZC_VAO(const GLuint& _config)
     glGenVertexArrays(1, &id);
 }
 
-ZC_VAO ZC_VAO::CreateVAO(const ZC_VAOConfig& vaoConfig) noexcept
+ZC_VAO ZC_VAO::CreateVAO(const ZC_VAOConfig& vaoConfig)
 {
     GLuint config = static_cast<GLuint>(vaos.size());
 
@@ -88,7 +88,7 @@ ZC_VAO ZC_VAO::CreateVAO(const ZC_VAOConfig& vaoConfig) noexcept
     return vao; 
 }
 #ifdef ZC_ANDROID
-void ZC_VAO::ResetVAOs() noexcept
+void ZC_VAO::ResetVAOs()
 {
     for (auto& vaosPair : vaos)
     {

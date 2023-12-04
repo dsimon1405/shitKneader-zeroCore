@@ -1,42 +1,42 @@
 #include <ZC/Video/OpenGL/ZC_VBO.h>
 
-ZC_VBO::~ZC_VBO() noexcept
+ZC_VBO::~ZC_VBO()
 {
     glDeleteBuffers(1, &id);
 }
 
-ZC_VBO* ZC_VBO::CreateVBO() noexcept
+ZC_VBO* ZC_VBO::CreateVBO()
 {
     return &vbos.emplace_back(ZC_VBO());
 }
 
-void ZC_VBO::BindVertexBuffer(GLuint vaoConfig, long offset, int stride) const noexcept
+void ZC_VBO::BindVertexBuffer(GLuint vaoConfig, long offset, int stride) const
 {
     glBindVertexBuffer(vaoConfig, id, offset, stride);
 }
 
-bool ZC_VBO::BufferData(long size, GLenum _usage) noexcept
+bool ZC_VBO::BufferData(long size, GLenum _usage)
 {
     ZC_DynamicArray<GLbyte> emptyData(nullptr, size);
     return BufferData(std::move(emptyData), _usage);
 }
 
-ZC_VBO::ZC_VBO() noexcept
+ZC_VBO::ZC_VBO()
 {
     glGenBuffers(1, &id);
 }
 
-void ZC_VBO::UnbindBuffer() noexcept
+void ZC_VBO::UnbindBuffer()
 {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void ZC_VBO::BindBuffer() const noexcept
+void ZC_VBO::BindBuffer() const
 {
     glBindBuffer(GL_ARRAY_BUFFER, id);
 }
 
-bool ZC_VBO::BufferData(void* pData, size_t bytesSize, GLenum _usage) noexcept
+bool ZC_VBO::BufferData(void* pData, size_t bytesSize, GLenum _usage)
 {
     BindBuffer();
     ZC_ErrorLogger::Clear();
@@ -52,7 +52,7 @@ bool ZC_VBO::BufferData(void* pData, size_t bytesSize, GLenum _usage) noexcept
     return true;
 }
 
-bool ZC_VBO::BufferSubData(long offset, void* pData, size_t bytesSize) noexcept
+bool ZC_VBO::BufferSubData(long offset, void* pData, size_t bytesSize)
 {
     BindBuffer();
     ZC_ErrorLogger::Clear();
@@ -71,7 +71,7 @@ ZC_VBO::ZC_VBO(ZC_VBO&& vbo) noexcept
     vbo.id = 0;
 }
 
-ZC_VBO& ZC_VBO::operator = (ZC_VBO&& vbo) noexcept
+ZC_VBO& ZC_VBO::operator = (ZC_VBO&& vbo)
 {
     if (id != 0) glDeleteBuffers(1, &id);
     id = vbo.id;
@@ -88,7 +88,7 @@ ZC_VBO::ZC_VBO(ZC_VBO&& vbo) noexcept
     vbo.id = 0;
 }
 
-ZC_VBO& ZC_VBO::operator = (ZC_VBO&& vbo) noexcept
+ZC_VBO& ZC_VBO::operator = (ZC_VBO&& vbo)
 {
     if (id != 0) glDeleteBuffers(1, &id);
     id = vbo.id;
@@ -97,6 +97,23 @@ ZC_VBO& ZC_VBO::operator = (ZC_VBO&& vbo) noexcept
 
     vbo.id = 0;
     return *this;
+}
+
+void ZC_VBO::ResetVBOs()
+{
+    for (ZC_VBO& vbo : vbos)
+    {
+        glGenBuffers(1, &vbo.id);
+        if (vbo.vboDatas.empty()) continue;
+        vbo.BindBuffer();
+        auto vboDatasIter = vbo.vboDatas.begin();
+        glBufferData(GL_ARRAY_BUFFER, vboDatasIter->size, vboDatasIter->pData, vbo.usage);
+        for (++vboDatasIter; vboDatasIter != vbo.vboDatas.end(); ++vboDatasIter)
+        {
+            glBufferSubData(GL_ARRAY_BUFFER, vboDatasIter->offset, vboDatasIter->size, vboDatasIter->pData);
+        }
+    }
+    UnbindBuffer();
 }
 
 void ZC_VBO::ClearvboDatas() noexcept
@@ -108,7 +125,7 @@ void ZC_VBO::ClearvboDatas() noexcept
     vboDatas.clear();
 }
 
-void ZC_VBO::AddVBOData(long offset, long size, char* pData) noexcept
+void ZC_VBO::AddVBOData(long offset, long size, char* pData)
 {
     auto emplacePosition = vboDatas.end();
     long endPos = offset + size;
@@ -156,23 +173,6 @@ void ZC_VBO::AddVBOData(long offset, long size, char* pData) noexcept
     {
         vboDatasIter = vboDatasIter->size == 0 ? vboDatas.erase(vboDatasIter) : ++vboDatasIter;
     }
-}
-
-void ZC_VBO::ResetVBOs() noexcept
-{
-    for (ZC_VBO& vbo : vbos)
-    {
-        glGenBuffers(1, &vbo.id);
-        if (vbo.vboDatas.empty()) continue;
-        vbo.BindBuffer();
-        auto vboDatasIter = vbo.vboDatas.begin();
-        glBufferData(GL_ARRAY_BUFFER, vboDatasIter->size, vboDatasIter->pData, vbo.usage);
-        for (++vboDatasIter; vboDatasIter != vbo.vboDatas.end(); ++vboDatasIter)
-        {
-            glBufferSubData(GL_ARRAY_BUFFER, vboDatasIter->offset, vboDatasIter->size, vboDatasIter->pData);
-        }
-    }
-    UnbindBuffer();
 }
 
 //  VBOData

@@ -8,7 +8,7 @@ ZC_Shader::ZC_Shader(ZC_Shader&& shader) noexcept
     shader.id = 0;
 }
 
-ZC_Shader& ZC_Shader::operator = (ZC_Shader&& shader) noexcept
+ZC_Shader& ZC_Shader::operator = (ZC_Shader&& shader)
 {
 	if (id != 0) glDeleteProgram(id);
     id = shader.id;
@@ -21,7 +21,7 @@ ZC_Shader::~ZC_Shader()
 	glDeleteProgram(id);
 }
 
-ZC_Shader* ZC_Shader::CreateShader(const std::string& name, ZC_ShaderCode&& shaderCode) noexcept
+ZC_Shader* ZC_Shader::CreateShader(const std::string& name, ZC_ShaderCode&& shaderCode)
 {
 	if (shaders.find(name) != shaders.end())
 	{
@@ -38,7 +38,7 @@ ZC_Shader* ZC_Shader::CreateShader(const std::string& name, ZC_ShaderCode&& shad
 #endif
 }
 
-ZC_Shader* ZC_Shader::GetShader(const std::string& name) noexcept
+ZC_Shader* ZC_Shader::GetShader(const std::string& name)
 {
 	auto shadersIter = shaders.find(name);
 	if (shadersIter == shaders.end()) return nullptr;
@@ -49,18 +49,18 @@ ZC_Shader* ZC_Shader::GetShader(const std::string& name) noexcept
 #endif
 }
 
-void ZC_Shader::Use() const noexcept
+void ZC_Shader::Use() const
 {
 	if (id != 0) glUseProgram(id);
 }
 
-void ZC_Shader::SetUniformMatrix4fv(const char* name, const float* pData) const noexcept
+void ZC_Shader::SetUniformMatrix4fv(const char* name, const float* pData) const
 {
 	GLint location = glGetUniformLocation(id, name);
 	glUniformMatrix4fv(location, 1, GL_FALSE, pData);
 }
 
-ZC_Shader::ZC_Shader(const ZC_ShaderCode& shaderCode) noexcept
+ZC_Shader::ZC_Shader(const ZC_ShaderCode& shaderCode)
 {
 	if (!shaderCode.vertexCode)
 	{
@@ -75,7 +75,7 @@ ZC_Shader::ZC_Shader(const ZC_ShaderCode& shaderCode) noexcept
 	CreateShaderProgram(shaderCode);
 }
 
-void ZC_Shader::CreateShaderProgram(const ZC_ShaderCode& shaderCode) noexcept
+void ZC_Shader::CreateShaderProgram(const ZC_ShaderCode& shaderCode)
 {
 	GLuint vertexID = CreateShader(shaderCode.vertexCode.Begin(), GL_VERTEX_SHADER);
 	if (vertexID == 0) return;
@@ -111,7 +111,7 @@ void ZC_Shader::CreateShaderProgram(const ZC_ShaderCode& shaderCode) noexcept
 	if (geometryID != 0) glDeleteShader(geometryID);
 }
 
-GLuint ZC_Shader::CreateShader(const char* shaderCode, GLenum shaderType) noexcept
+GLuint ZC_Shader::CreateShader(const char* shaderCode, GLenum shaderType)
 {
 	GLuint shaderID = glCreateShader(shaderType);
 	glShaderSource(shaderID, 1, &shaderCode, nullptr);
@@ -119,7 +119,7 @@ GLuint ZC_Shader::CreateShader(const char* shaderCode, GLenum shaderType) noexce
 	return ZC_ErrorLogger::WasError() ? 0 : shaderID;
 }
 #ifdef ZC_ANDROID
-void ZC_Shader::ResetShaders() noexcept
+void ZC_Shader::ResetShaders()
 {
 	for (auto& shadersPair : shaders)
 	{

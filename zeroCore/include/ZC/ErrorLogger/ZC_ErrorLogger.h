@@ -28,7 +28,7 @@ public:
     Return:
     If there was an error - true, otherwise false.
     */
-    constexpr static bool WasError() noexcept
+    static bool WasError() noexcept
     {
         return !errorMessage.empty();
     }

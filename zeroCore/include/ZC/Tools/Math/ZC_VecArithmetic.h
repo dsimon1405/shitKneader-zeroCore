@@ -5,14 +5,11 @@ namespace ZC_VecArithmetic
     template<typename TVec, typename TValue>
     void PlusValue(TVec& vec, short size, TValue addable) noexcept
     {
-        for (short i = 0; i < size; ++i)
-        {
-            vec[i] += addable;
-        }
+        for (short i = 0; i < size; ++i) vec[i] += addable;
     }
 
     template<typename TVec>
-    void PlusVec(TVec& vec1, short size, const TVec& addable) noexcept
+    constexpr void PlusVec(TVec& vec1, short size, const TVec& addable) noexcept
     {
         for (short i = 0; i < size; ++i)
         {

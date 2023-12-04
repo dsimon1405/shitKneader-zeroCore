@@ -7,9 +7,9 @@
 class ZC_SDL_AudioStream : public ZC_AudioStream
 {
 public:
-    ZC_SDL_AudioStream(const ZC_AudioSet& _audioSet) noexcept;
+    ZC_SDL_AudioStream(const ZC_AudioSet& _audioSet);
 
-    ~ZC_SDL_AudioStream() noexcept override;
+    ~ZC_SDL_AudioStream() override;
 
 private:
     SDL_AudioStream* audioStream = nullptr;

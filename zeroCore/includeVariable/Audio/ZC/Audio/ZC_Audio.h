@@ -20,7 +20,7 @@ public:
     Return:
     On success true, else false (ZC_ErrorLogger::ErrorMessage() - for more information).
     */
-    static bool OpenAudioStream(const ZC_AudioSet& _audioSet) noexcept;
+    static bool OpenAudioStream(const ZC_AudioSet& _audioSet);
 
     //  Closes the audio stream if it was open.
     static void CloseAudioStream() noexcept;
@@ -31,7 +31,7 @@ public:
     Return:
     If success - true, otherwise false.
     */
-    static bool ReopenAudioStream() noexcept;
+    static bool ReopenAudioStream();
 
 private:
     static inline ZC_uptr<ZC_AudioStream> upAudioStream;

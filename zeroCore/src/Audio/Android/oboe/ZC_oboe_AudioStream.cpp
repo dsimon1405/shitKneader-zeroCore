@@ -14,12 +14,12 @@ ZC_oboe_AudioStream::ZC_oboe_AudioStream(const ZC_AudioSet& _audioSet)
     InitAudioStream();
 }
 
-ZC_oboe_AudioStream::~ZC_oboe_AudioStream() noexcept
+ZC_oboe_AudioStream::~ZC_oboe_AudioStream()
 {
     spAudioStream->close();
 }
 
-void ZC_oboe_AudioStream::InitAudioStream() noexcept
+void ZC_oboe_AudioStream::InitAudioStream()
 {
     oboe::AudioStreamBuilder builder;
     builder.setFormatConversionAllowed(true);

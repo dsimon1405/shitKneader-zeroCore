@@ -9,12 +9,12 @@
 class ZC_AndroidNativeAppGlue_Window : public ZC_Window, public ZC_android_app
 {
 public:
-    ZC_AndroidNativeAppGlue_Window(const char* name, int width, int height) noexcept;
+    ZC_AndroidNativeAppGlue_Window(const char* name, int width, int height);
     
     ~ZC_AndroidNativeAppGlue_Window() override = default;
 
-    bool HandleEvents() noexcept override;
-    void SwapBuffer() noexcept override;
+    bool HandleEvents() override;
+    void SwapBuffer() override;
 
 private:
     EGLDisplay display = nullptr;
@@ -24,7 +24,7 @@ private:
     static void HandleCMD(struct android_app* app, int cmd);
     static int HandleInput(struct android_app* app, AInputEvent* pEvent);
 
-    bool InitGraphicOpenGL(ANativeWindow* pWindow) noexcept;
-    void CloseGraphicOpenGL() noexcept;
+    bool InitGraphicOpenGL(ANativeWindow* pWindow);
+    void CloseGraphicOpenGL();
 };
 

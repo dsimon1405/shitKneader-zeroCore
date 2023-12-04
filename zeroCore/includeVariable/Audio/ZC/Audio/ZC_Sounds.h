@@ -23,7 +23,7 @@ public:
     Return:
     On success true, otherwise false (ZC_ErrorLogger::ErrorMessage() - for more information).
     */
-    static bool LoadWAV(const std::string& name, const char* path) noexcept;
+    static bool LoadWAV(const std::string& name, const char* path);
 
     /*
     Helps tp get loaded sound.
@@ -34,23 +34,23 @@ public:
     Return:
     If sound is loaded a unique pointer to the sound, otherwise nullptr.
     */
-    static ZC_upSound GetSound(const std::string& name) noexcept;
+    static ZC_upSound GetSound(const std::string& name);
 
 private:
     static inline std::map<std::string, ZC_SoundData> sounds;
     static inline std::shared_mutex soundsSMutex;
     static inline std::condition_variable_any soundsCVA;
 
-    static ZC_SoundData ReadWAV(const char* path) noexcept;
+    static ZC_SoundData ReadWAV(const char* path);
 
     template<ZC_cBitsPerSample T>
-    static bool DeleteStartNullData(ZC_upFileReader& file, int32_t& size, const char* path) noexcept;
+    static bool DeleteStartNullData(ZC_upFileReader& file, int32_t& size, const char* path);
 
     static bool ConstCharEqual(const char* first, char* second) noexcept;
 };
 
 template<ZC_cBitsPerSample T>
-bool ZC_Sounds::DeleteStartNullData(ZC_upFileReader& file, int32_t& size, const char* path) noexcept
+bool ZC_Sounds::DeleteStartNullData(ZC_upFileReader& file, int32_t& size, const char* path)
 {
     T readData = 0;
     static constexpr long readDataSizeof = sizeof(readData);

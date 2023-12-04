@@ -17,7 +17,7 @@ public:
 	ZC_VAO& operator = (const ZC_VAO&) = delete;
 
 	ZC_VAO(ZC_VAO&& vao) noexcept;
-	ZC_VAO& operator = (ZC_VAO&& vao) noexcept;
+	ZC_VAO& operator = (ZC_VAO&& vao);
 
 	~ZC_VAO();
 
@@ -29,7 +29,7 @@ public:
 	Return:
 	On success pointer to ZC_VAO, otherwise nullptr (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
 	*/
-	static ZC_VAO* GetVAO(const ZC_VAOConfig& vaoConfig) noexcept;
+	static ZC_VAO* GetVAO(const ZC_VAOConfig& vaoConfig);
 
 	/*
 	If ZC_VAO does not exist (there was no previously called GetVAO with the same vaoConfig), it is created using ZC_VAOConfig with the MOVE constructor. If previously it was called GetVAO with the same vaoConfig, nothing happens with vaoConfig.
@@ -40,17 +40,17 @@ public:
 	Return:
 	On success pointer to ZC_VAO, otherwise nullptr (in second case ZC_ErrorLogger::ErrorMessage() - for more information).
 	*/
-	static ZC_VAO* GetVAO(ZC_VAOConfig&& vaoConfig) noexcept;
+	static ZC_VAO* GetVAO(ZC_VAOConfig&& vaoConfig);
 
 	/*
 	Unbind vertex array object.
 	*/
-	static void UnbindVertexArray() noexcept;
+	static void UnbindVertexArray();
 
 	/*
 	Bind vertex array object.
 	*/
-	void BindVertexArray() const noexcept;
+	void BindVertexArray() const;
 
 	/*
 	Drawings graphic objects.
@@ -61,7 +61,7 @@ public:
 	mode - OpenGL drawing mode (depends on the location of the data in vbo) : GL_POINTS, GL_LINE_STRIP, GL_LINE_LOOP, GL_LINES, GL_LINE_STRIP_ADJACENCY, GL_LINES_ADJACENCY, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_TRIANGLES, GL_TRIANGLE_STRIP_ADJACENCY, GL_TRIANGLES_ADJACENCY GL_PATCHES.
 	count - count of drawing elements (depends on mode).
 	*/
-	void DrawArrays(const ZC_VBO* vbo, long bufferOffset, GLenum mode, int count) const noexcept;
+	void DrawArrays(const ZC_VBO* vbo, long bufferOffset, GLenum mode, int count) const;
 
 private:
 	static inline std::map<ZC_VAOConfig, ZC_VAO> vaos;
@@ -72,10 +72,10 @@ private:
 
 	ZC_VAO(const GLuint& _config);
 
-	static ZC_VAO CreateVAO(const ZC_VAOConfig& vaoConfig) noexcept;
+	static ZC_VAO CreateVAO(const ZC_VAOConfig& vaoConfig);
 
 #ifdef ZC_ANDROID
 	friend class ZC_AndroidNativeAppGlue_Window;
-    static void ResetVAOs() noexcept;
+    static void ResetVAOs();
 #endif
 };

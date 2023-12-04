@@ -14,21 +14,21 @@ class ZC_SoundData
 public:
     
     ZC_SoundData() = default;
-    ZC_SoundData(ZC_DynamicArray<char> _data, const ZC_AudioSet& _audioSet) noexcept;
+    ZC_SoundData(ZC_DynamicArray<char>&& _data, const ZC_AudioSet& _audioSet) noexcept;
 
     ZC_SoundData(const ZC_SoundData&) = delete;
     ZC_SoundData& operator = (const ZC_SoundData&) = delete;
 
     ZC_SoundData(ZC_SoundData&& soundData) noexcept;
-    ZC_SoundData& operator = (ZC_SoundData&& soundData) noexcept;
+    ZC_SoundData& operator = (ZC_SoundData&& soundData);
 
     ~ZC_SoundData() = default;
 
     template <ZC_cBitsPerSample T>
-    unsigned long Size() const noexcept;
+    unsigned long Size() const;
 
     template <ZC_cBitsPerSample T>
-    T GetValue(unsigned long index) const noexcept;
+    T GetValue(unsigned long index) const;
 
     ZC_AudioSet GetAudioSet() const noexcept;
 
@@ -38,13 +38,13 @@ private:
 };
 
 template <ZC_cBitsPerSample T>
-unsigned long ZC_SoundData::Size() const noexcept
+unsigned long ZC_SoundData::Size() const
 {
     return data.size / sizeof(T);
 }
 
 template <ZC_cBitsPerSample T>
-T ZC_SoundData::GetValue(unsigned long index) const noexcept
+T ZC_SoundData::GetValue(unsigned long index) const
 {
     unsigned long size = Size<T>();
     if (index >= size)

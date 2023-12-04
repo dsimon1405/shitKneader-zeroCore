@@ -51,7 +51,7 @@ void ZC_OpenGLErrorCallback(GLenum source, GLenum type, unsigned int id, GLenum 
     ZC_ErrorLogger::Err(stream.str(), __FILE__, __LINE__);
 }
 
-void ZC_OpenGLAssigneErrorCallback() noexcept
+void ZC_OpenGLAssigneErrorCallback()
 {
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);

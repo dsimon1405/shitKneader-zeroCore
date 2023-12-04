@@ -89,8 +89,39 @@ void FillMat(T& mat)
 //   return true;
 // }
 
+template<typename T>
+struct S
+{
+  constexpr S(T _t) : t(_t){}
+  constexpr S<T>& operator += (const S<T>& s)
+  {
+    t += s.t;
+    return *this;
+  }
+  constexpr S<T> operator + (const S<T>& s) const
+  {
+    S<T> k(t + s.t);
+    return k;
+    // return S<T>(*this) += s;
+  }
+
+  T t;
+};
+
+template<typename T>
+constexpr S<T> Foo(S<T> s1, S<T> s2)
+{
+  int a = 2;
+  s1.t += a;
+  return s1 + s2;
+}
+//  579,1 кБ (579 144 байта)
 int ZC_main()
 {
+  ZC_Vec3 v1(1.f,2.f,3.f);
+  ZC_Vec3 v2(1.1f,2.1f,3.1f);
+  v1 *= 2.f;
+
     ZC_upWindow window = ZC_Video::MakeWindow("lolka", 640, 480);
     
      ZC_Sounds::LoadWAV("lp", SK_Path_sounds_lp);
@@ -145,7 +176,7 @@ int ZC_main()
           shader->Use();
           shader->SetUniformMatrix4fv("projection", perspective.Begin());
           shader->SetUniformMatrix4fv("view", view.Begin());
-        c.Stop<ZC_Seconds>();
+        c.Restart<ZC_Seconds>();
       ZC_Mat4 model(1.0f);
     model.Translate({-0.5f,0.f,-0.5f}).Translate({-0.5f,0.f,-0.5f});
          shader->SetUniformMatrix4fv("model", model.Begin());

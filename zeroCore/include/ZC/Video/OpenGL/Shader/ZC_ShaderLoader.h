@@ -30,7 +30,7 @@ public:
     Return:
     If success ZC_ShaderCode with code data, otherwise ZC_ShaderCode will consider nullptr data (use ZC_ErrorLogger::WasError() for check)(ZC_ErrorLogger::ErrorMessage() - for more information).
     */
-    static ZC_ShaderCode LoadShaderCode(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr) noexcept;
+    static ZC_ShaderCode LoadShaderCode(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
 
     /*
     Read shader code from file.
@@ -42,7 +42,7 @@ public:
     Return:
     If success struct dynamic array with code, otherwise empty struct (ZC_ErrorLogger::ErrorMessage() - for more information).
     */
-    static ZC_DynamicArray<char> ReadShaderFile(const char* path, ShaderType shaderType) noexcept;
+    static ZC_DynamicArray<char> ReadShaderFile(const char* path, ShaderType shaderType);
 
 private:
 #ifdef ZC_PC

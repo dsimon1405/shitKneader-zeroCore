@@ -54,21 +54,18 @@ protected:
     ZC_AudioStream() = default;
     ZC_AudioStream(const ZC_AudioSet& _audioSet) noexcept;
 
-    static void GetStreamData(void* pDataContainer, int bytesCount) noexcept;
+    static void GetStreamData(void* pDataContainer, int bytesCount);
 
 private:
-    static inline ZC_AudioStream::State stateAudioStream = ZC_AudioStream::State::Null;
+    static inline typename ZC_AudioStream::State stateAudioStream = ZC_AudioStream::State::Null;
     static inline ZC_Signal<ZC_StreamSound*()> sGetpZC_StreamSound;
 
     template <ZC_cBitsPerSample T>
-    static void FillData(void* pDataContainer, int bytesCount, std::vector<ZC_StreamSound*>& sounds) noexcept;
-
-    //template<typename T>
-    //static T Avg(T* datas, size_t size) noexcept;
+    static void FillData(void* pDataContainer, int bytesCount, std::vector<ZC_StreamSound*>& sounds);
 };
 
 template <ZC_cBitsPerSample T>
-void ZC_AudioStream::FillData(void* pDataContainer, int bytesCount, std::vector<ZC_StreamSound*>& sounds) noexcept
+void ZC_AudioStream::FillData(void* pDataContainer, int bytesCount, std::vector<ZC_StreamSound*>& sounds)
 {
     T* pData = static_cast<T*>(pDataContainer);
     int pDataSize = bytesCount / static_cast<int>(sizeof(T));
@@ -95,15 +92,3 @@ void ZC_AudioStream::FillData(void* pDataContainer, int bytesCount, std::vector<
         pData[pDataIndex] = result;
     }
 }
-
-//template<typename T>
-//T ZC_AudioStream::Avg(T* datas, size_t size) noexcept
-//{
-//    T result = 0;
-//    T divisor = static_cast<T>(size);
-//    for (T i = 0; i < size; ++i)
-//    {
-//        result += datas[i] / divisor;
-//    }
-//    return size < 2 ? result / 2 : result;
-//}

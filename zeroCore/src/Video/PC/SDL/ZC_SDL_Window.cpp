@@ -7,7 +7,7 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_events.h>
 
-ZC_SDL_Window::ZC_SDL_Window(const char* name, int _width, int _height) noexcept
+ZC_SDL_Window::ZC_SDL_Window(const char* name, int _width, int _height)
 {
 	static bool sdlVideoInited = false;
 	if (!sdlVideoInited)
@@ -45,13 +45,13 @@ ZC_SDL_Window::ZC_SDL_Window(const char* name, int _width, int _height) noexcept
 	SDL_GetWindowSize(window, &width, &height);
 }
 
-ZC_SDL_Window::~ZC_SDL_Window() noexcept
+ZC_SDL_Window::~ZC_SDL_Window()
 {
     SDL_GL_DeleteContext(glContext);
     SDL_DestroyWindow(window);
 }
 #include <ZC/Tools/Console/ZC_cout.h>
-bool ZC_SDL_Window::HandleEvents() noexcept
+bool ZC_SDL_Window::HandleEvents()
 {
     static SDL_Event event;
 	int count = 0;
@@ -111,12 +111,12 @@ bool ZC_SDL_Window::HandleEvents() noexcept
     return true;
 }
 
-void ZC_SDL_Window::SwapBuffer() noexcept
+void ZC_SDL_Window::SwapBuffer()
 {
     SDL_GL_SwapWindow(window);
 }
 
-bool ZC_SDL_Window::SetOpenGLAttributes() noexcept
+bool ZC_SDL_Window::SetOpenGLAttributes()
 {
 	 if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0)
 	 {

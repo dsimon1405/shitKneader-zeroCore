@@ -5,7 +5,7 @@
 
 #include <SDL3/SDL_init.h>
 
-ZC_SDL_AudioStream::ZC_SDL_AudioStream(const ZC_AudioSet& _audioSet) noexcept
+ZC_SDL_AudioStream::ZC_SDL_AudioStream(const ZC_AudioSet& _audioSet)
     : ZC_AudioStream(_audioSet)
 {
 	static bool sdlAudioInited = false;
@@ -62,7 +62,7 @@ ZC_SDL_AudioStream::ZC_SDL_AudioStream(const ZC_AudioSet& _audioSet) noexcept
     ZC_ErrorLogger::Clear();
 }
 
-ZC_SDL_AudioStream::~ZC_SDL_AudioStream() noexcept
+ZC_SDL_AudioStream::~ZC_SDL_AudioStream()
 {
     SDL_DestroyAudioStream(audioStream);
 }

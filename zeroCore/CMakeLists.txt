@@ -16,7 +16,7 @@ option(ZC_STATIC "ON - build static library, else build shared" ON)
 
 message(STATUS "========================= ZERO CORE START ========================")
 
-set(ZC_MY_DEBUG 0)
+set(ZC_MY_DEBUG 1)
 
 #========================= c++ standard
 set(CMAKE_CXX_STANDARD 23)
@@ -236,7 +236,7 @@ target_link_libraries(${PROJECT_NAME} ${ZC_LINK_LIBS})
 
 #========================= compiler params
 target_compile_options(${PROJECT_NAME}
-	PRIVATE	-W3
+	PRIVATE	$<IF:$<BOOL:${WIN32}>,-W3,-Wall>
 			$<$<CONFIG:Release>:-O3>
 	)
 

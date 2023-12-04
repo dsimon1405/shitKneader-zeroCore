@@ -10,41 +10,41 @@ concept ZC_cVecTypes = std::same_as<T, float> ||std::same_as<T, double>;
 template<ZC_cVecTypes TValue = float>
 struct ZC_Vec3
 {
-    ZC_Vec3(TValue x = 0, TValue y = 0, TValue z = 0) noexcept;
+    constexpr ZC_Vec3(TValue x = 0, TValue y = 0, TValue z = 0) noexcept;
 
-    TValue& operator [] (int index);
-    const TValue& operator [] (int index) const;
+    constexpr TValue& operator [] (int index);
+    constexpr const TValue& operator [] (int index) const;
 
     ZC_Vec3<TValue>& operator += (TValue addable) noexcept;
-    ZC_Vec3<TValue> operator + (TValue addable) const noexcept;
+    constexpr ZC_Vec3<TValue> operator + (TValue addable) const noexcept;
     ZC_Vec3<TValue>& operator += (const ZC_Vec3<TValue>& addable) noexcept;
-    ZC_Vec3<TValue> operator + (const ZC_Vec3<TValue>& addable) const noexcept;
+    constexpr ZC_Vec3<TValue> operator + (const ZC_Vec3<TValue>& addable) const noexcept;
 
     ZC_Vec3<TValue>& operator -= (TValue subtrahend) noexcept;
-    ZC_Vec3<TValue> operator - (TValue subtrahend) const noexcept;
+    constexpr ZC_Vec3<TValue> operator - (TValue subtrahend) const noexcept;
     ZC_Vec3<TValue>& operator -= (const ZC_Vec3<TValue>& subtrahend) noexcept;
-    ZC_Vec3<TValue> operator - (const ZC_Vec3<TValue>& subtrahend) const noexcept;
+    constexpr ZC_Vec3<TValue> operator - (const ZC_Vec3<TValue>& subtrahend) const noexcept;
 
     ZC_Vec3<TValue>& operator *= (TValue factor) noexcept;
-    ZC_Vec3<TValue> operator * (TValue factor) const noexcept;
+    constexpr ZC_Vec3<TValue> operator * (TValue factor) const noexcept;
 
 private:
     TValue values[3];
 };
 
 template<ZC_cVecTypes TValue>
-ZC_Vec3<TValue>::ZC_Vec3(TValue x, TValue y, TValue z) noexcept
+constexpr ZC_Vec3<TValue>::ZC_Vec3(TValue x, TValue y, TValue z) noexcept
     :values{x, y ,z}
 {}
 
 template<ZC_cVecTypes TValue>
-TValue& ZC_Vec3<TValue>::operator [] (int index)
+constexpr TValue& ZC_Vec3<TValue>::operator [] (int index)
 {
     return values[index];
 }
 
 template<ZC_cVecTypes TValue>
-const TValue& ZC_Vec3<TValue>::operator [] (int index) const
+constexpr const TValue& ZC_Vec3<TValue>::operator [] (int index) const
 {
     return const_cast<TValue&>(values[index]);
 }
@@ -52,74 +52,64 @@ const TValue& ZC_Vec3<TValue>::operator [] (int index) const
 template<ZC_cVecTypes TValue>
 ZC_Vec3<TValue>& ZC_Vec3<TValue>::operator += (TValue addable) noexcept
 {
-    ZC_VecArithmetic::PlusValue(*this, 3, addable);
+    for (short i = 0; i < 3; ++i) values[i] += addable;
     return *this;
 }
 
 template<ZC_cVecTypes TValue>
-ZC_Vec3<TValue> ZC_Vec3<TValue>::operator + (TValue addable) const noexcept
+constexpr ZC_Vec3<TValue> ZC_Vec3<TValue>::operator + (TValue addable) const noexcept
 {
-    ZC_Vec3<TValue> result = *this;
-    ZC_VecArithmetic::PlusValue(result, 3, addable);
-    return result;
+    return ZC_Vec3(values[0] + addable, values[1] + addable, values[2] + addable);
 }
 
 template<ZC_cVecTypes TValue>
 ZC_Vec3<TValue>& ZC_Vec3<TValue>::operator += (const ZC_Vec3<TValue>& addable) noexcept
 {
-    ZC_VecArithmetic::PlusVec(*this, 3, addable);
+    for (short i = 0; i < 3; ++i) values[i] += addable.values[i];
     return *this;
 }
 
 template<ZC_cVecTypes TValue>
-ZC_Vec3<TValue> ZC_Vec3<TValue>::operator + (const ZC_Vec3<TValue>& addable) const noexcept
+constexpr ZC_Vec3<TValue> ZC_Vec3<TValue>::operator + (const ZC_Vec3<TValue>& addable) const noexcept
 {
-    ZC_Vec3<TValue> result = *this;
-    ZC_VecArithmetic::PlusVec(result, 3, addable);
-    return result;
+    return ZC_Vec3(values[0] + addable.values[0], values[1] + addable.values[1], values[2] + addable.values[2]);
 }
 
 template<ZC_cVecTypes TValue>
 ZC_Vec3<TValue>& ZC_Vec3<TValue>::operator -= (TValue subtrahend) noexcept
 {
-    ZC_VecArithmetic::MinusValue(*this, 3, subtrahend);
+    for (short i = 0; i < 3; ++i) values[i] -= subtrahend;
     return *this;
 }
 
 template<ZC_cVecTypes TValue>
-ZC_Vec3<TValue> ZC_Vec3<TValue>::operator - (TValue subtrahend) const noexcept
+constexpr ZC_Vec3<TValue> ZC_Vec3<TValue>::operator - (TValue subtrahend) const noexcept
 {
-    ZC_Vec3<TValue> result = *this;
-    ZC_VecArithmetic::MinusValue(result, 3, subtrahend);
-    return result;
+    return ZC_Vec3(values[0] - subtrahend, values[1] - subtrahend, values[2] - subtrahend);
 }
 
 template<ZC_cVecTypes TValue>
 ZC_Vec3<TValue>& ZC_Vec3<TValue>::operator -= (const ZC_Vec3<TValue>& subtrahend) noexcept
 {
-    ZC_VecArithmetic::MinusVec(*this, 3, subtrahend);
+    for (short i = 0; i < 3; ++i) values[i] -= subtrahend.values[i];
     return *this;
 }
 
 template<ZC_cVecTypes TValue>
-ZC_Vec3<TValue> ZC_Vec3<TValue>::operator - (const ZC_Vec3<TValue>& subtrahend) const noexcept
+constexpr ZC_Vec3<TValue> ZC_Vec3<TValue>::operator - (const ZC_Vec3<TValue>& subtrahend) const noexcept
 {
-    ZC_Vec3<TValue> result = *this;
-    ZC_VecArithmetic::MinusVec(result, 3, subtrahend);
-    return result;
+    return ZC_Vec3(values[0] - subtrahend.values[0], values[1] - subtrahend.values[1], values[2] - subtrahend.values[2]);
 }
 
 template<ZC_cVecTypes TValue>
 ZC_Vec3<TValue>& ZC_Vec3<TValue>::operator *= (TValue factor) noexcept
 {
-    ZC_VecArithmetic::MultiplyValue(*this, 3, factor);
+    for (short i = 0; i < 3; ++i) values[i] *= factor;
     return *this;
 }
 
 template<ZC_cVecTypes TValue>
-ZC_Vec3<TValue> ZC_Vec3<TValue>::operator * (TValue factor) const noexcept
+constexpr ZC_Vec3<TValue> ZC_Vec3<TValue>::operator * (TValue factor) const noexcept
 {
-    ZC_Vec3<TValue> result = *this;
-    ZC_VecArithmetic::MultiplyValue(result, 3, factor);
-    return result;
+    return ZC_Vec3(values[0] * factor, values[1] * factor, values[2] * factor);
 }
